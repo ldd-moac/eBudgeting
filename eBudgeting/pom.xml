@@ -8,8 +8,8 @@
 	<packaging>war</packaging>
 	<version>0.0.1-BUILD-SNAPSHOT</version>
 	<scm>
-		<connection>scm:git:https://github.com/dbuaklee/eBudgeting.git</connection>
-    	<url>https://github.com/dbuaklee/eBudgeting</url>
+		<connection>scm:git:https://github.com/ldd-moac/eBudgeting.git</connection>
+    	<url>https://github.com/ldd-moac/eBudgeting</url>
 	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
