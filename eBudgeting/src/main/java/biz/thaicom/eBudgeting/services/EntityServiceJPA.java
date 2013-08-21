@@ -24,6 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -3490,7 +3493,7 @@ public class EntityServiceJPA implements EntityService {
 	@Override
 	public List<BudgetCommonType> findAllBudgetCommonTypes(Integer fiscalYear) {
 		
-		return budgetCommonTypeRepository.findAllByFiscalYear(fiscalYear);
+		return budgetCommonTypeRepository.findAllByFiscalYear(fiscalYear, new Sort( new Order(Direction.ASC, "name")));
 	}
 
 	@Override
