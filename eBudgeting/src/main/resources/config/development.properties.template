@@ -3,5 +3,7 @@ config.datasource.jdbc.username=sa
 config.datasource.jdbc.password=
 config.datasource.jdbc.driver=org.h2.Driver
 config.hibernate.dialect=org.hibernate.dialect.H2Dialect
-
 config.hibernate.showSql=false
+
+config.logback.level=debug
+config.logback.appender=console
