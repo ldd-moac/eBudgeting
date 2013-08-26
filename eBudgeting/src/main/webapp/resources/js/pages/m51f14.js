@@ -711,6 +711,7 @@ var BudgetSltView = Backbone.View.extend({
 	
 	changeSlt: function(e) {
 		var budgetTypeSelectedId = $('select#budgetTypeSlt').val();
+		
 		if(budgetTypeSelectedId != 0) {
 			this.mainTblView.searchTxt = null;
 			this.mainTblView.collection.setTargetPage(1);
@@ -753,19 +754,19 @@ var BudgetTypeSelectionView = Backbone.View.extend({
 	},
 	
 	events: {
-		"change select:first" : "selectionChange" // only the first one
+		"change #budgetTypeSlt" : "selectionChange" // only the first one
 	},
 	
 	selectionChange: function(e) {
 		var selectedBudgetTypeId = $(e.target).val();
 		// now try to get this model
-		var budgetType = BudgetType.findOrCreate({_id : selectedBudgetTypeId});
-		e1 = budgetType;
-		Backbone.sync('GET',budgetType, {
+		var budgetType = BudgetType.findOrCreate({id : selectedBudgetTypeId});
+		
+		budgetType.fetch({
 			url: appUrl('/BudgetType/' + selectedBudgetTypeId),
 			success: _.bind(function(model, response){
-			var fetchedBudgetType = response;
-			if(fetchedBudgetType.parentLevel < 3) {
+
+			if(budgetType.get('parentLevel') < 3) {
 				
 				var nextEl = this.$el.selector + " select + div";
 				this.nextBudgetTypeSelectionView = new BudgetTypeSelectionView({model: budgetType, el: nextEl, mainTblView: this.mainTblView});
