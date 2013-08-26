@@ -44,6 +44,7 @@ import biz.thaicom.eBudgeting.models.bgt.BudgetType;
 import biz.thaicom.eBudgeting.models.bgt.FiscalBudgetType;
 import biz.thaicom.eBudgeting.models.bgt.FormulaColumn;
 import biz.thaicom.eBudgeting.models.bgt.FormulaStrategy;
+import biz.thaicom.eBudgeting.models.bgt.ObjectiveAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposalTarget;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
@@ -71,6 +72,7 @@ import biz.thaicom.eBudgeting.repositories.BudgetTypeRepository;
 import biz.thaicom.eBudgeting.repositories.FiscalBudgetTypeRepository;
 import biz.thaicom.eBudgeting.repositories.FormulaColumnRepository;
 import biz.thaicom.eBudgeting.repositories.FormulaStrategyRepository;
+import biz.thaicom.eBudgeting.repositories.ObjectiveAllocationRecordRepository;
 import biz.thaicom.eBudgeting.repositories.ObjectiveBudgetProposalRepository;
 import biz.thaicom.eBudgeting.repositories.ObjectiveDetailRepository;
 import biz.thaicom.eBudgeting.repositories.ObjectiveNameRepository;
@@ -174,6 +176,9 @@ public class EntityServiceJPA implements EntityService {
 	
 	@Autowired
 	private AllocationRecordStrategyRepository allocationRecordStrategyRepository;
+	
+	@Autowired
+	private ObjectiveAllocationRecordRepository objectiveAllocationRecordRepository;
 	
 	@Autowired
 	private ObjectMapper mapper;
@@ -335,6 +340,30 @@ public class EntityServiceJPA implements EntityService {
 			
 			obj.getProposals().size();
 			obj.getObjectiveProposals().size();
+			
+			obj.getAllocationRecords().size();
+			for(AllocationRecord r : obj.getAllocationRecords()) {
+				if(r.getIndex() == 0) {
+					obj.getAllocationRecordsR1().add(r);
+				} else if (r.getIndex() == 1) {
+					obj.getAllocationRecordsR2().add(r);
+				} else if (r.getIndex() == 2) {
+					obj.getAllocationRecordsR3().add(r);
+				}
+			}
+			
+			
+			obj.getObjectiveAllocationRecords().size();
+			for(ObjectiveAllocationRecord r : obj.getObjectiveAllocationRecords()) {
+				if(r.getIndex() == 0) {
+					obj.getObjectiveAllocationRecordsR1().add(r);
+				} else if (r.getIndex() == 1) {
+					obj.getObjectiveAllocationRecordsR2().add(r);
+				} else if (r.getIndex() == 2) {
+					obj.getObjectiveAllocationRecordsR3().add(r);
+				}
+			}
+			
 			
 			obj.setFilterProposals(obj.getProposals());
 			obj.setFilterObjectiveBudgetProposals(obj.getObjectiveProposals());
@@ -1125,7 +1154,7 @@ public class EntityServiceJPA implements EntityService {
 //		List<BudgetProposal> proposalList = budgetProposalRepository
 //				.findBudgetProposalByFiscalYearAndParentPath(fiscalYear, parentPathLikeString);
 		
-		if(round == 1) {
+
 			// we update all formulaStrategy here
 			List<FormulaStrategy> formulaList = formulaStrategyRepository.findAllByFiscalYear(fiscalYear);
 			for(FormulaStrategy fs : formulaList) {
@@ -1144,7 +1173,12 @@ public class EntityServiceJPA implements EntityService {
 				}
 				 
 				
-				asp.setStandardPrice(fs.getStandardPrice());
+				if(round ==1) {
+					asp.setStandardPrice(fs.getStandardPrice());
+				} else {
+					// will have to come from previous round?
+					asp.setStandardPrice(fs.getAllocationStandardPriceMap().get(round-2).getStandardPrice());
+				}
 				for(FormulaColumn fc: fs.getFormulaColumns()) {
 					AllocatedFormulaColumnValue afcv;
 					if(fc.getAllocatedFormulaColumnValueMap() == null) {
@@ -1160,39 +1194,124 @@ public class EntityServiceJPA implements EntityService {
 						 afcv = fc.getAllocatedFormulaColumnValueMap().get(round-1);	
 					}
 					
-					afcv.setAllocatedValue(fc.getValue());
+					if(round==1) {
+						afcv.setAllocatedValue(fc.getValue());
+					} else {
+						// will have to com from previous round
+						afcv.setAllocatedValue(fc.getAllocatedFormulaColumnValueMap().get(round-2).getAllocatedValue());
+					}
 				}
 				formulaColumnRepository.save(fs.getFormulaColumns());
 			}
 			formulaStrategyRepository.save(formulaList);
 			
+			
+			
+			
 			// here we have to remove allocationRecord and its associated 
 			List<AllocationRecord> arList = allocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, round-1);
 			allocationRecordRepository.delete(arList);
 			
-			
+			if(round>1) {
+				List<AllocationRecord> previousArList = allocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, round-2);
+				for(AllocationRecord r : previousArList) {
+					AllocationRecord newR = new AllocationRecord();
+					newR.setAmountAllocated(r.getAmountAllocated());
+					newR.setBudgetType(r.getBudgetType());
+					newR.setIndex(round-1);
+					newR.setForObjective(r.getForObjective());
+					
+					allocationRecordRepository.save(newR);
+					
+					if(r.getAllocationRecordStrategies().size() > 0) {
+						newR.setAllocationRecordStrategies(new ArrayList<AllocationRecordStrategy>());
+						for(AllocationRecordStrategy ars : r.getAllocationRecordStrategies()) {
+							AllocationRecordStrategy newArs = new AllocationRecordStrategy();
+							newArs.setAllocationRecord(newR);
+							newArs.setStrategy(ars.getStrategy());
+							newArs.setTotalCalculatedAmount(ars.getTotalCalculatedAmount());
+							
+							newR.getAllocationRecordStrategies().add(newArs);
+							
+							allocationRecordStrategyRepository.save(newArs);
+							
+							for(RequestColumn rc : ars.getRequestColumns()) {
+								RequestColumn newRC = new RequestColumn();
+								
+								newRC.setAllocatedAmount(rc.getAllocatedAmount());
+								newRC.setAllocationRecordStrategy(newArs);
+								newRC.setAmount(rc.getAmount());
+								newRC.setColumn(rc.getColumn());
+								
+								requestColumnRepositories.save(newRC);
+							}
+							
+						}
+					}				
+				}
+				
+				List<ObjectiveAllocationRecord> previousObjArList = objectiveAllocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, round-2);
+				for(ObjectiveAllocationRecord oar : previousObjArList) {
+					ObjectiveAllocationRecord newOar = new ObjectiveAllocationRecord();
+					newOar.setAmountAllocated(oar.getAmountAllocated());
+					newOar.setBudgetType(oar.getBudgetType());
+					newOar.setForObjective(oar.getForObjective());
+					newOar.setIndex(round-1);
+					
+					objectiveAllocationRecordRepository.save(newOar);
+				}
+				
+				
+			} else {
 			for(Objective o : list) {
 				HashMap<Long, AllocationRecord> budgetTypeMap = new HashMap<Long, AllocationRecord>();
+				HashMap<Long, ObjectiveAllocationRecord> objBudgetTypeMap = new HashMap<Long, ObjectiveAllocationRecord>();
+				
 				HashMap<FormulaStrategy, AllocationRecordStrategy> formulaStrategyMap = new HashMap<FormulaStrategy, AllocationRecordStrategy>();
 				HashMap<BudgetType, AllocationRecordStrategy> allocStrgyBudgetTypeMap = new HashMap<BudgetType, AllocationRecordStrategy>();
 				HashMap<FormulaColumn, RequestColumn> columnMap = new HashMap<FormulaColumn, RequestColumn>();
+
+				for(ObjectiveBudgetProposal p : o.getObjectiveProposals()) {
+					ObjectiveAllocationRecord r = objBudgetTypeMap.get(p.getBudgetType().getId());
+					if(r == null) {
+						r = new ObjectiveAllocationRecord();
+						r.setIndex(round-1);
+						r.setForObjective(o);
+						r.setBudgetType(p.getBudgetType());
+						
+						
+						r.setAmountAllocated(p.getAmountRequest());
+						
+						
+						objBudgetTypeMap.put(p.getBudgetType().getId(), r);
+					} else {
+						
+						r.setAmountAllocated(r.getAmountAllocated() + p.getAmountRequest());
+						
+					}
+					objectiveAllocationRecordRepository.save(r);
+				}
+				
+				
 				
 				for(BudgetProposal p : o.getProposals()) {
 					AllocationRecord ar = budgetTypeMap.get(p.getBudgetType().getId());
-					if(p.getId().equals(2887L)) {
-						logger.debug("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-					} 
+
 					if(ar == null) {
 						ar = new AllocationRecord();
-						ar.setIndex(0);
+						ar.setIndex(round-1);
 						ar.setForObjective(o);
 						ar.setBudgetType(p.getBudgetType());
-						ar.setAmountAllocated(p.getAmountRequest());
 						
+						
+						ar.setAmountAllocated(p.getAmountRequest());
+												
 						budgetTypeMap.put(p.getBudgetType().getId(), ar);
 
-					} else {						
+					} else {
+						
 						ar.setAmountAllocated(ar.getAmountAllocated() + p.getAmountRequest());
+						
 					}
 					allocationRecordRepository.save(ar);
 					
@@ -1200,6 +1319,7 @@ public class EntityServiceJPA implements EntityService {
 					for(ProposalStrategy ps : p.getProposalStrategies()) {
 						ar.setAllocationRecordStrategies(new ArrayList<AllocationRecordStrategy>());
 						AllocationRecordStrategy ars;
+						Long previousArsId = null;
 						if(ps.getFormulaStrategy() == null) {
 							ars = allocStrgyBudgetTypeMap.get(ar.getBudgetType());
 							
@@ -1215,12 +1335,17 @@ public class EntityServiceJPA implements EntityService {
 							}
 							
 							ars.getProposalStrategies().add(ps);
+							
+							
 							ars.setTotalCalculatedAmount(ps.getTotalCalculatedAmount());
+							
 							
 							formulaStrategyMap.put(ps.getFormulaStrategy(), ars);
 							allocationRecordStrategyRepository.save(ars);
 						} else {
-							ars.setTotalCalculatedAmount(ars.getTotalCalculatedAmount() + ps.getTotalCalculatedAmount());
+							
+								ars.setTotalCalculatedAmount(ars.getTotalCalculatedAmount() + ps.getTotalCalculatedAmount());
+							
 							ars.getProposalStrategies().add(ps);
 						}
 						
@@ -1229,12 +1354,16 @@ public class EntityServiceJPA implements EntityService {
 							if(allocRc == null) {
 								allocRc = new RequestColumn();
 								allocRc.setAllocationRecordStrategy(ars);
+								
 								allocRc.setAmount(rc.getAmount());
+								
 								allocRc.setColumn(rc.getColumn());
 								
 								columnMap.put(rc.getColumn(), allocRc);
 							} else {
-								allocRc.setAmount(allocRc.getAmount() + rc.getAmount());
+								
+								allocRc.setAmount(rc.getAmount());
+								
 							}
 						}
 					
@@ -1245,8 +1374,8 @@ public class EntityServiceJPA implements EntityService {
 				allocationRecordStrategyRepository.save(formulaStrategyMap.values());
 				requestColumnRepositories.save(columnMap.values());
 			}
-			
-		}
+			}
+
 //			//loop through proposalList
 //			for(BudgetProposal proposal : proposalList) {
 //				Integer index = list.indexOf(proposal.getForObjective());
@@ -1492,6 +1621,99 @@ public class EntityServiceJPA implements EntityService {
 			} 
 			
 			if(o.getProposals().size() > 0 ) {
+			
+				if(o.getChildren().size() >0) {
+					o.setIsLeaf(false);
+				} else {
+					o.setIsLeaf(true);
+				}
+				
+				o.getTargetValueAllocationRecords().size();
+				o.getTargetValues().size();
+				for(TargetValue tv : o.getTargetValues()) {
+					tv.getOwner().getId();
+				}
+			} else {
+				
+			}
+			
+		}
+		
+		return returnList;
+	}
+	
+	@Override
+	public List<Objective> findFlatChildrenObjectivewithObjectiveBudgetProposalAndAllocation(
+			Integer fiscalYear, Long objectiveId, Boolean isFindObjectiveBudget) {
+		String parentPathLikeString = "%."+objectiveId.toString()+"%";
+		List<Objective> list = objectiveRepository.findFlatByObjectiveObjBudgetProposal(fiscalYear, parentPathLikeString);
+		Objective parent = objectiveRepository.findOne(objectiveId);
+		
+		List<ObjectiveBudgetProposal> proposalList = objectiveBudgetProposalRepository
+				.findObjBudgetProposalByFiscalYearAndParentPath(fiscalYear, parentPathLikeString);
+		
+		//loop through proposalList
+		for(ObjectiveBudgetProposal proposal : proposalList) {
+			Integer index = list.indexOf(proposal.getForObjective());
+			Objective o = list.get(index);
+			o.getProposals().size();
+			
+			o.addToSumBudgetTypeObjectiveProposalsOnlyAmount(proposal);
+			
+			//logger.debug("AAding proposal {} to objective: {}", proposal.getId(), o.getId());
+			
+			//o.getProposals().add(proposal);
+			//logger.debug("proposal size is " + o.getProposals().size());
+		}
+		
+		//now loop through allocationRecord
+		List<ObjectiveAllocationRecord> recordList = objectiveAllocationRecordRepository
+				.findBudgetProposalByFiscalYearAndOwnerAndParentPath(fiscalYear, parentPathLikeString);
+		for(ObjectiveAllocationRecord record : recordList) {
+			
+			
+			Integer index = list.indexOf(record.getForObjective());
+			Objective o = list.get(index);
+			//logger.debug("AAding Allocation {} to objective: {}", record.getId(), o.getId());
+			
+			if(o.getObjectiveAllocationRecords()==null) {
+				o.setObjectiveAllocationRecords(new ArrayList<ObjectiveAllocationRecord>());
+			}
+			
+			if(record.getIndex() == 0) {
+				o.getObjectiveAllocationRecordsR1().add(record);
+			} else if(record.getIndex() == 1) {
+				o.getObjectiveAllocationRecordsR2().add(record);
+			} else if(record.getIndex() == 2) {
+				o.getObjectiveAllocationRecordsR3().add(record);
+			}
+			
+			//o.getProposals().add(record);
+			//logger.debug("proposal size is " + o.getAllocationRecords().size());
+		}
+		
+		// And lastly loop through reservedBudget
+		List<ReservedBudget> reservedBudgets = reservedBudgetRepository.findAllByFiscalYearAndParentPathLike(fiscalYear, parentPathLikeString);
+		for(ReservedBudget rb : reservedBudgets) {
+			//logger.debug("reservedBuget: {} ", rb.getForObjective().getId());
+			Integer index = list.indexOf(rb.getForObjective());
+			Objective o = list.get(index);
+			
+			o.getReservedBudgets().size();
+			
+			
+		}
+		
+		List<Objective> returnList = new ArrayList<Objective>();
+		
+		// oh not yet!
+		for(Objective o : list) {
+			if(o.getParent().getId().equals(parent.getId()) && o.getObjectiveProposals().size() > 0) {
+				//logger.debug("---------------------adding {}", o.getId() );
+				returnList.add(o); 
+			} 
+			
+			if(o.getObjectiveProposals().size() > 0 ) {
 			
 				if(o.getChildren().size() >0) {
 					o.setIsLeaf(false);
@@ -2577,7 +2799,10 @@ public class EntityServiceJPA implements EntityService {
 			
 			// then we update the allocation!
 			AllocationRecord record = ars.getAllocationRecord();
-			record.adjustAmountAllocated(adjustedAmount);
+			record.setAmountAllocated(allocationRecordStrategyRepository.findSumTotalCalculatedAmount(record));
+			
+			
+			//record.adjustAmountAllocated(adjustedAmount);
 			allocationRecordRepository.save(record);
 			
 			// now looking back
@@ -2586,7 +2811,13 @@ public class EntityServiceJPA implements EntityService {
 				logger.debug("parent.id: {}", parent.getId());
 				AllocationRecord temp = allocationRecordRepository.findOneByBudgetTypeAndObjectiveAndIndex(record.getBudgetType(), parent, 0);
 				
-				temp.adjustAmountAllocated(adjustedAmount);
+				temp.setAmountAllocated(allocationRecordRepository.findSumAmountAllocationOfBudgetTypeAndParent(record.getBudgetType(), parent, 0));
+				
+				if(temp.getForObjective().getCode().equals("98")) {
+					logger.debug("xxxxxxxx" + temp.getAmountAllocated());
+				}
+				
+				//temp.adjustAmountAllocated(adjustedAmount);
 				
 				allocationRecordRepository.save(temp);
 				
@@ -4378,6 +4609,47 @@ public class EntityServiceJPA implements EntityService {
 		}
 		
 		return ar;
+	}
+
+	@Override
+	public ObjectiveAllocationRecord findObjectiveAllocationRecordById(Long id) {
+		ObjectiveAllocationRecord oar = objectiveAllocationRecordRepository.findOne(id);
+		return oar;
+	}
+
+	@Override
+	public void updateObjectiveAllocationRecord(Long id, JsonNode data) {
+		ObjectiveAllocationRecord record = objectiveAllocationRecordRepository.findOne(id);
+		
+		// now update the value
+		Long amountUpdate = data.get("amountAllocated").asLong();
+		Long oldAmount = record.getAmountAllocated();
+		Long adjustedAmount = oldAmount - amountUpdate;
+		
+		Integer index = record.getIndex();
+		BudgetType budgetType = record.getBudgetType();
+		Objective objective = record.getForObjective();
+		
+		record.setAmountAllocated(amountUpdate);
+		objectiveAllocationRecordRepository.save(record);
+		
+		
+		// now looking back
+		Objective parent = objective.getParent();
+		while(parent.getParent() != null) {
+			logger.debug("parent.id: {}", parent.getId());
+			ObjectiveAllocationRecord temp = objectiveAllocationRecordRepository.findOneByBudgetTypeAndObjectiveAndIndex(budgetType, parent, index);
+			
+			temp.adjustAmountAllocated(adjustedAmount);
+			
+			objectiveAllocationRecordRepository.save(temp);
+			
+			parent = parent.getParent();
+			logger.debug("parent.id--: {}", parent.getId());
+		}
+		
+		return;
+		
 	}
 	
 	

@@ -1113,5 +1113,34 @@ insert into s_system_list values (s_system_list_seq.nextval, 2,1);
 insert into s_system_list values (s_system_list_seq.nextval, 3,1);
 
 
-	
+
+-- version 14
+-- Modified Date: Aug 26, 2013
+update app_info set db_version = 14;
+
+create table BGT_OBJALLOCATIONRECORD (
+        id number(19,0) not null,
+        amountAllocated number(19,0),
+        IDX number(10,0),
+        BUDGETTYPE_BGT_ID number(19,0),
+        OBJECTIVE_PLN_OBJECTIVE_ID number(19,0),
+        primary key (id)
+    );
+    
+    alter table BGT_OBJALLOCATIONRECORD 
+        add constraint FK3867F39A15D40184
+        foreign key (BUDGETTYPE_BGT_ID) 
+        references BGT_BUDGETTYPE;
+
+    alter table BGT_OBJALLOCATIONRECORD 
+        add constraint FK89327A48FC26BD38
+        foreign key (OBJECTIVE_PLN_OBJECTIVE_ID) 
+        references PLN_OBJECTIVE;
+        
+    create sequence BGT_OBJALLOCATIONRECORD_SEQ;
+    
+    alter table bgt_allocrec_proposalstrgy
+	drop CONSTRAINT  SYS_C007049;
+	ALTER TABLE bgt_allocrec_proposalstrgy
+	add CONSTRAINT SYS_C007049 UNIQUE (BGT_ALLOCRECORDSTRATEGY_ID,PROPOSALSTRATEGIES_ID);
     

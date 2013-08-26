@@ -25,4 +25,10 @@ public interface AllocationRecordStrategyRepository extends
 	AllocationRecordStrategy findOneByAllocationRecordAndStrategy(
 			AllocationRecord ar, FormulaStrategy fs);
 
+	@Query(""
+			+ "SELECT sum(strategy.totalCalculatedAmount) "
+			+ "FROM AllocationRecordStrategy strategy "
+			+ "WHERE allocationRecord = ?1 ")
+	Long findSumTotalCalculatedAmount(AllocationRecord record);
+
 }

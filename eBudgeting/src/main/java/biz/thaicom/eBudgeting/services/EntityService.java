@@ -17,6 +17,7 @@ import biz.thaicom.eBudgeting.models.bgt.BudgetType;
 import biz.thaicom.eBudgeting.models.bgt.FiscalBudgetType;
 import biz.thaicom.eBudgeting.models.bgt.FormulaColumn;
 import biz.thaicom.eBudgeting.models.bgt.FormulaStrategy;
+import biz.thaicom.eBudgeting.models.bgt.ObjectiveAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
 import biz.thaicom.eBudgeting.models.bgt.RequestColumn;
@@ -84,6 +85,8 @@ public interface EntityService {
 			Integer fiscalYear, Long ownerId, Long objectiveId);
 	
 	public List<Objective> findFlatChildrenObjectivewithBudgetProposalAndAllocation(
+			Integer fiscalYear, Long objectiveId, Boolean isFindObjectiveBudget);
+	public List<Objective> findFlatChildrenObjectivewithObjectiveBudgetProposalAndAllocation(
 			Integer fiscalYear, Long objectiveId, Boolean isFindObjectiveBudget);
 
 	public Objective addBudgetTypeToObjective(Long id, Long budgetTypeId);
@@ -318,6 +321,10 @@ public interface EntityService {
 	public User updateUser(JsonNode node);
 	public User saveUser(JsonNode node);
 	public User deleteUser(Long id);
+
+	// ObjectiveAllocationRecord
+	public ObjectiveAllocationRecord findObjectiveAllocationRecordById(Long id);
+	public void updateObjectiveAllocationRecord(Long id, JsonNode data);
 
 
 

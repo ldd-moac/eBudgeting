@@ -87,11 +87,11 @@ public class GenericViewController {
 	// --------------------------------------------------------------m64f04:
 	// การพิจารณาตามชั้นกรรมาธิการ (วาระที่ 1 - 3) (m64)
 	@RequestMapping("/page/m64f04/")
-	public String runder_m64f04(Model model, HttpServletRequest request) {
-		List<Objective> fiscalYears = entityService.findRootFiscalYear();
+	public String runder_m64f04(Model model, HttpServletRequest request, HttpSession session) {
 		model.addAttribute("rootPage", true);
-		model.addAttribute("fiscalYears", fiscalYears);
-		return "m3f05";
+		Integer fiscalYear = setFiscalYearFromSession(model, session);
+		model.addAttribute("rootObjective", entityService.findOneRootObjectiveByFiscalyear(fiscalYear));
+		return "m64f04";
 	}
 
 	// --------------------------------------------------------------m65f04:
@@ -880,6 +880,15 @@ public class GenericViewController {
 		return "m62f01";
 	}
 
+	@RequestMapping("/page/m63f01/")
+	public String runder_m63f01(Model model, HttpSession session) {
+		model.addAttribute("rootPage", true);
+		setFiscalYearFromSession(model, session);
+
+		return "m63f01";
+	}
+
+	
 	@RequestMapping("/page/m63f02/")
 	public String runder_m63f02(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);

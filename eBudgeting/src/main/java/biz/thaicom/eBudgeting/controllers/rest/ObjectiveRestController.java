@@ -361,7 +361,7 @@ public class ObjectiveRestController {
 			) {
 		
 		boolean isFindObjectiveBudget = true;
-		List<Objective> objectives = entityService.findFlatChildrenObjectivewithBudgetProposalAndAllocation(fiscalYear, objectiveId, isFindObjectiveBudget);
+		List<Objective> objectives = entityService.findFlatChildrenObjectivewithObjectiveBudgetProposalAndAllocation(fiscalYear, objectiveId, isFindObjectiveBudget);
 		
 		return objectives;
 		

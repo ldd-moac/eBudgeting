@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import biz.thaicom.eBudgeting.models.bgt.AllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.BudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.BudgetType;
+import biz.thaicom.eBudgeting.models.bgt.ObjectiveAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
 import biz.thaicom.eBudgeting.models.bgt.RequestColumn;
@@ -114,6 +115,10 @@ public class Objective implements Serializable {
 	private List<AllocationRecord> allocationRecords;
 	
 	@OneToMany(mappedBy="forObjective", fetch=FetchType.LAZY)
+	private List<ObjectiveAllocationRecord> objectiveAllocationRecords;
+	
+	
+	@OneToMany(mappedBy="forObjective", fetch=FetchType.LAZY)
 	private List<TargetValueAllocationRecord> targetValueAllocationRecords;
 	
 	@OneToMany(mappedBy="forObjective", fetch=FetchType.LAZY)
@@ -150,10 +155,22 @@ public class Objective implements Serializable {
 	private List<AllocationRecord> allocationRecordsR3;
 	
 	@Transient
+	private List<ObjectiveAllocationRecord> objectiveAllocationRecordsR1;
+
+	@Transient
+	private List<ObjectiveAllocationRecord> objectiveAllocationRecordsR2;
+	
+	@Transient
+	private List<ObjectiveAllocationRecord> objectiveAllocationRecordsR3;
+	
+	@Transient
 	private List<TargetValue> filterTargetValues;
 	
 	@Transient
 	private List<BudgetProposal> sumBudgetTypeProposals;
+
+	@Transient
+	private List<ObjectiveBudgetProposal> sumBudgetTypeObjectiveProposals;
 	
 	
 	//Normal Getter/Setter
@@ -265,6 +282,34 @@ public class Objective implements Serializable {
 			this.units = new ArrayList<TargetUnit>();
 		}
 		this.units.add(unit);
+	}
+	
+	public List<ObjectiveAllocationRecord> getObjectiveAllocationRecordsR1() {
+		if(objectiveAllocationRecordsR1 == null) {
+			objectiveAllocationRecordsR1 = new ArrayList<ObjectiveAllocationRecord>();
+		}
+		return objectiveAllocationRecordsR1;
+	}
+	public void setObjectiveAllocationRecordsR1(List<ObjectiveAllocationRecord> objectiveAllocationRecordsR1) {
+		this.objectiveAllocationRecordsR1 = objectiveAllocationRecordsR1;
+	}
+	public List<ObjectiveAllocationRecord> getObjectiveAllocationRecordsR2() {
+		if(objectiveAllocationRecordsR2 == null) {
+			objectiveAllocationRecordsR2 = new ArrayList<ObjectiveAllocationRecord>();
+		}
+		return objectiveAllocationRecordsR2;
+	}
+	public void setObjectiveAllocationRecordsR2(List<ObjectiveAllocationRecord> objectiveAllocationRecordsR2) {
+		this.objectiveAllocationRecordsR2 = objectiveAllocationRecordsR2;
+	}
+	public List<ObjectiveAllocationRecord> getObjectiveAllocationRecordsR3() {
+		if(objectiveAllocationRecordsR3 == null) {
+			objectiveAllocationRecordsR3 = new ArrayList<ObjectiveAllocationRecord>();
+		}
+		return objectiveAllocationRecordsR3;
+	}
+	public void setObjectiveAllocationRecordsR3(List<ObjectiveAllocationRecord> objectiveAllocationRecordsR3) {
+		this.objectiveAllocationRecordsR3 = objectiveAllocationRecordsR3;
 	}
 	
 	public List<AllocationRecord> getAllocationRecordsR1() {
@@ -396,6 +441,37 @@ public class Objective implements Serializable {
 	
 	public void addToSumBudgetTypeProposalsOnlyAmount(BudgetProposal proposal) {
 		this.addToSumBudgetTypeProposals(proposal, false);
+	}
+	
+	public void addToSumBudgetTypeObjectiveProposalsOnlyAmount(
+			ObjectiveBudgetProposal proposal) {
+		if(this.sumBudgetTypeObjectiveProposals == null) {
+			this.sumBudgetTypeObjectiveProposals = new ArrayList<ObjectiveBudgetProposal>();
+			
+		}
+		
+		for(ObjectiveBudgetProposal p : sumBudgetTypeObjectiveProposals) {
+			if(p.getBudgetType().getId().equals(proposal.getBudgetType().getId())) {
+				p.setAmountRequest(p.getAmountRequest() + proposal.getAmountRequest());
+				p.setAmountRequestNext1Year(p.getAmountRequestNext1Year() + proposal.getAmountRequestNext1Year());
+				p.setAmountRequestNext2Year(p.getAmountRequestNext2Year() + proposal.getAmountRequestNext2Year());
+				p.setAmountRequestNext3Year(p.getAmountRequestNext3Year() + proposal.getAmountRequestNext3Year());
+				
+				return;
+			}
+		}
+		
+		ObjectiveBudgetProposal p = new ObjectiveBudgetProposal();
+		p.setAmountRequest(proposal.getAmountRequest());
+		p.setAmountRequestNext1Year(proposal.getAmountRequestNext1Year());
+		p.setAmountRequestNext2Year(proposal.getAmountRequestNext2Year());
+		p.setAmountRequestNext3Year(proposal.getAmountRequestNext3Year());
+		p.setBudgetType(proposal.getBudgetType());
+		p.setForObjective(this);
+		
+		this.sumBudgetTypeObjectiveProposals.add(p);
+		return;
+		
 	}
 	
 	public void addToSumBudgetTypeProposals(BudgetProposal proposal, Boolean addRequestColumn){
@@ -687,6 +763,22 @@ public class Objective implements Serializable {
 		return nextLineNumber;
 		
 	}
+	public List<ObjectiveAllocationRecord> getObjectiveAllocationRecords() {
+		return objectiveAllocationRecords;
+	}
+	public void setObjectiveAllocationRecords(
+			List<ObjectiveAllocationRecord> objectiveAllocationRecords) {
+		this.objectiveAllocationRecords = objectiveAllocationRecords;
+	}
+	public List<ObjectiveBudgetProposal> getSumBudgetTypeObjectiveProposals() {
+		return sumBudgetTypeObjectiveProposals;
+	}
+	public void setSumBudgetTypeObjectiveProposals(
+			List<ObjectiveBudgetProposal> sumBudgetTypeObjectiveProposals) {
+		this.sumBudgetTypeObjectiveProposals = sumBudgetTypeObjectiveProposals;
+	}
+
+
 	
 	
 

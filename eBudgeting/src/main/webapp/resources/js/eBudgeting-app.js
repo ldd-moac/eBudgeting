@@ -51,6 +51,31 @@ Objective = Backbone.RelationalModel.extend({
 	    	key: 'sumBudgetTypeProposals',
 	    	relatedModel: 'BudgetProposal',
 	    	collectionType: 'BudgetProposalCollection'
+	    },{
+	    	type: Backbone.HasMany,
+	    	key: 'sumBudgetTypeObjectiveProposals',
+	    	relatedModel: 'ObjectiveBudgetProposal',
+	    	collectionType: 'ObjectiveBudgetProposalCollection'
+	    }, {
+	    	type: Backbone.HasMany,
+	    	key: 'objectiveAllocationRecords',
+	    	relatedModel: 'ObjectiveAllocationRecord',
+	    	collectionType: 'ObjectiveAllocationRecordCollection'
+	    }, {
+	    	type: Backbone.HasMany,
+	    	key: 'objectiveAllocationRecordsR1',
+	    	relatedModel: 'ObjectiveAllocationRecord',
+	    	collectionType: 'ObjectiveAllocationRecordCollection'
+	    }, {
+	    	type: Backbone.HasMany,
+	    	key: 'objectiveAllocationRecordsR2',
+	    	relatedModel: 'ObjectiveAllocationRecord',
+	    	collectionType: 'ObjectiveAllocationRecordCollection'
+	    }, {
+	    	type: Backbone.HasMany,
+	    	key: 'objectiveAllocationRecordsR3',
+	    	relatedModel: 'ObjectiveAllocationRecord',
+	    	collectionType: 'ObjectiveAllocationRecordCollection'
 	    }, {
 	    	type: Backbone.HasMany,
 	    	key: 'allocationRecords',
@@ -378,6 +403,21 @@ AllocationRecord = Backbone.RelationalModel.extend({
 	}],
 	urlRoot: appUrl('/AllocationRecord')
 });
+
+ObjectiveAllocationRecord = Backbone.RelationalModel.extend({
+	idAttribute: 'id',
+	relations: [{
+		type: Backbone.HasOne,
+		key: 'forObjective',
+		relatedModel : 'Objective'
+	},{
+		type: Backbone.HasOne,
+		key: 'budgetType',
+		relatedModel : 'BudgetType'
+	}],
+	urlRoot: appUrl('/ObjectiveAllocationRecord')
+});
+
 
 AllocationRecordStrategy = Backbone.RelationalModel.extend({
 	idAttribute: 'id', 
@@ -799,6 +839,9 @@ ProposalStrategyCollection = Backbone.Collection.extend({
 });
 AllocationRecordCollection =Backbone.Collection.extend({
 	model: AllocationRecord
+});
+ObjectiveAllocationRecordCollection =Backbone.Collection.extend({
+	model: ObjectiveAllocationRecord
 }); 
 TargetValueAllocationRecordCollection=Backbone.Collection.extend({
 	model: TargetValueAllocationRecord

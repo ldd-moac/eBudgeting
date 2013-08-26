@@ -37,5 +37,15 @@ public interface ObjectiveBudgetProposalRepository extends
 
 	Long findSumTotalOfOwner(Integer fiscalYear, Organization workAt);
 
+	@Query("" +
+			"SELECT distinct proposal " +
+			"FROM ObjectiveBudgetProposal proposal " +
+			"	INNER JOIN FETCH proposal.forObjective objective " +
+			"	INNER JOIN FETCH proposal.owner owner " +
+			"WHERE objective.fiscalYear =?1 and objective.parentPath like ?2 " +
+			"ORDER BY proposal.budgetType.id asc")
+	List<ObjectiveBudgetProposal> findObjBudgetProposalByFiscalYearAndParentPath(
+			Integer fiscalYear, String parentPathLikeString);
+
 
 }

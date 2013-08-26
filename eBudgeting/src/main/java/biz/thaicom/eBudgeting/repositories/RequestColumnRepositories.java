@@ -17,4 +17,10 @@ public interface RequestColumnRepositories extends
 			"WHERE rc.proposalStrategy.proposal.forObjective.fiscalYear = ?1")
 	List<RequestColumn> findAllByFiscalYear(Integer fiscalYear);
 
+	@Query("" 
+			+ "SELECT rc "
+			+ "FROM RequestColumn rc "
+			+ "WHERE rc.allocationRecordStrategy.id = ?1 " )
+	RequestColumn findOneByAllocationRecordStrategyId(Long previousArsId);
+
 }

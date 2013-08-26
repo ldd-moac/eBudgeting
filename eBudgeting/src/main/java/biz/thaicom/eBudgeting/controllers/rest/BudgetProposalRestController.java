@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import biz.thaicom.eBudgeting.models.bgt.AllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.BudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.BudgetSignOff;
+import biz.thaicom.eBudgeting.models.bgt.ObjectiveAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
 import biz.thaicom.eBudgeting.services.EntityService;
@@ -177,6 +178,22 @@ public class BudgetProposalRestController {
 //		//return entityService.saveBudgetProposal(proposal);
 //		
 //	}
+	
+	
+	@RequestMapping(value="/ObjectiveAllocationRecord/{id}", method=RequestMethod.GET)
+	public @ResponseBody ObjectiveAllocationRecord findObjectiveAllocationRecord(
+			@PathVariable Long id) {
+		return entityService.findObjectiveAllocationRecordById(id);
+	}
+	@RequestMapping(value="/ObjectiveAllocationRecord/{id}", method=RequestMethod.PUT)
+	public @ResponseBody String updateObjectiveAllocationRecord(
+			@PathVariable Long id,
+			@RequestBody JsonNode data,
+			@Activeuser ThaicomUserDetail currentUser){
+		
+		entityService.updateObjectiveAllocationRecord(id, data);
+		return "ok";
+	}
 	
 	@RequestMapping(value="/AllocationRecord/{id}", method=RequestMethod.GET)
 	public @ResponseBody AllocationRecord findAllocationRecord(
