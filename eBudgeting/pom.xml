@@ -34,6 +34,7 @@
     	<apache.poi-version>3.8</apache.poi-version>
     	<jackson-version>2.2.3</jackson-version>
     	<jackson-datatype-hibernate4-version>2.2.3</jackson-datatype-hibernate4-version>
+    	<javamelody-version>1.46.0</javamelody-version>
 	</properties>
 	<dependencies>
 		<!-- Spring -->
@@ -272,6 +273,13 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<!-- javamelody-core -->
+        <dependency>
+                <groupId>net.bull.javamelody</groupId>
+                <artifactId>javamelody-core</artifactId>
+                <version>${javamelody-version}</version>
+        </dependency>
 
 		<!-- @Inject -->
 		<dependency>

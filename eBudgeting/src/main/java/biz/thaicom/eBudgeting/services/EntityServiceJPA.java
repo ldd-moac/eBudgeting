@@ -18,6 +18,8 @@ import javassist.expr.NewArray;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import net.bull.javamelody.MonitoredWithSpring;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,6 +101,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @Transactional
+@MonitoredWithSpring
 public class EntityServiceJPA implements EntityService {
 	private static final Logger logger = LoggerFactory.getLogger(EntityServiceJPA.class);
 	
