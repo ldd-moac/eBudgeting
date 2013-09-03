@@ -42,7 +42,7 @@ public class GenericViewController {
 	// --------------------------------------------------------------m1f05:
 	// เพิ่มข้อมูลเริ่มต้นปีงบประมาณ
 	@RequestMapping("/page/m1f05/")
-	public String runder_m1f05(Model model, HttpServletRequest request) {
+	public String render_m1f05(Model model, HttpServletRequest request) {
 		List<Objective> fiscalYears = entityService.findRootFiscalYear();
 		model.addAttribute("rootPage", true);
 		model.addAttribute("fiscalYears", fiscalYears);
@@ -63,41 +63,13 @@ public class GenericViewController {
 	}
 
 	
-	// --------------------------------------------------------------m63f04:
-	// การประมวลผลก่อนการปรับลดครั้งที่ 1  (m63f04)
-	@RequestMapping("/page/m63f04/")
-	public String runder_m63f04(Model model, HttpSession session) {
-		model.addAttribute("rootPage", true);
-		Integer fiscalYear = setFiscalYearFromSession(model, session);
-		model.addAttribute("rootObjective", entityService.findOneRootObjectiveByFiscalyear(fiscalYear));
-		return "m63f04";
-	}
-	
-	// --------------------------------------------------------------m63f05:
-	// ทะเบียนรายการและระดับรายการ
-	@RequestMapping("/page/m63f05/")
-	public String render_m63f05(Model model, HttpServletRequest request,
-			HttpSession session) {
 
-		model.addAttribute("rootPage", false);
-		setFiscalYearFromSession(model, session);
-		return "m63f05";
-	}
 
-	// --------------------------------------------------------------m64f04:
-	// การพิจารณาตามชั้นกรรมาธิการ (วาระที่ 1 - 3) (m64)
-	@RequestMapping("/page/m64f04/")
-	public String runder_m64f04(Model model, HttpServletRequest request, HttpSession session) {
-		model.addAttribute("rootPage", true);
-		Integer fiscalYear = setFiscalYearFromSession(model, session);
-		model.addAttribute("rootObjective", entityService.findOneRootObjectiveByFiscalyear(fiscalYear));
-		return "m64f04";
-	}
 
 	// --------------------------------------------------------------m65f04:
 	// การอนุมัติงบประมาณ ตาม พ.ร.บ. (m65)
 	@RequestMapping("/page/m65f04/")
-	public String runder_m65f04(Model model, HttpServletRequest request) {
+	public String render_m65f04(Model model, HttpServletRequest request) {
 		List<Objective> fiscalYears = entityService.findRootFiscalYear();
 		model.addAttribute("rootPage", true);
 		model.addAttribute("fiscalYears", fiscalYears);
@@ -105,7 +77,7 @@ public class GenericViewController {
 	}
 
 	@RequestMapping("/page/m4f01/")
-	public String runder_m4f01(Model model, HttpServletRequest request) {
+	public String render_m4f01(Model model, HttpServletRequest request) {
 		List<Objective> fiscalYears = entityService.findRootFiscalYear();
 		model.addAttribute("rootPage", true);
 		model.addAttribute("fiscalYears", fiscalYears);
@@ -113,7 +85,7 @@ public class GenericViewController {
 	}
 
 	@RequestMapping("/page/m4f02/")
-	public String runder_m4f02(Model model, HttpServletRequest request) {
+	public String render_m4f02(Model model, HttpServletRequest request) {
 		List<Objective> fiscalYears = entityService.findRootFiscalYear();
 		model.addAttribute("rootPage", true);
 		model.addAttribute("fiscalYears", fiscalYears);
@@ -822,6 +794,9 @@ public class GenericViewController {
 
 		return "m61f04_1";
 	}
+	
+	// ==============================================================m62:
+	// การกระทบยอดเงินงบประมาณ (m62)
 
 	// --------------------------------------------------------------m62f01:
 	// การประมวลผลการกระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม
@@ -880,24 +855,67 @@ public class GenericViewController {
 		return "m62f01";
 	}
 
+	// ==============================================================m63:
+	// การพิจารณากรอบวงเงินเพื่อตั้งคำของบประมาณ (เข้าระบบ e-Budgeting) (m63)
+	
+	// --------------------------------------------------------------m63f01:
+	// การปรับลดงบประมาณระดับกิจกรรมรอบที่ 1
 	@RequestMapping("/page/m63f01/")
-	public String runder_m63f01(Model model, HttpSession session) {
+	public String render_m63f01(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
 		setFiscalYearFromSession(model, session);
 
 		return "m63f01";
 	}
 
-	
+	// --------------------------------------------------------------m63f02:
+	// การปรับลดงบประมาณระดับรายการรอบที่ 1
 	@RequestMapping("/page/m63f02/")
-	public String runder_m63f02(Model model, HttpSession session) {
+	public String render_m63f02(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
 		setFiscalYearFromSession(model, session);
 
-		return "m63f02";
+		return "m63f02";		
+	}
+	
+	// --------------------------------------------------------------m63f04:
+	// การประมวลผลก่อนการปรับลดครั้งที่ 1  (m63f04)
+	@RequestMapping("/page/m63f04/")
+	public String render_m63f04(Model model, HttpSession session) {
+		model.addAttribute("rootPage", true);
+		Integer fiscalYear = setFiscalYearFromSession(model, session);
+		model.addAttribute("rootObjective", entityService.findOneRootObjectiveByFiscalyear(fiscalYear));
+		return "m63f04";
+	}
+	
+	// --------------------------------------------------------------m63f05:
+	// ทะเบียนรายการและระดับรายการ
+	@RequestMapping("/page/m63f05/")
+	public String render_m63f05(Model model, HttpServletRequest request,
+			HttpSession session) {
+
+		model.addAttribute("rootPage", false);
+		setFiscalYearFromSession(model, session);
+		return "m63f05";
+	}
+
+	
+	// ==============================================================m64:
+	// การพิจารณาตามชั้นกรรมาธิการ (วาระที่ 1 - 3) (m64)
+	
+	// --------------------------------------------------------------m64f01:
+	// การปรับลดงบประมาณระดับกิจกรรมรอบที่ 2
+	@RequestMapping("/page/m64f01/")
+	public String render_m64f01(Model model, HttpSession session) {
+		model.addAttribute("rootPage", true);
+		setFiscalYearFromSession(model, session);
+
+		return "m64f01";
 	}
 
 
+	// --------------------------------------------------------------m64f02:
+	// การปรับลดงบประมาณระดับรายการรอบที่ 2
 	@RequestMapping("/page/m64f02/")
 	public String render_m64f02(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
@@ -905,7 +923,30 @@ public class GenericViewController {
 		return "m64f02";
 	}
 
+	// --------------------------------------------------------------m64f04:
+	//  การประมวลผลก่อนการปรับลดรอบที่ 2
+	@RequestMapping("/page/m64f04/")
+	public String render_m64f04(Model model, HttpServletRequest request, HttpSession session) {
+		model.addAttribute("rootPage", true);
+		Integer fiscalYear = setFiscalYearFromSession(model, session);
+		model.addAttribute("rootObjective", entityService.findOneRootObjectiveByFiscalyear(fiscalYear));
+		return "m64f04";
+	}
 
+	// --------------------------------------------------------------m64f05:
+	// การปรับลดทะเบียนรายการรอบที่ 2
+	@RequestMapping("/page/m64f05/")
+	public String render_m64f05(Model model, HttpServletRequest request,
+			HttpSession session) {
+
+		model.addAttribute("rootPage", false);
+		setFiscalYearFromSession(model, session);
+		return "m64f05";
+	}
+	
+	// ==============================================================m65:
+	// การอนุมัติงบประมาณ ตาม พ.ร.บ. (m65)
+	
 	@RequestMapping("/page/m65f02/")
 	public String render_m65f02(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
@@ -914,8 +955,11 @@ public class GenericViewController {
 	}
 
 
+	// ==============================================================m71:
+	// การจัดสรรงบประมาณ (m71)
+	
 	@RequestMapping("/page/m71f02/")
-	public String runder_m71f02(Model model, HttpServletRequest request) {
+	public String render_m71f02(Model model, HttpServletRequest request) {
 		List<Objective> fiscalYears = entityService.findRootFiscalYear();
 		model.addAttribute("rootPage", true);
 		model.addAttribute("fiscalYears", fiscalYears);

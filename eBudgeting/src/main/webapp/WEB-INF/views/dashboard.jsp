@@ -173,7 +173,7 @@ var menuJson = [{
 		},{
 			name: "m63f01: การปรับลดงบประมาณระดับกิจกรรมรอบที่ 1",code: "m63f01",  link: "page/m63f01/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m63f05: การปรับลดทะเบียนรายการ",code: "m63f05",  link: "page/m63f05/", group: "BGT_USER"
+			name: "m63f05: การปรับลดทะเบียนรายการรอบที่ 1",code: "m63f05",  link: "page/m63f05/", group: "BGT_BGT_ADMIN"
 		},{
 			name: "m63f02: การปรับลดงบประมาณระดับรายการรอบที่ 1", code: "m63f02", link: "page/m63f02/", group: "BGT_BGT_ADMIN"
 		},{
@@ -183,8 +183,10 @@ var menuJson = [{
 		name: "การพิจารณาตามชั้นกรรมาธิการ (วาระที่ 1 - 3) (m64)", code: "m64", menus:[{
 			name: "m64f04: การประมวลผลก่อนการปรับลดรอบที่ 2", code: "m64f04", link: "page/m64f04/", group: "BGT_BGT_ADMIN"
 		}, {
-			name: "m64f01: การปรับลดงบประมาณระดับกิจกรรมรอบที่ 2", code: "m64f01", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
-		}, {
+			name: "m64f01: การปรับลดงบประมาณระดับกิจกรรมรอบที่ 2", code: "m64f01", link: "page/m64f01/", group: "BGT_BGT_ADMIN"
+		},{
+			name: "m64f05: การปรับลดทะเบียนรายการรอบที่ 2",code: "m64f05",  link: "page/m64f05/", group: "BGT_BGT_ADMIN"
+		},{
 			name: "m64f02: การปรับลดงบประมาณระดับรายการรอบที่ 2", code: "m64f02", link: "page/m64f02/", group: "BGT_BGT_ADMIN"
 		}, {
 			name: "m64f03: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m64f03", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
