@@ -69,10 +69,14 @@ var DetailModalView = Backbone.View.extend({
 		//prepare the allocation
 		_.forEach(json.sumBudgetTypeObjectiveProposals, _.bind(function(proposal) {
 			var budgetType = BudgetType.findOrCreate({id:proposal.budgetType.id});
-			// search the allocationR1 
-			var objectiveAllocationRecord = this.currentObjective.get('objectiveAllocationRecordsR1').findWhere({budgetType:budgetType});
+			// search the allocationR2 
+			var objectiveAllocationRecord = this.currentObjective.get('objectiveAllocationRecordsR2').findWhere({budgetType:budgetType});
 			if(objectiveAllocationRecord  != null) {
+				
+				var r1 = this.currentObjective.get('objectiveAllocationRecordsR1').findWhere({budgetType:budgetType});
+				
 				proposal.amountAllocated = objectiveAllocationRecord.get('amountAllocated');
+				proposal.amountAllocatedR1 = r1.get('amountAllocated');
 				proposal.allocationId = objectiveAllocationRecord.get('id');
 			}
 			
@@ -705,6 +709,16 @@ var MainCtrView = Backbone.View.extend({
 	        	width: 80,
 	        	sortable: false,
 	        	align: 'center'
+	        }, {
+	        	text: 'ปรับลดครั้งที่ 2',
+	        	width: 120,
+	        	sortable : false,
+	        	dataIndex: 'sumObjectiveAllocationR2',
+	        	align: 'right',
+	        	renderer: function(value) {
+	        		return addCommas(value);
+	        	}
+	        		
 	        }, {
 	        	text: 'ปรับลดครั้งที่ 1',
 	        	width: 120,

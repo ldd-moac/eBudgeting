@@ -1253,6 +1253,10 @@ public class EntityServiceJPA implements EntityService {
 					}				
 				}
 				
+				// here we have to remove objAllocationRecord and its associated 
+				List<ObjectiveAllocationRecord> objArList = objectiveAllocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, round-1);
+				objectiveAllocationRecordRepository.delete(objArList);
+				
 				List<ObjectiveAllocationRecord> previousObjArList = objectiveAllocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, round-2);
 				for(ObjectiveAllocationRecord oar : previousObjArList) {
 					ObjectiveAllocationRecord newOar = new ObjectiveAllocationRecord();

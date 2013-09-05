@@ -147,7 +147,7 @@
 	<thead>
 		<tr>
 			<td>รายการงบประมาณ</td>
-			<td>ปรับลดครั้งที่1</td>
+			<td>ปรับลดครั้งที่2</td>
 		</tr>
 	</thead>
 	<tbody>
@@ -218,6 +218,7 @@
 	<thead>
 		<tr>
 			<td>รายการงบประมาณ</td>
+			<td>ปรับลดครั้งที่2</td>
 			<td>ปรับลดครั้งที่1</td>
 			<td>ขอตั้ง</td>
 		</tr>
@@ -227,6 +228,7 @@
 		<tr>
 			<td><a href="#" data-allocationId={{allocationId}} class="detailAllocation">{{budgetType.name}}</a></td>
 			<td>{{formatNumber amountAllocated}}</td>
+			<td>{{formatNumber amountAllocatedR1}}</td>
 			<td>{{formatNumber amountRequest}}</td>
 		</tr>
 		{{/each}}
@@ -639,6 +641,10 @@ $(document).ready(function() {
 		},{
 			name: 'objectiveAllocationRecordsR1', mapping: 'objectiveAllocationRecordsR1'
 		},{
+			name: 'objectiveAllocationRecordsR2', mapping: 'objectiveAllocationRecordsR2'
+		},{
+			name: 'objectiveAllocationRecordsR3', mapping: 'objectiveAllocationRecordsR3'
+		},{
 			name: 'sumObjectiveProposals', 
             convert: function(v, rec) {
             	var sum = 0;
@@ -688,6 +694,28 @@ $(document).ready(function() {
         		var sum=0;
         		_.forEach(rec.data.objectiveAllocationRecordsR1, function(record) {
         			if(record.index == 0) { 
+        				sum += record.amountAllocated;
+        			}	
+        		});
+        		return sum;
+        	}
+        }, {
+        	name: 'sumObjectiveAllocationR2',
+        	convert: function(v, rec) {
+        		var sum=0;
+        		_.forEach(rec.data.objectiveAllocationRecordsR2, function(record) {
+        			if(record.index == 1) { 
+        				sum += record.amountAllocated;
+        			}	
+        		});
+        		return sum;
+        	}
+        }, {
+        	name: 'sumObjectiveAllocationR3',
+        	convert: function(v, rec) {
+        		var sum=0;
+        		_.forEach(rec.data.objectiveAllocationRecordsR3, function(record) {
+        			if(record.index == 2) { 
         				sum += record.amountAllocated;
         			}	
         		});
