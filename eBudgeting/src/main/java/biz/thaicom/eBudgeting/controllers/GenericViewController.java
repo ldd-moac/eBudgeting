@@ -66,16 +66,6 @@ public class GenericViewController {
 
 
 
-	// --------------------------------------------------------------m65f04:
-	// การอนุมัติงบประมาณ ตาม พ.ร.บ. (m65)
-	@RequestMapping("/page/m65f04/")
-	public String render_m65f04(Model model, HttpServletRequest request) {
-		List<Objective> fiscalYears = entityService.findRootFiscalYear();
-		model.addAttribute("rootPage", true);
-		model.addAttribute("fiscalYears", fiscalYears);
-		return "m3f06";
-	}
-
 	@RequestMapping("/page/m4f01/")
 	public String render_m4f01(Model model, HttpServletRequest request) {
 		List<Objective> fiscalYears = entityService.findRootFiscalYear();
