@@ -195,7 +195,9 @@ var menuJson = [{
 		name: "การอนุมัติงบประมาณ ตาม พ.ร.บ. (m65)",code: "m65",  menus: [{
 			name: "m65f04: การประมวลผลก่อนการปรับลดรอบที่ 3", code: "m65f04", link: "page/m65f04/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m65f01: การปรับลดงบประมาณระดับกิจกรรมรอบที่ 3", code: "m65f01", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
+			name: "m65f01: การปรับลดงบประมาณระดับกิจกรรมรอบที่ 3", code: "m65f01", link: "page/m65f01/", group: "BGT_BGT_ADMIN"
+		},{
+			name: "m65f05: การปรับลดทะเบียนรายการรอบที่ 3",code: "m65f05",  link: "page/m65f05/", group: "BGT_BGT_ADMIN"
 		},{
 			name: "m65f02: การปรับลดงบประมาณระดับรายการรอบที่ 3", code: "m65f02", link: "page/m65f02/", group: "BGT_BGT_ADMIN"
 		},{

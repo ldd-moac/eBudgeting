@@ -71,7 +71,7 @@
 <script id="mainCtrTemplate" type="text/x-handler-template">
 <div id="mainSelection">
 </div>
-<div id="mainTbl">
+<div id="mainTbl" class="x-border-box">
 </div>
 </script>
 
@@ -119,25 +119,117 @@
 </div>
 </script>
 
+<script id="detailAllocationRecordTemplate" type="text/x-handler-template">
+<table class="table table-bordered" id="detailAllocationRecordTbl" data-id="{{id}}">
+	<thead>
+		<tr>
+			<td>รายการงบประมาณ</td>
+			<td>ปรับลดครั้งที่1</td>
+		</tr>
+	</thead>
+	<tbody>
+		{{#each allocationRecordStrategies}}
+		<tr>
+			{{#if strategy}}
+			<td><a href="#" data-allocationStrategyId="{{id}}" class="detailAllocationStrategy">{{strategy.name}}</a></td>
+			{{else}}
+			<td><a href="#" data-allocationStrategyId="{{id}}" class="detailAllocationStrategy">default</a></td>
+			{{/if}}
+			<td>{{formatNumber totalCalculatedAmount}}</td>
+		</tr>
+		{{/each}}
+	</tbody>
+</table>
+</script>
+
+<script id="detailAllocationRecordBasicTemplate" type="text/x-handler-template">
+<table class="table table-bordered" id="detailAllocationRecordTbl" data-id="{{id}}">
+	<thead>
+		<tr>
+			<td>รายการงบประมาณ</td>
+			<td>ปรับลดครั้งที่2</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><a href="#" data-allocationId="{{id}}" class="detailBasicAllocation">{{budgetType.name}}</a></td>
+			<td>{{formatNumber amountAllocated}}</td>
+		</tr>
+	</tbody>
+</table>
+</script>
+
+<script id="detailAllocationRecordStrategyTemplate" type="text/x-handler-template">
+	<div id="allocRecStrgy" data-id="{{allocStrategyId}}">
+				รายการ: <strong> {{type.name}} / {{name}} </strong>
+	</div>
+	<div id="formulaBox">
+		<div>
+			<div style="height:35px;margin-bottom:10px;">
+				เรื่อง: 
+			</div>
+			<div style="height:35px;">
+				จำนวน:
+			</div>
+		</div>
+		<div>
+			<div style="height:35px;margin-bottom:10px;">
+				<input type="text" style="width:70px;" value="ราคา (บาท)" disabled="disabled"/>
+			</div>
+			<div style="height:35px;">
+				<input type="text" id="standardPriceTxt" style="width:70px;" disabled="disabled" value="{{allocationStandardPriceMap.2.standardPrice}}"></input> &times;
+			</div>
+		</div>
+		{{#each formulaColumns}}
+		<div>
+			<div style="height:35px;margin-bottom:10px;">
+				<input type="text" style="width:70px;" value="{{unitName}}" disabled="disabled"/>
+			</div>
+			<div style="height:35px;">
+				<input type="text" class="formulaColumnInput" id="formulaColumnId-{{id}}" style="width:70px;"  value="{{allocatedFormulaColumnValueMap.2.allocatedValue}}"></input> {{#if $last}}={{else}}&times;{{/if}}
+			</div>
+		</div>
+		{{/each}}
+		<div>
+			<div style="height:35px;margin-bottom:5px;padding-top:5px;text-align:center;padding-right:30px;">
+				
+			</div>
+			<div style="height:35px;" id="totalInputForm">
+				<div class="input-append"><input type="text" id="totalInputTxt" style="width:120px;"  disabled="disabled" value="{{total}}"></input><span class="add-on">บาท</span></div>
+			</div>
+		</div>
+	</div>
+	
+<div class="clearfix"></div>
+{{#if budgetTypeUnitName}}
+<div id="formulaBox">
+	<div>
+		<div style="vertical-align:middle"> <strong>ระบุค่าเป้าหมาย:</strong></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div class="input-append"><input style="width:80px;" type="text" id="targetValue" data-unitId="{{targetUnitId}}" value="{{targetValue}}"/><span class="add-on">{{budgetTypeUnitName}}</span></div>
+	</div>
+</div>
+{{/if}}
+<div class="clearfix"></div>
+</script>
 <script id="detailViewTableTemplate" type="text/x-handler-template">
 <table class="table table-bordered" id="detailViewTbl">
 	<thead>
 		<tr>
 			<td>รายการงบประมาณ</td>
-			<td>ขอตั้ง</td>
-			<td>ปรับลดครั้งที่1</td>
 			<td>ปรับลดครั้งที่2</td>
-			<td>ปรับลดครั้งที่3</td>
+			<td>ปรับลดครั้งที่1</td>
+			<td>ขอตั้ง</td>
 		</tr>
 	</thead>
 	<tbody>
 		{{#each sumBudgetTypeProposals}}
 		<tr>
-			<td>{{budgetType.name}}</td>
-			<td>{{formatNumber amountRequest}}</td>
+			<td><a href="#" data-allocationId={{allocationId}} class="detailAllocation">{{budgetType.name}}</a></td>
+			<td>{{formatNumber amountAllocated}}</td>
 			<td>{{formatNumber amountAllocatedR1}}</td>
-			<td>{{formatNumber amountAllocatedR2}}</td>
-			<td><a href="#" data-allocationId={{allocationId}} class="amountAllocatedInput">{{formatNumber amountAllocatedR3}}</a></td>
+			<td>{{formatNumber amountRequest}}</td>
 		</tr>
 		{{/each}}
 	</tbody>
@@ -219,6 +311,47 @@
 <script id="detailModalTemplate" type="text/x-handler-template">
 <div><u>รายการขอตั้งงบประมาณของกิจกรรม</u></div>
 <div id="detailModalDiv"></div>
+</script>
+
+<script id="detailModalMainFooterTemplate"  type="text/x-handler-template">
+<a href="#" class="btn" id="cancelBtn">กลับหน้าหลัก</a> 
+</script>
+
+<script id="detailAllocationRecordFooterTemplate"  type="text/x-handler-template">
+	 <button class="pull-left btn backToProposal">ย้อนกลับ</button>
+<a href="#" class="btn" id="cancelBtn">กลับหน้าหลัก</a> 
+</script>
+
+<script id="detailAllocationBasicFooterTemplate"  type="text/x-handler-template">
+	<button class="pull-left btn btn-primary updateAllocRec">บันทึก</button> 
+	 <button class="pull-left btn backToProposal">ย้อนกลับ</button>
+<a href="#" class="btn" id="cancelBtn">กลับหน้าหลัก</a> 
+</script>
+<script id="detailAllocationBasicTemplate" type="text/x-handler-template">
+	<div id="formulaBox">
+		<div id="allocRecId" data-id="{{id}}">
+			<div style="height:35px;margin-bottom:10px;">
+				<strong>รายการ:</strong> 
+			</div>
+			<div style="height:35px;">
+				<strong>ระบุงบประมาณ:</strong>
+			</div>
+		</div>
+		<div id="allocRecStrgy" data-id="{{id}}">
+			<div style="height:35px;margin-bottom:5px;padding-top:5px;">
+				<strong>{{budgetType.name}}</strong>
+			</div>
+			<div style="height:35px;" id="totalInputForm">
+				<div class="input-append"><input type="text" id="totalInputTxt" style="width:120px;" value="{{amountAllocated}}"></input><span class="add-on">บาท</span></div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script id="detailAllocationRecordStrategyFooterTemplate"  type="text/x-handler-template">
+	<button class="pull-left btn btn-primary updateAllocRecStrgy">บันทึก</button> 
+	 <button class="pull-left btn backToProposal">ย้อนกลับ</button>
+<a href="#" class="btn" id="cancelBtn">กลับหน้าหลัก</a> 
 </script>
 
 <script id="modalTemplate" type="text/x-handler-template">
@@ -504,7 +637,11 @@ $(document).ready(function() {
 		},{
 			name: 'proposals', mapping: 'proposals'
 		},{
-			name: 'allocationRecords', mapping: 'allocationRecords'
+			name: 'allocationRecordsR1', mapping: 'allocationRecordsR1'
+		},{
+			name: 'allocationRecordsR2', mapping: 'allocationRecordsR2'
+		},{
+			name: 'allocationRecordsR3', mapping: 'allocationRecordsR3'
 		},{
 			name: 'sumProposals', 
             convert: function(v, rec) {
@@ -553,9 +690,8 @@ $(document).ready(function() {
         	name: 'sumAllocationR1',
         	convert: function(v, rec) {
         		var sum=0;
-        		_.forEach(rec.data.allocationRecords, function(record) {
-        			if(record.index == 0) {
-        				
+        		_.forEach(rec.data.allocationRecordsR1, function(record) {
+        			if(record.index == 0) {        				
         				sum += record.amountAllocated;
         			}	
         		});
@@ -565,9 +701,8 @@ $(document).ready(function() {
         	name: 'sumAllocationR2',
         	convert: function(v, rec) {
         		var sum=0;
-        		_.forEach(rec.data.allocationRecords, function(record) {
-        			if(record.index == 1) {
-        				
+        		_.forEach(rec.data.allocationRecordsR2, function(record) {
+        			if(record.index == 1) {        				
         				sum += record.amountAllocated;
         			}	
         		});
@@ -577,9 +712,8 @@ $(document).ready(function() {
         	name: 'sumAllocationR3',
         	convert: function(v, rec) {
         		var sum=0;
-        		_.forEach(rec.data.allocationRecords, function(record) {
-        			if(record.index == 2) {
-        				
+        		_.forEach(rec.data.allocationRecordsR3, function(record) {
+        			if(record.index == 2) {        				
         				sum += record.amountAllocated;
         			}	
         		});

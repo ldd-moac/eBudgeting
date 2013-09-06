@@ -67,15 +67,19 @@ var DetailModalView = Backbone.View.extend({
 		// now render table
 		
 		//prepare the allocation
-		_.forEach(json.sumBudgetTypeProposals, _.bind(function(proposal) {
+		_.forEach(json.sumBudgetTypeObjectiveProposals, _.bind(function(proposal) {
 			var budgetType = BudgetType.findOrCreate({id:proposal.budgetType.id});
-			// search the allocationR1 
-			var allocationRecord = this.currentObjective.get('allocationRecordsR2').findWhere({budgetType:budgetType});
-			if(allocationRecord  != null) {
-				var r1 = this.currentObjective.get('allocationRecordsR1').findWhere({budgetType:budgetType});
+			// search the allocationR2 
+			var objectiveAllocationRecord = this.currentObjective.get('objectiveAllocationRecordsR2').findWhere({budgetType:budgetType});
+			if(objectiveAllocationRecord  != null) {
+				
+				var r1 = this.currentObjective.get('objectiveAllocationRecordsR1').findWhere({budgetType:budgetType});
+				var r2 = this.currentObjective.get('objectiveAllocationRecordsR2').findWhere({budgetType:budgetType});
+				
+				proposal.amountAllocated = objectiveAllocationRecord.get('amountAllocated');
 				proposal.amountAllocatedR1 = r1.get('amountAllocated');
-				proposal.amountAllocated = allocationRecord.get('amountAllocated');
-				proposal.allocationId = allocationRecord.get('id');
+				proposal.amountAllocatedR2 = r2.get('amountAllocated');
+				proposal.allocationId = objectiveAllocationRecord.get('id');
 			}
 			
 		},this));
@@ -86,28 +90,21 @@ var DetailModalView = Backbone.View.extend({
 		return this;
 	},
 	detailAllocation: function(e) {
-		var allocationRecord = AllocationRecord.findOrCreate($(e.target).attr('data-allocationId'));
-		allocationRecord.fetch({
+		var objectiveAllocationRecord = ObjectiveAllocationRecord.findOrCreate($(e.target).attr('data-allocationId'));
+		objectiveAllocationRecord.fetch({
 			success: _.bind(function(model, response, options) {
 				this.$el.find('.modal-footer').html(this.detailAllocationRecordFooterTemplate());
 				e1=model;
 				var json = model.toJSON();
 				var html;
-				if(model.get('allocationRecordStrategies') != null && 
-						model.get('allocationRecordStrategies').length > 0) {
-					html = this.detailAllocationRecordTemplate(json);
-				} else {
-					html = this.detailAllocationRecordBasicTemplate(json);
-				}
-				
-				
+				html = this.detailAllocationRecordBasicTemplate(json);
 				
 				this.$el.find('.modal-body').html(html);
 			},this)
 		});
 	},
 	detailBasicAllocation : function(e) {
-		var allocRec = AllocationRecord.findOrCreate($(e.target).attr('data-allocationId'));
+		var allocRec = ObjectiveAllocationRecord.findOrCreate($(e.target).attr('data-allocationId'));
 		this.$el.find('.modal-footer').html(this.detailAllocationBasicFooterTemplate());
 		
 		var json = allocRec.toJSON();
@@ -136,7 +133,7 @@ var DetailModalView = Backbone.View.extend({
 			return false;
 		}
 		
-		var allocRec = AllocationRecord.findOrCreate(this.$el.find('#allocRecId').attr('data-id'));
+		var allocRec = ObjectiveAllocationRecord.findOrCreate(this.$el.find('#allocRecId').attr('data-id'));
 		var totalInputTxt = this.$el.find('#totalInputTxt').val();
 		
 		// now see to its change!
@@ -182,7 +179,7 @@ var DetailModalView = Backbone.View.extend({
 			
 		} else {
 		
-			calculatedAmount = strgy.get('allocationStandardPriceMap').at(2).get('standardPrice');
+			calculatedAmount = strgy.get('allocationStandardPriceMap').at(0).get('standardPrice');
 			var formulaColumns = strgy.get('formulaColumns');
 			for (i = 0; i < formulaColumns.length; i++) {
 	
@@ -205,7 +202,7 @@ var DetailModalView = Backbone.View.extend({
 	
 				} else {
 					if (calculatedAmount == 0) {
-						calculatedAmount = fc.get('allocatedFormulaColumnValueMap').at(2).get('allocatedValue');
+						calculatedAmount = fc.get('allocatedFormulaColumnValueMap').at(0).get('allocatedValue');
 					} else {
 						calculatedAmount = calculatedAmount	* fc.get('allocatedFormulaColumnValueMap')[0].get('allocatedValue');
 					}
@@ -282,7 +279,7 @@ var DetailModalView = Backbone.View.extend({
 		// OK we'll go through all td value
 		var allocRecStrgy = AllocationRecordStrategy.findOrCreate(this.$el.find('#allocRecStrgy').attr('data-id'));
 		var strgy = allocRecStrgy.get('strategy');
-		var standardPrice = strgy.get('allocationStandardPriceMap').at(2).get('standardPrice');
+		var standardPrice = strgy.get('allocationStandardPriceMap').at(0).get('standardPrice');
 		
 		 if(isNaN(standardPrice) || standardPrice == null) {
 			standardPrice = 1;
@@ -667,13 +664,12 @@ var MainCtrView = Backbone.View.extend({
 		//this.$el.find('#mainTbl').html(this.loadingTemplate());
 		this.$el.find('#mainTbl').empty();
 		
-		
 		this.treeStore = Ext.create('Ext.data.TreeStore', {
 	        model: 'data.Model.Objective',
 	        proxy: {
 	            type: 'ajax',
 	            //the store will get the content from the .json file
-	            url: appUrl("/ObjectiveWithBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants")
+	            url: appUrl("/ObjectiveWithObjectiveBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants")
 	        },
 	        folderSort: false
 	    });
@@ -716,10 +712,20 @@ var MainCtrView = Backbone.View.extend({
 	        	sortable: false,
 	        	align: 'center'
 	        }, {
+	        	text: 'ปรับลดครั้งที่ 3',
+	        	width: 120,
+	        	sortable : false,
+	        	dataIndex: 'sumObjectiveAllocationR3',
+	        	align: 'right',
+	        	renderer: function(value) {
+	        		return addCommas(value);
+	        	}
+	        		
+	        }, {
 	        	text: 'ปรับลดครั้งที่ 2',
 	        	width: 120,
 	        	sortable : false,
-	        	dataIndex: 'sumAllocationR2',
+	        	dataIndex: 'sumObjectiveAllocationR2',
 	        	align: 'right',
 	        	renderer: function(value) {
 	        		return addCommas(value);
@@ -729,7 +735,7 @@ var MainCtrView = Backbone.View.extend({
 	        	text: 'ปรับลดครั้งที่ 1',
 	        	width: 120,
 	        	sortable : false,
-	        	dataIndex: 'sumAllocationR1',
+	        	dataIndex: 'sumObjectiveAllocationR1',
 	        	align: 'right',
 	        	renderer: function(value) {
 	        		return addCommas(value);
@@ -739,7 +745,7 @@ var MainCtrView = Backbone.View.extend({
 	        	text: 'ขอตั้งปี ' + fiscalYear,
 	        	width: 120,
 	        	sortable : false,
-	        	dataIndex: 'sumProposals',
+	        	dataIndex: 'sumObjectiveProposals',
 	        	align: 'right',
 	        	renderer: function(value) {
 	        		return addCommas(value);
@@ -749,7 +755,7 @@ var MainCtrView = Backbone.View.extend({
 	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+1),
 	        	width: 120,
 	        	sortable : false,
-	        	dataIndex: 'sumProposalsNext1year',
+	        	dataIndex: 'sumObjectiveProposalsNext1year',
 	        	align: 'right',
 	        	renderer: function(value) {
 	        		return addCommas(value);
@@ -759,7 +765,7 @@ var MainCtrView = Backbone.View.extend({
 	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+2),
 	        	width: 120,
 	        	sortable : false,
-	        	dataIndex: 'sumProposalsNext2year',
+	        	dataIndex: 'sumObjectiveProposalsNext2year',
 	        	align: 'right',
 	        	renderer: function(value) {
 	        		return addCommas(value);
@@ -769,7 +775,7 @@ var MainCtrView = Backbone.View.extend({
 	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+3),
 	        	width: 120,
 	        	sortable : false,
-	        	dataIndex: 'sumProposalsNext3year',
+	        	dataIndex: 'sumObjectiveProposalsNext3year',
 	        	align: 'right',
 	        	renderer: function(value) {
 	        		return addCommas(value);

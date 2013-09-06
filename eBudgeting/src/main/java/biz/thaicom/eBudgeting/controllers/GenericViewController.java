@@ -947,6 +947,27 @@ public class GenericViewController {
 	// ==============================================================m65:
 	// การอนุมัติงบประมาณ ตาม พ.ร.บ. (m65)
 	
+	// --------------------------------------------------------------m65f01:
+	// การปรับลดงบประมาณระดับกิจกรรมรอบที่ 2
+	@RequestMapping("/page/m65f01/")
+	public String render_m65f01(Model model, HttpSession session) {
+		model.addAttribute("rootPage", true);
+		setFiscalYearFromSession(model, session);
+
+		return "m65f01";
+	}
+	
+	// --------------------------------------------------------------m65f04:
+	//  การประมวลผลก่อนการปรับลดรอบที่ 2
+	@RequestMapping("/page/m65f04/")
+	public String render_m65f04(Model model, HttpServletRequest request, HttpSession session) {
+		model.addAttribute("rootPage", true);
+		Integer fiscalYear = setFiscalYearFromSession(model, session);
+		model.addAttribute("rootObjective", entityService.findOneRootObjectiveByFiscalyear(fiscalYear));
+		return "m65f04";
+	}
+
+	
 	@RequestMapping("/page/m65f02/")
 	public String render_m65f02(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
