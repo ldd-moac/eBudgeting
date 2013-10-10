@@ -61,12 +61,13 @@ public class HomeController {
 			// now find current fyYear
 			for(int i=0; i<root.size(); i++) {
 				Objective o = root.get(i);
-				if(o.getFiscalYear().equals(year)) {
+				if(o.getFiscalYear().equals(year) || (i+1 == root.size())) {
 					session.setAttribute("currentRootFY", o);
 					logger.debug("year = "  + year);
 					break;
-				}
+				} 
 			}
+			
 		}
 		
 		if(session.getAttribute("navbarBreadcrumb")!= null) {
