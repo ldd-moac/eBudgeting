@@ -480,6 +480,8 @@ public class EntityServiceJPA implements EntityService {
 	public BudgetType findBudgetTypeById(Long id) {
 		BudgetType b = budgetTypeRepository.findOne(id);
 		if(b!=null) {
+			
+			logger.debug(">> b.getChildren() : " + b.getChildren().size());
 			b.doBasicLazyLoad();
 			
 			b.getChildren().size();

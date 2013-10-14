@@ -258,11 +258,7 @@ BudgetType = Backbone.RelationalModel.extend({
 	    	type: Backbone.HasMany,
 	    	key: 'children',
 	    	relatedModel: 'BudgetType',
-	    	collectionType: 'BudgetTypeCollection',
-	    	reverseRelation: {
-	    		type: Backbone.HasOne,
-	    		key: 'parent'
-	    	}
+	    	collectionType: 'BudgetTypeCollection'
 	    },{
 	    	type: Backbone.HasOne,
 	    	key: 'standardStrategy',
@@ -280,6 +276,10 @@ BudgetType = Backbone.RelationalModel.extend({
 	    	type: Backbone.HasOne,
 	    	key: 'unit',
 	    	relatedModel : 'TargetUnit'
+	    },{
+	    	type: Backbone.HasOne,
+	    	key: 'parent',
+	    	relatedModel: 'BudgetType'
 	    }
 	],
 	setIdUrl: function(id) {
