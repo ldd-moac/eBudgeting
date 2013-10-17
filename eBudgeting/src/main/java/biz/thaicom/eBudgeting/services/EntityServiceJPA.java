@@ -553,7 +553,9 @@ public class EntityServiceJPA implements EntityService {
 	@Override
 	public BudgetType saveBudgetType(JsonNode node) {
 		BudgetType budgetType;
+		Boolean newModel = false;
 		if(node.get("id") == null) {
+			newModel = true;
 			budgetType = new BudgetType();
 			Long parentTypeId = node.get("parent").get("id").asLong();
 			
@@ -620,7 +622,13 @@ public class EntityServiceJPA implements EntityService {
 		
 		budgetTypeRepository.save(budgetType);
 		
-		return budgetType;
+		if(newModel) {
+			return budgetType;	
+		} else {
+			return null;
+		}
+		
+		
 	}
 
 	@Override

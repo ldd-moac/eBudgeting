@@ -271,7 +271,7 @@ var menuJson = [{
 		},{
 			name: "m52r07: แบบสรุปงบประมาณรายจ่ายประจำปีงบประมาณ(วิสัยทัศน์ - พันธกิจ)", code: 'm51r01', link: "m52r07.xls/"+fiscalYear+"/file/m52r07.xls",  type: "download", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m52r08: ความเชื่อมโยงกับแผนบริหารรราชการแผ่นดิน", code: 'm51r01', link: "m52r08.xls/"+fiscalYear+"/file/m52r08.xls",  type: "download", group: "BGT_BGT_ADMIN"
+			name: "m52r08: ความเชื่อมโยงกับแผนบริหารรราชการแผ่นดิน", code: 'm52r08', link: "m52r08.xls/"+fiscalYear+"/file/m52r08.xls",  type: "download", group: "BGT_BGT_ADMIN"
 		},{
 			name: "m52r11: ความเชื่อมโยงระหว่างยุทธศาสตร์กระทรวงกับกลยุทธ์หน่วยงานและแนวทางการจัดสรรงบประมาณ", code: 'm51r01', link: "m52r11.xls/"+fiscalYear+"/file/m52r11.xls",  type: "download", group: "BGT_BGT_ADMIN"
 		}]

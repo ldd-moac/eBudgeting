@@ -591,7 +591,8 @@ var MainTblView = Backbone.View.extend({
 	
 	saveLine: function(e) {
 
-		var id = $(e.target).attr('data-id');
+		var id = $('#rowForm').attr('data-id');
+		
 		var budgetType = BudgetType.findOrCreate(id);
 		
 		
@@ -633,6 +634,11 @@ var MainTblView = Backbone.View.extend({
 				this.$el.find('a.btn').toggleClass('disabled');
 				this.collection.add(newBudgetType);
 				this.collection.trigger("reset");
+				
+				alert('บันทึกข้อมูลเรียบร้อย');
+				// then close the modal;
+				  $('#budgetTypeModal').modal('hide');
+				
 			},this)
 		});
 		

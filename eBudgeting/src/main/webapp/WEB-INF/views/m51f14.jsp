@@ -300,7 +300,7 @@
 
 <script id="newRowTemplate" type="text/x-handlebars-template">
 	<div class="well">
-		 <form class="form-inline" data-id="{{id}}">
+		 <form class="form-inline" id="rowForm" data-id="{{id}}">
 			<div class="control-group">
 				{{#if this.editBudgetType}}
 					<b>แก้ไขรายการย่อย</b>
