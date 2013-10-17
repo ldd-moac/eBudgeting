@@ -24,10 +24,10 @@ public interface BudgetTypeRepository extends
 			"ORDER BY budgetType.fiscalYear asc")
 	List<Integer> findFiscalYears();
 	
-	@Query("SELECT budgetType " +
-			"FROM BudgetType budgetType " +
-			"WHERE parentLevel = ?1 AND parentPath like ?2 AND " +
-			"	(TO_CHAR(code) like ?3 OR name like ?3) ")
+	@Query("SELECT budgetType " 
+			+ "FROM BudgetType budgetType "
+			+ "WHERE parentLevel = ?1 AND parentPath like ?2 AND " 
+			+ "	(TO_CHAR(code) like ?3 OR name like ?3) ")
 	Page<BudgetType> findAllByParentLevelAndParentPathLike(Integer level,
 			String mainTypePath, String query, Pageable pageable);
 	

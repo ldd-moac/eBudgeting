@@ -759,6 +759,7 @@ var BudgetTypeSelectionView = Backbone.View.extend({
 		// first clear the siblings select
 		this.$el.nextAll('div').remove();
 		this.$el.empty();
+		//console.log(this.model.get('children').toJSON());
 		this.$el.html(this.selectionTpl(this.model.get('children').toJSON()));
 	},
 	

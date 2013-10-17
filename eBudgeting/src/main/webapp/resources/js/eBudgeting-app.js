@@ -281,7 +281,7 @@ BudgetType = Backbone.RelationalModel.extend({
 	    	key: 'parent',
 	    	relatedModel: 'BudgetType'
 	    }
-	],
+	],	
 	setIdUrl: function(id) {
 		this.url = this.urlRoot + "/" + id;
 	},
@@ -820,7 +820,10 @@ ObjectiveTypeCollection = Backbone.Collection.extend({
 	model: ObjectiveType
 });
 BudgetTypeCollection = Backbone.Collection.extend({
-	model: BudgetType
+	model: BudgetType,
+	comparator: function( model ){
+		return( model.get( 'index' ) );
+	},
 });
 BudgetCommonTypeCollection = Backbone.Collection.extend({
 	model: BudgetCommonType

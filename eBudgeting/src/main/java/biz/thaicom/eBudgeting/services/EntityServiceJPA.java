@@ -484,7 +484,11 @@ public class EntityServiceJPA implements EntityService {
 			logger.debug(">> b.getChildren() : " + b.getChildren().size());
 			b.doBasicLazyLoad();
 			
-			b.getChildren().size();
+			Integer sz = b.getChildren().size();
+			if(sz > 0) {
+				b.getChildren().get(0).getLevel().getName();
+			}
+			
 			//for each children get
 		}
 		return b;
@@ -508,7 +512,7 @@ public class EntityServiceJPA implements EntityService {
 			}
 			b.setStrategies(formulaStrategyRepository.findOnlyNonStandardByfiscalYearAndType_id(fiscalYear, b.getId()));
 			b.setStandardStrategy(formulaStrategyRepository.findOnlyStandardByfiscalYearAndType_id(fiscalYear, b.getId()));
-			
+			b.getParent().getId();
 			
 			
 			b.setCurrentFiscalYear(fiscalYear);
