@@ -287,8 +287,8 @@
 <script id="editRowTemplate" type="text/x-handelbars-template">
 <td><input type="radio" name="rowRdo" id="rdo_{{index}}" value="{{index}}" checked="checked"/></td>
 	<td> {{budgetTypeName parentIds.[1]}}</td>
-	<td> {{budgetTypeName parentIds.[2]}}	</td>
-	<td> {{budgetTypeName parentIds.[3]}} </td>
+	<td> {{budgetTypeName parentIds.[2]}}</td>
+	<td> {{budgetTypeName parentIds.[3]}}</td>
 	<td> [{{code}}] <br/><input type="text" id="nameTxt" value="{{name}}"/> 
 		<br/>
 		<button class='btn btn-mini btn-info lineUpdate'>บันทึกข้อมูล</button>

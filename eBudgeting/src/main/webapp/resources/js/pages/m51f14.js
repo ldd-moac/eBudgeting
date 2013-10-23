@@ -471,7 +471,11 @@ var MainTblView = Backbone.View.extend({
 			type: 'POST',
 			data: {
 				query: this.searchTxt
-			}
+			},
+			success: _.bind(function(){
+				this.render();
+			}, this)
+		
 		});
 		return false;
 	},
@@ -516,14 +520,12 @@ var MainTblView = Backbone.View.extend({
     	});
 		
 		
-		    $('#budgetTypeModal').modal({show: true, backdrop: 'static', keyboard: false});
+		$('#budgetTypeModal').modal({show: true, backdrop: 'static', keyboard: false});
 		
 	},
 	
 	editRow: function(e) {
 		var fsId = $('input[name=rowRdo]:checked').parents('tr').attr('data-id');
-		
-			
 		
 			var model = this.collection.get(fsId);
 		
@@ -557,7 +559,7 @@ var MainTblView = Backbone.View.extend({
 
 			
 			$('#budgetTypeModal .modal-body').html(this.newRowTemplate(json));	
-			  $('#budgetTypeModal').modal({show: true, backdrop: 'static', keyboard: false});
+			$('#budgetTypeModal').modal({show: true, backdrop: 'static', keyboard: false});
 	},
 	
 	

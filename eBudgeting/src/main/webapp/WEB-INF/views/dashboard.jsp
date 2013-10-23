@@ -128,7 +128,7 @@ var menuJson = [{
 		}]
 	}, {
 		name: "ทะเบียนตามแผนปฏิบัติราชการ (m52)", code: "m52",  menus:[{
-			name: "m52f01: ทะเบียนเป้าประสงค์ (เป้าหมาย) เชิงนโยบนาย", code: "m52f01",  link: "page/m52f01/", group: "BGT_BGT_ADMIN"
+			name: "m52f01: ทะเบียนเป้าประสงค์ (เป้าหมาย) เชิงนโยบาย", code: "m52f01",  link: "page/m52f01/", group: "BGT_BGT_ADMIN"
 		}]
 	},{
 		name: "ทะเบียนสายยุทธศาสตร์กระทรวง-หน่วยงาน (m53)", code: "m53",  menus: [{
@@ -161,47 +161,55 @@ var menuJson = [{
 		},{
 			name: "m61f04: การบันทึกงบประมาณ ระดับรายการ", code: "m61f04", link: "page/m61f04_1/", group: "BGT_USER"
 		},{
+			name: "m61f06: กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m61f06", link: "page/m61f06/", group: "BGT_USER"
+		},{
 			name: "m61f05: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)",code: "m61f05",  link: "page/m61f05/", group: "BGT_BGT_ADMIN" 
 		}]
 	}, {
-		name: "การกระทบยอดเงินงบประมาณ (m62)", code: "m62", menus: [{
+		name: "การกระทบยอดงบประมาณ (m62)", code: "m62", menus: [{
 			name: "m62f01: การประมวลผลการกระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m62f01", link: "page/m62f01/", group: "BGT_BGT_ADMIN"
 		}]
 	},{
-		name: "การพิจารณากรอบวงเงินเพื่อตั้งคำของบประมาณ (เข้าระบบ e-Budgeting) (m63)",code: "m63",  menus:[{
-			name: "m63f04: การประมวลผลก่อนการปรับลดรอบที่ 1", code: "m63f04", link: "page/m63f04/", group: "BGT_BGT_ADMIN"
+		name: "กรอบวงเงินเพื่อตั้งคำของบประมาณ (เข้าระบบ e-Budgeting) (m63)",code: "m63",  menus:[{
+			name: "m63f04: ประมวลผลก่อนการปรับลดรอบที่ 1", code: "m63f04", link: "page/m63f04/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m63f01: การปรับลดงบประมาณระดับกิจกรรมรอบที่ 1",code: "m63f01",  link: "page/m63f01/", group: "BGT_BGT_ADMIN"
+			name: "m63f01: ปรับลดงบประมาณระดับกิจกรรมรอบที่ 1",code: "m63f01",  link: "page/m63f01/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m63f05: การปรับลดทะเบียนรายการรอบที่ 1",code: "m63f05",  link: "page/m63f05/", group: "BGT_BGT_ADMIN"
+			name: "m63f05: ปรับลดทะเบียนรายการรอบที่ 1",code: "m63f05",  link: "page/m63f05/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m63f02: การปรับลดงบประมาณระดับรายการรอบที่ 1", code: "m63f02", link: "page/m63f02/", group: "BGT_BGT_ADMIN"
+			name: "m63f02: ปรับลดงบประมาณระดับรายการรอบที่ 1", code: "m63f02", link: "page/m63f02/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m63f03: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m63f03", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
+			name: "m63f06: กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m63f06", link: "page/m63f06/", group: "BGT_BGT_ADMIN"
+		},{
+			name: "m63f03: นำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m63f03", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
 		}]
 	}, {
 		name: "การพิจารณาตามชั้นกรรมาธิการ (วาระที่ 1 - 3) (m64)", code: "m64", menus:[{
-			name: "m64f04: การประมวลผลก่อนการปรับลดรอบที่ 2", code: "m64f04", link: "page/m64f04/", group: "BGT_BGT_ADMIN"
+			name: "m64f04: ประมวลผลก่อนการปรับลดรอบที่ 2", code: "m64f04", link: "page/m64f04/", group: "BGT_BGT_ADMIN"
 		}, {
-			name: "m64f01: การปรับลดงบประมาณระดับกิจกรรมรอบที่ 2", code: "m64f01", link: "page/m64f01/", group: "BGT_BGT_ADMIN"
+			name: "m64f01: ปรับลดงบประมาณระดับกิจกรรมรอบที่ 2", code: "m64f01", link: "page/m64f01/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m64f05: การปรับลดทะเบียนรายการรอบที่ 2",code: "m64f05",  link: "page/m64f05/", group: "BGT_BGT_ADMIN"
+			name: "m64f05: ปรับลดทะเบียนรายการรอบที่ 2",code: "m64f05",  link: "page/m64f05/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m64f02: การปรับลดงบประมาณระดับรายการรอบที่ 2", code: "m64f02", link: "page/m64f02/", group: "BGT_BGT_ADMIN"
-		}, {
-			name: "m64f03: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m64f03", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
+			name: "m64f02: ปรับลดงบประมาณระดับรายการรอบที่ 2", code: "m64f02", link: "page/m64f02/", group: "BGT_BGT_ADMIN"
+		},{
+			name: "m64f06: กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m64f06", link: "page/m64f06/", group: "BGT_BGT_ADMIN"
+		},{
+			name: "m64f03: นำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m64f03", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
 		}]
 	},{
 		name: "การอนุมัติงบประมาณ ตาม พ.ร.บ. (m65)",code: "m65",  menus: [{
-			name: "m65f04: การประมวลผลก่อนการปรับลดรอบที่ 3", code: "m65f04", link: "page/m65f04/", group: "BGT_BGT_ADMIN"
+			name: "m65f04: ประมวลผลก่อนการปรับลดรอบที่ 3", code: "m65f04", link: "page/m65f04/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m65f01: การปรับลดงบประมาณระดับกิจกรรมรอบที่ 3", code: "m65f01", link: "page/m65f01/", group: "BGT_BGT_ADMIN"
+			name: "m65f01: ปรับลดงบประมาณระดับกิจกรรมรอบที่ 3", code: "m65f01", link: "page/m65f01/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m65f05: การปรับลดทะเบียนรายการรอบที่ 3",code: "m65f05",  link: "page/m65f05/", group: "BGT_BGT_ADMIN"
+			name: "m65f05: ปรับลดทะเบียนรายการรอบที่ 3",code: "m65f05",  link: "page/m65f05/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m65f02: การปรับลดงบประมาณระดับรายการรอบที่ 3", code: "m65f02", link: "page/m65f02/", group: "BGT_BGT_ADMIN"
+			name: "m65f02: ปรับลดงบประมาณระดับรายการรอบที่ 3", code: "m65f02", link: "page/m65f02/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m65f03: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m65f03", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
+			name: "m65f06:  กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m65f06", link: "page/m65f06/", group: "BGT_BGT_ADMIN"
+		},{
+			name: "m65f03: นำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m65f03", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
 		}]
 	}]
 },{

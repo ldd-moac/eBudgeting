@@ -501,8 +501,11 @@ public class EntityServiceJPA implements EntityService {
 		logger.debug(query);
 		Page<BudgetType> p = budgetTypeRepository.findAllByParentLevelAndParentPathLike(level,mainTypePath, query,pageable);
 		
+		logger.debug("size return: " + p.getContent().size() );
+		
 		// now we load the necceessary 
 		for(BudgetType b : p ) {
+			logger.debug(b.getName());
 			b.getLevel().getId();
 			if(b.getCommonType() != null) {
 				b.getCommonType().getId();
