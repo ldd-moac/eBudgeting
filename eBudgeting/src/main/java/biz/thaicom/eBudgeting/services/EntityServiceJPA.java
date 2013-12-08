@@ -1775,7 +1775,7 @@ public class EntityServiceJPA implements EntityService {
 		for(BudgetProposal proposal : proposalList) {
 			Integer index = list.indexOf(proposal.getForObjective());
 			Objective o = list.get(index);
-			logger.debug("AAding proposal {} to objective: {}", proposal.getId(), o.getId());
+			//logger.debug("AAding proposal {} to objective: {}", proposal.getId(), o.getId());
 			
 			o.addfilterProposal(proposal);
 			//logger.debug("proposal size is " + o.getProposals().size());
@@ -1797,10 +1797,10 @@ public class EntityServiceJPA implements EntityService {
 			target.getForObjectives().size();
 			
 			for(Objective o : target.getForObjectives()) {
-				logger.debug("Adding objective target to list");
+				//logger.debug("Adding objective target to list");
 				Integer index = list.indexOf(o);
 				Objective objInlist = list.get(index);
-				logger.debug("objInList target size = " + objInlist.getTargets().size());
+				//logger.debug("objInList target size = " + objInlist.getTargets().size());
 				
 				TargetValue tv = targetValueMap.get(objInlist.getId() + "," + target.getId());
 				if(tv==null) {
@@ -1964,13 +1964,17 @@ public class EntityServiceJPA implements EntityService {
 		}
 		
 		// now deal with target
-		if(strategy.getTargetValue() != null && strategy.getTargetValue() > 0) {
+		if(strategy.getTargetValue() != null && strategy.getTargetValue() >= 0) {
+			logger.debug("strategy.getTargetValue() : " + strategy.getTargetValue());
 			Objective obj = strategy.getProposal().getForObjective();
 			
 			while(obj.getParent()!=null) {
 				List<TargetValue> tvList = targetValueRepository.findAllByOnwerIdAndTargetUnitIdAndObjectiveId(owner.getId(), strategy.getTargetUnit().getId(), obj.getId());
 				TargetValue tv = null;
 				if(tvList.size() == 0) {
+					logger.debug("create new Target Value for targetId: "+ strategy.getTargetUnit().getId() +"  for Objective " + obj.getId());
+					
+					
 					
 					//find a matching Target
 					ObjectiveTarget matchingTarget = objectiveTargetRepository.findOneByForObjectivesAndUnit(obj, strategy.getTargetUnit());
@@ -1988,9 +1992,12 @@ public class EntityServiceJPA implements EntityService {
 					}
 					
 				} else {
-				
+					logger.debug("found " + tvList.size() + " target value for Objective "+ obj.getId());
 					for(TargetValue tvInList: tvList) {
-						if(tvInList.getTarget().getIsSumable()) {
+						if(tvInList.getTarget().getIsSumable() 
+								&& tvInList.getOwner().getId().equals(b.getOwner().getId())) {
+							logger.debug(" -- update target value id: " + tvInList.getId());
+							
 							tv = tvInList;
 							
 							tv.adjustRequestedValue(oldStrategy.getTargetValue()-strategy.getTargetValue());
