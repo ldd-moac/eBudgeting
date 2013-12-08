@@ -1927,7 +1927,7 @@ public class EntityServiceJPA implements EntityService {
 		b.addAmountRequest(strategy.getTotalCalculatedAmount()-oldStrategy.getTotalCalculatedAmount());
 		b.addAmountRequestNext1Year(strategy.getAmountRequestNext1Year()-oldStrategy.getAmountRequestNext1Year());
 		b.addAmountRequestNext2Year(strategy.getAmountRequestNext2Year()-oldStrategy.getAmountRequestNext2Year());
-		b.addAmountRequestNext3Year(strategy.getAmountRequestNext2Year()-oldStrategy.getAmountRequestNext3Year());
+		b.addAmountRequestNext3Year(strategy.getAmountRequestNext3Year()-oldStrategy.getAmountRequestNext3Year());
 		
 		budgetProposalRepository.save(b);
 		
@@ -3840,6 +3840,9 @@ public class EntityServiceJPA implements EntityService {
 	public ObjectiveBudgetProposal saveObjectiveBudgetProposal(
 			Organization workAt, JsonNode node) {
 
+		logger.debug("node : ");
+		logger.debug(node.toString());
+		
 		ObjectiveBudgetProposal obp;
 		
 		if(getJsonNodeId(node) != null) {
