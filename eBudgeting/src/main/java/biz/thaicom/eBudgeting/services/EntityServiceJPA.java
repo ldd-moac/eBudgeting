@@ -2086,7 +2086,7 @@ public class EntityServiceJPA implements EntityService {
 			ps.setRequestColumns(rcList);
 			
 			logger.debug(">> requestColumns: "+ psNode.get("requestColumns").toString());
-			Iterator<JsonNode> rcNodeIter = psNode.get("requestColumns").iterator();
+			Iterator<JsonNode> rcNodeIter = psNode.get("requestColumns").iterator(); 
 			while (rcNodeIter.hasNext()) {
 			
 				JsonNode rcNode  = rcNodeIter.next();
@@ -4396,8 +4396,8 @@ public class EntityServiceJPA implements EntityService {
 	}
 
 	@Override
-	public Page<User> findUser(PageRequest pageRequest) {
-		return userRepository.findAll(pageRequest);
+	public Page<User> findUser(String query, PageRequest pageRequest) {
+		return userRepository.findAll(User.UserHasNameLike(query), pageRequest);
 	}
 
 	@Override

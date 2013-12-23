@@ -319,15 +319,16 @@ public interface EntityService {
 	
 	
 	// Security User
-	public Page<User> findUser(PageRequest pageRequest);
 	public User findOneUser(Long id);
 	public User updateUser(JsonNode node);
 	public User saveUser(JsonNode node);
 	public User deleteUser(Long id);
-
+	public Page<User> findUser(String query, PageRequest pageRequest);
+	
 	// ObjectiveAllocationRecord
 	public ObjectiveAllocationRecord findObjectiveAllocationRecordById(Long id);
 	public void updateObjectiveAllocationRecord(Long id, JsonNode data);
+
 
 
 
