@@ -205,7 +205,38 @@ var MainTblView = Backbone.View.extend({
 		"click .menuEdit"	: "editRow",
 		"click .menuEditUnit"	: "editRowUnit",
 		
+		"click #search" : "search",
+		"click #searchDisplayAll" : "searchAll",
+		
 		"click a.pageLink" : "gotoPage"
+	},
+	
+	searchAll: function(e) {
+		this.collection.query = "";
+		this.collection.targetPage = 1;
+		this.collection.fetch({
+			success: _.bind(function() {
+				//this.render();
+				this.collection.trigger('reset');
+			}, this)
+		});
+		return false;
+	},
+	
+	search: function(e) {
+		var query = this.$el.find('#availableChildrenSearch').val();
+		
+		this.collection.targetPage = 1;
+		this.collection.query = query;
+		this.collection.fetch({
+			success: _.bind(function() {
+				//this.render();
+				this.collection.trigger('reset');
+				
+				this.$el.find('#availableChildrenSearch').val(query);
+			}, this)
+		});
+		return false;
 	},
 	
 	newRow: function(e) {
@@ -298,17 +329,18 @@ var MainTblView = Backbone.View.extend({
 	
 	renderTargetPage: function(pageNumber) {
 		
-		userCollection.targetPage = pageNumber;
+		this.collection.targetPage = pageNumber;
 		
-		userCollection.fetch({
+		this.collection.fetch({
 			silent: true,
-			success: function(){
+			success: _.bind(function(){
 				
 				
-				userCollection.trigger('reset');
+				this.collection.trigger('reset');
+				this.$el.find('#availableChildrenSearch').val(this.collection.query);
 				
 				
-			}
+			},this)
 		});
 	}
 	

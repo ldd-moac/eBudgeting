@@ -19,12 +19,18 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Fetch;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.SetJoin;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import biz.thaicom.eBudgeting.models.hrx.Organization;
+import biz.thaicom.eBudgeting.models.hrx.Organization_;
 import biz.thaicom.eBudgeting.models.hrx.Person;
+import biz.thaicom.eBudgeting.models.hrx.Person_;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -98,16 +104,27 @@ public class User implements Serializable {
 		this.groups = groups;
 	}
 	
-	 public static Specification<User> UserHasNameLike(final String name) {
-         return new Specification<User>() {
-                        @Override
-                        public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query,
-                                        CriteriaBuilder cb) {
-                                return cb.like(root.get(User_.username), name);
-                        }
-                };
-         }
-
+	public static Specification<User> UserHasNameLike(final String name) {
+		return new Specification<User>() {
+			@Override
+			public Predicate toPredicate(Root<User> root,
+					CriteriaQuery<?> query, CriteriaBuilder cb) {
+				
+				Join<User, Person> p = root.join(User_.person);
+				Join<Person, Organization> o = p.join(Person_.workAt);
+				if (Long.class != query.getResultType()) {
+					root.fetch(User_.person).fetch(Person_.workAt);
+				}
+				
+				
+				return cb.or(
+						cb.like(root.get(User_.username), name),
+						cb.like(p.get(Person_.firstName), name),
+						cb.like(p.get(Person_.lastName), name),
+						cb.like(o.get(Organization_.name), name));
+			}
+		};
+	}
 	
 	
 }

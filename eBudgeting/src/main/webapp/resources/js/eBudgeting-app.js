@@ -606,15 +606,20 @@ TargetValueAllocationRecord = Backbone.RelationalModel.extend({
 
 User = Backbone.RelationalModel.extend({
 	idAttribute: 'id',
-	relation: [{
-		type: Backbone.HaseOne,
+	relations: [{
+		type: Backbone.HasOne,
 		key: 'person',
 		relatedModel: 'Person'
 	}]
 });
 
 Person = Backbone.RelationalModel.extend({
-	idAttribute: 'id'
+	idAttribute: 'id',
+	relations: [{
+		type: Backbone.HasOne,
+		key: 'workAt',
+		relatedModel: 'Organization'
+	}]
 });
 
 BudgetSignOff = Backbone.RelationalModel.extend({
@@ -717,6 +722,9 @@ PagableCollection = Backbone.Collection.extend({
 
 
 // Collection
+UserCollection = Backbone.Collection.extend({
+	model: User
+});
 
 ObjectiveCollection = Backbone.Collection.extend({
 	model: Objective
@@ -732,11 +740,15 @@ UserPagableCollection = PagableCollection.extend({
 	 },
 		
 	model: User,
+	query: '',
 	
 	url: function() {
-		return appUrl('/User/page/' + this.targetPage);
+		if(this.query == null || this.query.length == 0 ) {
+            return appUrl('/User/page/' + this.targetPage);
+		} else {
+            return appUrl('/User/page/' + this.targetPage + '?query=' + this.query);
+		}
 	}
-	
 });
 
 ObjectiveNamePagableCollection = PagableCollection.extend({
