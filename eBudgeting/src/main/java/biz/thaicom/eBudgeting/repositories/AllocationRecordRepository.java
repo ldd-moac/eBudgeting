@@ -47,6 +47,21 @@ public interface AllocationRecordRepository extends
 	public Long findSumAmountAllocationOfBudgetTypeAndParent(
 			BudgetType budgetType, Objective parent, Integer index);
 
+	@Query(""
+			+ "SELECT sum(record.amountAllocated) "
+			+ "FROM AllocationRecord record "
+			+ "WHERE record.forObjective = ?1 and record.index = ?2 "
+			)
+	public Long findSumAllocationForObjectiveAndIndex(Objective obj, int i);
+
+	@Query("" +
+			"SELECT record " +
+			"FROM AllocationRecord record " +
+			"WHERE record.forObjective = ?1 and record.index =?2 ")
+	public List<AllocationRecord> findAllByForObjectiveAndIndex(
+			Objective objectvie, int i);
+	
+
 	
 	
 

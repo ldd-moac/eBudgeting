@@ -128,7 +128,8 @@ public interface EntityService {
 
 	public List<Objective> findObjectiveAllChildrenByObjectiveIdLoadProposal(
 			Long id);
-	
+	public List<Objective> findObjectiveChildrenByObjectiveIdLoadAllocation(
+			Long id, Integer roundNum);
 		
 	//BudgetType
 	public List<BudgetType> findRootBudgetType();
@@ -183,6 +184,9 @@ public interface EntityService {
 	public List<BudgetProposal> findBudgetProposalByObjectiveIdAndBudgetTypeId(Long objectiveId, Long budgetTypeId);
 
 	public void copyFromProposalToObjectiveProposal(Integer fiscalYear, Organization workAt);
+	public void copyFromAllocationToObjectiveAllocation(Integer fiscalYear,
+			Integer roundNum);
+	
 	public List<BudgetProposal> findBudgetProposalByObjectiveId(Long objectiveId);
 	
 	//ProposalStrategy
@@ -328,6 +332,8 @@ public interface EntityService {
 	// ObjectiveAllocationRecord
 	public ObjectiveAllocationRecord findObjectiveAllocationRecordById(Long id);
 	public void updateObjectiveAllocationRecord(Long id, JsonNode data);
+
+
 
 
 

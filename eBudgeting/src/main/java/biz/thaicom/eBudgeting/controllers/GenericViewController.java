@@ -889,6 +889,22 @@ public class GenericViewController {
 		return "m63f05";
 	}
 
+	// --------------------------------------------------------------m63f06:
+	// การประมวลผลการกระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม
+	@RequestMapping("/page/m63f06/")
+	public String render_m63f06(Model model, HttpServletRequest request,
+			HttpSession session,
+			@Activeuser ThaicomUserDetail currentUser) {
+		model.addAttribute("rootPage", true);
+		model.addAttribute("user", currentUser);
+		Integer fiscalYear = setFiscalYearFromSession(model, session);
+		Objective rootObjective = entityService.findOneRootObjectiveByFiscalyear(fiscalYear);
+		model.addAttribute("rootObjective", rootObjective);
+		logger.debug("rootObjective.id" + rootObjective.getId());
+		
+		return "m63f06";
+	}
+
 	
 	// ==============================================================m64:
 	// การพิจารณาตามชั้นกรรมาธิการ (วาระที่ 1 - 3) (m64)
@@ -933,6 +949,22 @@ public class GenericViewController {
 		setFiscalYearFromSession(model, session);
 		return "m64f05";
 	}
+
+	// --------------------------------------------------------------m64f06:
+	// การประมวลผลการกระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม
+	@RequestMapping("/page/m64f06/")
+	public String render_m64f06(Model model, HttpServletRequest request,
+			HttpSession session,
+			@Activeuser ThaicomUserDetail currentUser) {
+		model.addAttribute("rootPage", true);
+		model.addAttribute("user", currentUser);
+		Integer fiscalYear = setFiscalYearFromSession(model, session);
+		Objective rootObjective = entityService.findOneRootObjectiveByFiscalyear(fiscalYear);
+		model.addAttribute("rootObjective", rootObjective);
+		logger.debug("rootObjective.id" + rootObjective.getId());
+		
+		return "m64f06";
+	}
 	
 	// ==============================================================m65:
 	// การอนุมัติงบประมาณ ตาม พ.ร.บ. (m65)
@@ -965,6 +997,22 @@ public class GenericViewController {
 		return "m65f02";
 	}
 
+	
+	// --------------------------------------------------------------m65f06:
+	// การประมวลผลการกระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม
+	@RequestMapping("/page/m65f06/")
+	public String render_m65f06(Model model, HttpServletRequest request,
+			HttpSession session,
+			@Activeuser ThaicomUserDetail currentUser) {
+		model.addAttribute("rootPage", true);
+		model.addAttribute("user", currentUser);
+		Integer fiscalYear = setFiscalYearFromSession(model, session);
+		Objective rootObjective = entityService.findOneRootObjectiveByFiscalyear(fiscalYear);
+		model.addAttribute("rootObjective", rootObjective);
+		logger.debug("rootObjective.id" + rootObjective.getId());
+		
+		return "m65f06";
+	}
 
 	// ==============================================================m71:
 	// การจัดสรรงบประมาณ (m71)

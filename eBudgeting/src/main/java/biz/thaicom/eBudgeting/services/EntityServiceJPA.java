@@ -326,6 +326,63 @@ public class EntityServiceJPA implements EntityService {
 	}
 
 	@Override
+	public List<Objective> findObjectiveChildrenByObjectiveIdLoadAllocation(
+			Long id, Integer roundNum) {
+		List<Objective> objs =  objectiveRepository.findChildrenWithParentAndTypeAndBudgetType(id);
+		List<Objective> returnObjs = new ArrayList<Objective>();
+		for(Objective obj : objs){
+			obj.getTargets().size();
+			if(obj.getChildren().size() > 0) {
+				obj.setIsLeaf(false);
+			} else {
+				obj.setIsLeaf(true);
+			}
+			// assume no children!
+			obj.setChildren(null);
+			
+			Long sumAllocation = allocationRecordRepository.findSumAllocationForObjectiveAndIndex(obj, roundNum-1);
+			obj.setAllocationRecordsR1(new ArrayList<AllocationRecord>());
+			AllocationRecord ar = new AllocationRecord();
+			ar.setForObjective(obj);
+			ar.setIndex(roundNum-1);
+			if(sumAllocation == null) {
+				ar.setAmountAllocated(0L);
+			} else {
+				ar.setAmountAllocated(sumAllocation);
+			}
+			
+			
+			Long sumObjAllocation = objectiveAllocationRecordRepository.findSumAllocationForObjectiveAndIndex(obj, roundNum-1);
+			obj.setObjectiveAllocationRecordsR1(new ArrayList<ObjectiveAllocationRecord>());
+			ObjectiveAllocationRecord oar = new ObjectiveAllocationRecord();
+			oar.setForObjective(obj);
+			oar.setIndex(roundNum-1);
+			if(sumObjAllocation == null) {
+				oar.setAmountAllocated(0L);
+			} else {
+				oar.setAmountAllocated(sumObjAllocation);
+			}
+			
+			if(roundNum == 1) {
+				
+				obj.getAllocationRecordsR1().add(ar);
+				obj.getObjectiveAllocationRecordsR1().add(oar);
+			} else if(roundNum == 2) {
+				obj.getAllocationRecordsR2().add(ar);
+				obj.getObjectiveAllocationRecordsR2().add(oar);
+			} else if(roundNum == 3) {
+				obj.getAllocationRecordsR3().add(ar);
+				obj.getObjectiveAllocationRecordsR3().add(oar);
+			}
+			returnObjs.add(obj);
+			
+		}
+		
+		return returnObjs;
+
+	}
+
+	@Override
 	public List<Objective> findObjectiveAllChildrenByObjectiveIdLoadProposal(
 			Long id) {
 
@@ -4459,6 +4516,66 @@ public class EntityServiceJPA implements EntityService {
 		
 		return user;
 	}
+	
+	
+
+	@Override
+	public void copyFromAllocationToObjectiveAllocation(Integer fiscalYear,
+			Integer roundNum) {
+		Objective root = findOneRootObjectiveByFiscalyear(fiscalYear);
+		
+		List<BudgetType> budgetMainType = fiscalBudgetTypeRepository.findAllMainBudgetTypeByFiscalYear(fiscalYear);
+		for(Objective obj : root.getChildren()) {
+			copyFromAllocationToObjectiveAllocation(obj.getChildren(), budgetMainType, roundNum);
+			copyFromAllocationToObjectiveAllocation(obj, budgetMainType, roundNum);
+		}
+	}
+	
+	private void copyFromAllocationToObjectiveAllocation(List<Objective> children,
+			List<BudgetType> budgetMainType, Integer roundNum) {
+		if(children == null || children.size() == 0) {
+			return;
+		}
+		for(Objective obj : children) {
+			copyFromAllocationToObjectiveAllocation(obj.getChildren(), budgetMainType, roundNum);
+			copyFromAllocationToObjectiveAllocation(obj, budgetMainType, roundNum);
+		}
+	}
+	
+	private void copyFromAllocationToObjectiveAllocation(Objective objectvie,
+			List<BudgetType> budgetMainType, Integer roundNum) {
+		
+		List<AllocationRecord> ars = allocationRecordRepository.findAllByForObjectiveAndIndex(objectvie, roundNum-1);
+		List<ObjectiveAllocationRecord> oars = objectiveAllocationRecordRepository.findAllByForObjectiveAndIndex(objectvie, roundNum-1);
+		
+		
+		for(ObjectiveAllocationRecord oar : oars) {
+			if(oar.getBudgetType() != null) {
+				Long sum =0L;
+				List<AllocationRecord> newList = new ArrayList<AllocationRecord>();
+				for(AllocationRecord ar : ars) {
+					if(ar.getBudgetType().getParentPath().contains(oar.getBudgetType().getId().toString())) {
+						newList.add(ar);
+						sum += ar.getAmountAllocated();
+					}
+				}
+				// now 
+				ars.removeAll(newList);
+				oar.setAmountAllocated(sum);
+			} else {
+				Long sum =0L;
+				for(AllocationRecord ar : ars) {
+					if(ar.getBudgetType().getParentPath().contains(oar.getBudgetType().getId().toString())) {
+						sum += ar.getAmountAllocated();
+					}
+				}
+				oar.setAmountAllocated(sum);
+			}
+		}
+		
+		objectiveAllocationRecordRepository.save(oars);
+		
+	}
 
 	@Override
 	public void copyFromProposalToObjectiveProposal(Integer fiscalYear, Organization workAt) {
@@ -4472,7 +4589,7 @@ public class EntityServiceJPA implements EntityService {
 		}
 		
  	}
-
+	
 	private void copyFromProposalToObjectiveProposal(List<Objective> children,
 			Organization workAt, List<BudgetType> budgetMainType) {
 		if(children == null || children.size() == 0) {

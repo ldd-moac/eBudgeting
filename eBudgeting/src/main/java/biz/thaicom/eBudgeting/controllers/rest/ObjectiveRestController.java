@@ -121,6 +121,18 @@ public class ObjectiveRestController {
 		return  list;
 	}
 	
+	@RequestMapping(value="/Objective/{id}/childrenWithAllocations/R{roundNum}", method=RequestMethod.GET)
+	public @ResponseBody List<Objective> getChildrenObjectiveByIdAndLoadAllocationOfRound(
+			@PathVariable Long id,
+			@PathVariable Integer roundNum,
+			@Activeuser ThaicomUserDetail currentUser
+			) {
+		logger.debug("id: " + id + " round : " + roundNum);
+		List<Objective> list =entityService.findObjectiveChildrenByObjectiveIdLoadAllocation(id,roundNum);
+
+		return  list;
+	}
+	
 	@RequestMapping(value="/Objective/{id}/availableChildren", method=RequestMethod.GET)
 	public @ResponseBody List<Objective> getAvailableChildrenObjectiveById(@PathVariable Long id) {
 		logger.debug("id: " + id);
