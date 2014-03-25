@@ -1,7 +1,7 @@
 package biz.thaicom.eBudgeting.repositories;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.ejb.Ejb3Configuration;
+//import org.hibernate.ejb.Ejb3Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -13,10 +13,10 @@ public class DatabaseSchemaExport {
 	public String getSchema() {
 		String s = "";
 
-		Configuration cfg =	new Ejb3Configuration().configure(fb.getPersistenceUnitInfo(),fb.getJpaPropertyMap()).getHibernateConfiguration();
-	    
+		//Configuration cfg =	new Ejb3Configuration().configure(fb.getPersistenceUnitInfo(),fb.getJpaPropertyMap()).getHibernateConfiguration();
+	    Configuration cfg1 = new Configuration();
 
-	    SchemaExport schema = new SchemaExport(cfg);
+	    SchemaExport schema = new SchemaExport(cfg1);
 	    //schema.setOutputFile("resources/sql/schema.sql");
 	    schema.create(true, false);
 		return s;
