@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import biz.thaicom.eBudgeting.models.pln.Objective;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveName;
@@ -29,9 +30,10 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 	@Query("" +
 			"SELECT objective " +
 			"FROM Objective objective " +
-			"WHERE objective.name='ROOT' and fiscalYear=?1 " +
+			"WHERE objective.name='ROOT' and fiscalYear = :fiscalYear " +
 			"")
-	public Objective findRootOfFiscalYear(Integer fiscalYear);
+	public Objective findRootOfFiscalYear(
+			@Param("fiscalYear") Integer fiscalYear);
 	
 	
 	
@@ -46,10 +48,13 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 	@Query("" +  
 			"SELECT objective " +
 			"FROM Objective objective " +
-			"	LEFT OUTER JOIN objective.proposals proposal with proposal.owner.id = ?2 " +
-			"WHERE objective.parent.id = ?3 and objective.fiscalYear = ?1 " +
+			"	LEFT OUTER JOIN objective.proposals proposal with proposal.owner.id = :ownerId " +
+			"WHERE objective.parent.id = :objectiveId and objective.fiscalYear = :fiscalYear " +
 			"ORDER BY objective.id asc ")
-	public List<Objective> findByObjectiveBudgetProposal(Integer fiscalYear, Long onwerId, Long objectiveId);
+	public List<Objective> findByObjectiveBudgetProposal(
+			@Param("fiscalYear") Integer fiscalYear,
+			@Param("ownerId") Long ownerId, 
+			@Param("objectiveId") Long objectiveId);
 
 	
 	
@@ -59,8 +64,8 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 			"	INNER JOIN FETCH objective.parent parent " +
 			"	INNER JOIN FETCH objective.type type " +
 			"	LEFT OUTER JOIN FETCH objective.budgetTypes budgetTypes " +
-			"	LEFT OUTER JOIN objective.proposals proposal with proposal.owner.id = ?2 " +
-			"WHERE objective.fiscalYear = ?1 AND (objective.parentPath like ?3 OR objective.parentPath is null) " +
+			"	LEFT OUTER JOIN objective.proposals proposal with proposal.owner.id = :ownerId " +
+			"WHERE objective.fiscalYear = :fiscalYear AND (objective.parentPath like :parentPathLikeString OR objective.parentPath is null) " +
 			"ORDER BY objective.id asc ")
 	public List<Objective> findFlatByObjectiveBudgetProposal(
 			Integer fiscalYear, Long ownerId, String parentPathLikeString);
@@ -72,11 +77,13 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 			"	INNER JOIN FETCH objective.parent parent " +
 			"	INNER JOIN FETCH objective.type type " +
 			"	LEFT OUTER JOIN FETCH objective.budgetTypes budgetTypes " +
-			"	LEFT OUTER JOIN objective.objectiveProposals proposal with proposal.owner.id = ?2 " +
-			"WHERE objective.fiscalYear = ?1 AND (objective.parentPath like ?3 OR objective.parentPath is null) " +
+			"	LEFT OUTER JOIN objective.objectiveProposals proposal with proposal.owner.id = :ownerId " +
+			"WHERE objective.fiscalYear = :fiscalYear AND (objective.parentPath like :parentPathLikeString OR objective.parentPath is null) " +
 			"ORDER BY objective.id asc ")	
 	public List<Objective> findFlatByObjectiveObjectiveBudgetProposal(
-			Integer fiscalYear, Long ownerId, String parentPathLikeString);
+			@Param("fiscalYear") Integer fiscalYear,
+			@Param("ownerId") Long ownerId,  
+			@Param("parentPathLikeString") String parentPathLikeString);
 	
 	
 	@Query("" +  
@@ -87,10 +94,12 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 			"	INNER JOIN FETCH objective.type type " +
 			"	LEFT OUTER JOIN objective.budgetTypes budgetTypes " +
 			"	LEFT OUTER JOIN objective.proposals proposal " +
-			"WHERE objective.fiscalYear = ?1 AND (objective.parentPath like ?2 OR objective.parentPath is null) " +
+			"WHERE objective.fiscalYear = :fiscalYear "
+			+ "	AND (objective.parentPath like :parentPathLikeString OR objective.parentPath is null) " +
 			"ORDER BY objective.id asc ")
 	public List<Objective> findFlatByObjectiveBudgetProposal(
-			Integer fiscalYear, String parentPathLikeString);
+			@Param("fiscalYear") Integer fiscalYear,
+			@Param("parentPathLikeString") String parentPathLikeString);
 	
 	@Query("" +  
 			"SELECT distinct objective " +
@@ -100,23 +109,27 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 			"	INNER JOIN FETCH objective.type type " +
 			"	LEFT OUTER JOIN objective.budgetTypes budgetTypes " +
 			"	LEFT OUTER JOIN objective.objectiveProposals proposal " +
-			"WHERE objective.fiscalYear = ?1 AND (objective.parentPath like ?2 OR objective.parentPath is null) " +
+			"WHERE objective.fiscalYear = :fiscalYear"
+			+ "	 AND (objective.parentPath like :parentPathLikeString OR objective.parentPath is null) " +
 			"ORDER BY objective.id asc ")
 	public List<Objective> findFlatByObjectiveObjBudgetProposal(
-			Integer fiscalYear, String parentPathLikeString);
+			@Param("fiscalYear") Integer fiscalYear,
+			@Param("parentPathLikeString") String parentPathLikeString);
 	
 	@Query("" +
 			"SELECT objective " +
 			"FROM Objective objective " +
-			"WHERE objective.parentPath like ?1")
-	public List<Objective> findAllDescendantOf(String parentPathLikeString);
+			"WHERE objective.parentPath like :parentPathLikeString")
+	public List<Objective> findAllDescendantOf(
+			@Param("parentPathLikeString") String parentPathLikeString);
 	
 	@Query("" +
 			"SELECT objective " +
 			"FROM Objective objective " +
-			"WHERE objective.id in (?1) " +
+			"WHERE objective.id in ( :ids ) " +
 			"ORDER BY objective.parentPath DESC ")
-	public List<Objective> findAllObjectiveByIds(List<Long> ids);
+	public List<Objective> findAllObjectiveByIds(
+			@Param("ids") List<Long> ids);
 	
 	
 	@Query("" +  
@@ -124,16 +137,18 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 			"FROM Objective objective" +
 			"	INNER JOIN FETCH objective.type type " +
 			"	LEFT OUTER JOIN FETCH objective.budgetTypes budgetTypes " +
-			"WHERE objective.parent.id = ?1  " +
+			"WHERE objective.parent.id = :id  " +
 			"ORDER BY objective.id asc ")
 	public List<Objective> findChildrenWithParentAndTypeAndBudgetType(
-			Long id);
+			@Param("id") Long id);
 
 	@Modifying
 	@Query("update Objective objective " +
 			"set index = index-1 " +
-			"where index > ?1 and objective.parent = ?2 ")
-	public int reIndex(Integer deleteIndex, Objective parent);
+			"where index > :deleteIndex and objective.parent = :parent ")
+	public int reIndex(
+			@Param("deleteIndex") Integer deleteIndex,
+			@Param("parent") Objective parent);
 
 	@Query("" +
 			"SELECT objective " +
@@ -141,50 +156,61 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 			"	INNER JOIN FETCH objective.type type " +
 			"	LEFT OUTER JOIN FETCH objective.parent parent " +
 			"	LEFT OUTER JOIN FETCH objective.units unit " +
-			"WHERE objective.fiscalYear=?1 " +
-			"	AND objective.type.id=?2 " +
+			"WHERE objective.fiscalYear= :fiscalYear " +
+			"	AND objective.type.id= :typeId " +
 			"ORDER BY objective.id asc ")
-	public List<Objective> findAllByFiscalYearAndType_id(Integer fiscalYear,
-			Long typeId);
+	public List<Objective> findAllByFiscalYearAndType_id(
+			@Param("fiscalYear") Integer fiscalYear,
+			@Param("typeId") Long typeId);
 	
 	@Query("" +
 			"SELECT objective " +
 			"FROM Objective objective " +
-			"WHERE objective.fiscalYear=?1 " +
-			"	AND objective.type.id=?2 " )
-	public Page<Objective> findPageByFiscalYearAndType_id(Integer fiscalYear,
-			Long typeId, Pageable pageable);
+			"WHERE objective.fiscalYear= :fiscalYear " +
+			"	AND objective.type.id= :typeId " )
+	public Page<Objective> findPageByFiscalYearAndType_id(
+			@Param("fiscalYear") Integer fiscalYear,
+			@Param("typeId") Long typeId, 
+			Pageable pageable);
 	
 	@Query("" +
 			"SELECT max(o.code) " +
 			"FROM Objective o " +
-			"WHERE o.type=? AND o.fiscalYear=?2 ")
-	public String findMaxCodeOfTypeAndFiscalYear(ObjectiveType type,
-			Integer fiscalYear);
+			"WHERE o.type= :type AND o.fiscalYear= :fiscalYear ")
+	public String findMaxCodeOfTypeAndFiscalYear(
+			@Param("type") ObjectiveType type,
+			@Param("fiscalYear") Integer fiscalYear);
 	
 	@Query("" +
 			"SELECT max(o.lineNumber) " +
 			"FROM Objective o " +
-			"WHERE o.fiscalYear=?1 ")
-	public Integer findMaxLineNumberFiscalYear(Integer fiscalYear);
+			"WHERE o.fiscalYear= :fiscalYear ")
+	public Integer findMaxLineNumberFiscalYear(@Param("fiscalYear") Integer fiscalYear);
 	
 	@Modifying
 	@Query("update Objective objective " +
-			"set lineNumber = lineNumber + ?3  " +
-			"where fiscalYear =?1 AND lineNumber >= ?2 ")
-	public Integer insertFiscalyearLineNumberAt(Integer fiscalYear, Integer lineNumer, Integer amount);
+			"set lineNumber = lineNumber + :amount  " +
+			"where fiscalYear = :fiscalYear AND lineNumber >= :lineNumber ")
+	public Integer insertFiscalyearLineNumberAt(
+			@Param("fiscalYear") Integer fiscalYear,
+			@Param("lineNumber") Integer lineNumer,
+			@Param("amount") Integer amount);
 
 	@Modifying
 	@Query("update Objective objective " +
-			"set lineNumber = lineNumber - ?3  " +
-			"where fiscalYear =?1 AND lineNumber > ?2 ")
-	public Integer removeFiscalyearLineNumberAt(Integer fiscalYear, Integer lineNumer, Integer amount);
+			"set lineNumber = lineNumber - :amount  " +
+			"where fiscalYear =:fiscalYear AND lineNumber > :lineNumber ")
+	public Integer removeFiscalyearLineNumberAt(
+			@Param("fiscalYear") Integer fiscalYear,
+			@Param("lineNumber") Integer lineNumer,
+			@Param("amount") Integer amount);
+
 	
 	@Query("" +
 			"SELECT max(o.lineNumber) " +
 			"FROM Objective o " +
-			"WHERE o.parent = ?1  ")
-	public Integer findMaxLineNumberChildrenOf(Objective parent);
+			"WHERE o.parent = :parent  ")
+	public Integer findMaxLineNumberChildrenOf(@Param("parent") Objective parent);
 	
 	
 	
@@ -193,9 +219,9 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 	@Query("" +
 			"SELECT objective " +
 			"FROM Objective objective " +
-			"WHERE objective.type in (?1) and objective.parent is null ")
-		public List<Objective> findAvailableChildrenOfObjectiveType(
-			Set<ObjectiveType> childrenSet);
+			"WHERE objective.type in ( :childrenSet ) and objective.parent is null ")
+	public List<Objective> findAvailableChildrenOfObjectiveType(
+			@Param("childrenSet") Set<ObjectiveType> childrenSet);
 
 	public Objective findOneByFiscalYearAndName(Integer fiscalYear,
 			String string);
@@ -209,18 +235,21 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 			"	INNER JOIN FETCH objective.proposals proposal " +
 			"	INNER JOIN FETCH proposal.owner owner " +
 			"	INNER JOIN FETCH proposal.budgetType budgetType " +
-			"WHERE objective.fiscalYear = ?1 AND objective.type.id = ?2 ")
+			"WHERE objective.fiscalYear = :fiscalYear AND objective.type.id = :typeId ")
 	public List<Objective> findAllByTypeIdAndFiscalYearInitBudgetProposal(
-			Integer fiscalYear, long typeId);
+			@Param("fiscalYear") Integer fiscalYear,
+			@Param("typeId") long typeId);
 
 
 	@Query("" +
 			"SELECT objective " +
 			"FROM Objective objective " +
-			"WHERE fiscalYear = ?1 and type.id = ?2 and " +
-			"	(name like ?3 or code like ?3) ")
+			"WHERE fiscalYear = :fiscalYear and type.id = :typeId and " +
+			"	(name like :query or code like :query) ")
 	public Page<Objective> findByFiscalYearAndType_Id(
-			Integer fiscalYear, Long typeId, String query, Pageable pageable);
+			@Param("fiscalYear") Integer fiscalYear,
+			@Param("typeId") Long typeId,
+			@Param("query") String query, Pageable pageable);
 
 	
 	@Query("" +
@@ -229,13 +258,5 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 			"	LEFT JOIN FETCH objective.children " +
 			"	LEFT JOIN FETCH objective.parent ")
 	public Iterable<Objective> findAllFetchChildrenParent();
-
-	
-	
-
-
-
-
-
 
 }

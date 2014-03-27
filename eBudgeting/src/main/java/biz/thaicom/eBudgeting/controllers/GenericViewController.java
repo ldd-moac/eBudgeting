@@ -1015,13 +1015,22 @@ public class GenericViewController {
 	}
 
 	// ==============================================================m71:
+	// --------------------------------------------------------------m71f04:
+		//  การประมวลผลก่อนการปรับลดรอบที่ 2
+		@RequestMapping("/page/m71f04/")
+		public String render_m71f04(Model model, HttpServletRequest request, HttpSession session) {
+			model.addAttribute("rootPage", true);
+			Integer fiscalYear = setFiscalYearFromSession(model, session);
+			model.addAttribute("rootObjective", entityService.findOneRootObjectiveByFiscalyear(fiscalYear));
+			return "m71f04";
+		}
+	
 	// การจัดสรรงบประมาณ (m71)
 	
 	@RequestMapping("/page/m71f02/")
-	public String render_m71f02(Model model, HttpServletRequest request) {
-		List<Objective> fiscalYears = entityService.findRootFiscalYear();
+	public String render_m71f02(Model model, HttpServletRequest request, HttpSession session) {
 		model.addAttribute("rootPage", true);
-		model.addAttribute("fiscalYears", fiscalYears);
+		setFiscalYearFromSession(model, session);
 		return "m71f02";
 	}
 

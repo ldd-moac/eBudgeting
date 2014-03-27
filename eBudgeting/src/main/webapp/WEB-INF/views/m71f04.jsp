@@ -3,7 +3,7 @@
 
 <div class="hero-unit white">
 <div id="headLine">
-	<h4>การประมวลผลก่อนการปรับลดงบประมาณครั้งที่ 3</h4> 
+	<h4>การประมวลผลก่อนการจัดสรรงบประมาณ</h4> 
 </div>
 
 
@@ -55,14 +55,14 @@
 
 <script id="mainTblTemplate" type="text/x-handler-template">
 <div style="margin-bottom:20px;">
-	<button id="processBtn" class="btn btn-primary">ประมวลผลก่อนการปรับลดงบประมาณครั้งที่ 3</button>
+	<button id="processBtn" class="btn btn-primary">ประมวลผลก่อนการจัดสรรงบประมาณ</button>
 </div>
 <table class="table table-bordered table-striped">
 	<thead>
 		<tr>
 			<td style="width: 400px;">กิจกรรม</td>
-			<td style="width: 100px;">ปรับลดครั้งที่2 ระดับกิจกรรม</td>
-			<td style="width: 100px;">ปรับลดครั้งที่2 ระดับรายการ</td>
+			<td style="width: 100px;">ปรับลดครั้งที่3 ระดับกิจกรรม</td>
+			<td style="width: 100px;">ปรับลดครั้งที่3 ระดับรายการ</td>
 		</tr>
 	</thead>
 	<tbody>
@@ -81,27 +81,27 @@
 			<a id="link-{{id}}" class="drillDown" href="#"><i id="caret-{{id}}" class="icon-chevron-right"></i></icon></a> 
 		{{/if}}
 		{{name}} </td>
-	<td style="text-align: right; padding-right: 15px;"> <br/>{{sumAllocationR2 this}}</td>
-	<td style="text-align: right; padding-right: 15px;"> <br/>{{sumObjectiveAllocationR2 this}}</td>
+	<td style="text-align: right; padding-right: 15px;"> <br/>{{sumAllocationR3 this}}</td>
+	<td style="text-align: right; padding-right: 15px;"> <br/>{{sumObjectiveAllocationR3 this}}</td>
 </tr>
 {{/each}}
 </script>
 
-<script src="<c:url value='/resources/js/pages/m65f04.js'/>"></script>
+<script src="<c:url value='/resources/js/pages/m71f04.js'/>"></script>
 
 <script type="text/javascript">
 
-Handlebars.registerHelper('sumAllocationR2', function(obj) {
+Handlebars.registerHelper('sumAllocationR3', function(obj) {
 	var sum=0;
-	_.forEach(obj.allocationRecordsR2, function(r) {
+	_.forEach(obj.allocationRecordsR3, function(r) {
 		sum += r.amountAllocated;
 	});
 	return addCommas(sum);
 });
 
-Handlebars.registerHelper('sumObjectiveAllocationR2', function(obj) {
+Handlebars.registerHelper('sumObjectiveAllocationR3', function(obj) {
 	var sum=0;
-	_.forEach(obj.objectiveAllocationRecordsR2, function(r) {
+	_.forEach(obj.objectiveAllocationRecordsR3, function(r) {
 		sum += r.amountAllocated;
 	});
 	return addCommas(sum);

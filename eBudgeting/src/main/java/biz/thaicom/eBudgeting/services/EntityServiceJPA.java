@@ -2870,10 +2870,9 @@ public class EntityServiceJPA implements EntityService {
 			JsonNode data) {
 		
 		AllocationRecordStrategy ars = allocationRecordStrategyRepository.findOne(id);
+		Integer index = ars.getAllocationRecord().getIndex();
 		if(ars != null) {
 			Long amountUpdate = data.get("totalCalculatedAmount").asLong();
-			Long oldAmount = ars.getTotalCalculatedAmount();
-			Long adjustedAmount = oldAmount - amountUpdate;
 			
 			ars.setTotalCalculatedAmount(amountUpdate);
 			
@@ -2897,15 +2896,9 @@ public class EntityServiceJPA implements EntityService {
 			Objective parent = record.getForObjective().getParent();
 			while(parent.getParent() != null) {
 				logger.debug("parent.id: {}", parent.getId());
-				AllocationRecord temp = allocationRecordRepository.findOneByBudgetTypeAndObjectiveAndIndex(record.getBudgetType(), parent, 0);
+				AllocationRecord temp = allocationRecordRepository.findOneByBudgetTypeAndObjectiveAndIndex(record.getBudgetType(), parent, index);
 				
-				temp.setAmountAllocated(allocationRecordRepository.findSumAmountAllocationOfBudgetTypeAndParent(record.getBudgetType(), parent, 0));
-				
-				if(temp.getForObjective().getCode().equals("98")) {
-					logger.debug("xxxxxxxx" + temp.getAmountAllocated());
-				}
-				
-				//temp.adjustAmountAllocated(adjustedAmount);
+				temp.setAmountAllocated(allocationRecordRepository.findSumAmountAllocationOfBudgetTypeAndParent(record.getBudgetType(), parent, index));
 				
 				allocationRecordRepository.save(temp);
 				

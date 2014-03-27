@@ -216,7 +216,7 @@ var menuJson = [{
 	name: "ระบบการจัดสรรงบประมาณ (m7)", code: "m7", 
 	menus: [{
 		name: "การจัดสรรงบประมาณ (m71)",code: "m71",  menus: [{
-			name: "m3f04: การประมวลผลก่อนการจัดสรรงบประมาณ", code: "m3f04", link: "page/m4f01/", group: "BGT_BGT_ADMIN"
+			name: "m71f04: การประมวลผลก่อนการจัดสรรงบประมาณ", code: "m3f04", link: "page/m71f04/", group: "BGT_BGT_ADMIN"
 		},{
 			name: "m71f01: การจัดสรรงบประมาณระดับกิจกรรม", code: "m71f01", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
 		},{

@@ -70,15 +70,32 @@ var DetailModalView = Backbone.View.extend({
 		_.forEach(json.sumBudgetTypeProposals, _.bind(function(proposal) {
 			var budgetType = BudgetType.findOrCreate({id:proposal.budgetType.id});
 			// search the allocationR1 
-			var allocationRecord = this.currentObjective.get('allocationRecordsR3').findWhere({budgetType:budgetType});
-			if(allocationRecord  != null) {
-				var r1 = this.currentObjective.get('allocationRecordsR1').findWhere({budgetType:budgetType});
-				var r2 = this.currentObjective.get('allocationRecordsR2').findWhere({budgetType:budgetType});
-				proposal.amountAllocatedR1 = r1.get('amountAllocated');
-				proposal.amountAllocatedR2 = r2.get('amountAllocated');
-				proposal.amountAllocated = allocationRecord.get('amountAllocated');
-				proposal.allocationId = allocationRecord.get('id');
-			}
+			
+			var allProposals = this.currentObjective.get('proposals').where({budgetType:budgetType});
+			var sumAllocated = 0;
+			
+			_.forEach(allProposals, function(proposal) {
+				if(proposal.get("amountAllocated") != null) {
+					sumAllocated += proposal.get("amountAllocated");
+				}
+			});
+			
+			
+
+			var r1 = this.currentObjective.get('allocationRecordsR1').findWhere({budgetType:budgetType});
+			var r2 = this.currentObjective.get('allocationRecordsR2').findWhere({budgetType:budgetType});
+			var r3 = this.currentObjective.get('allocationRecordsR3').findWhere({budgetType:budgetType});
+			var reserved = this.currentObjective.get('reservedBudgets').findWhere({budgetType:budgetType});
+			proposal.amountAllocatedR1 = r1.get('amountAllocated');
+			proposal.amountAllocatedR2 = r2.get('amountAllocated');
+			proposal.amountAllocatedR3 = r3.get('amountAllocated');
+			proposal.amountReserved = reserved.get('amountReserved');
+			
+			proposal.amountToBeAllocated = proposal.amountAllocatedR3 - proposal.amountAllocated;
+			
+			proposal.amountAllocated = sumAllocated;
+			
+
 			
 		},this));
 		
@@ -718,6 +735,36 @@ var MainCtrView = Backbone.View.extend({
 	        	sortable: false,
 	        	align: 'center'
 	        }, {
+	        	text: 'จัดสรรให้หน่วยงาน',
+	        	width: 120,
+	        	sortable : false,
+	        	dataIndex: 'sumProposalsAllocated',
+	        	align: 'right',
+	        	renderer: function(value) {
+	        		return addCommas(value);
+	        	}
+	        		
+	        }, {
+	        	text: 'จัดสรรเข้ายุทธศาสตร์',
+	        	width: 120,
+	        	sortable : false,
+	        	dataIndex: 'sumBudgetReserved',
+	        	align: 'right',
+	        	renderer: function(value) {
+	        		return addCommas(value);
+	        	}
+	        		
+	        }, {
+	        	text: 'เหลือจัดสรร',
+	        	width: 120,
+	        	sortable : false,
+	        	dataIndex: 'sumAllocationR3',
+	        	align: 'right',
+	        	renderer: function(value) {
+	        		return addCommas(value);
+	        	}
+	        		
+	        },  {
 	        	text: 'ปรับลดครั้งที่ 3',
 	        	width: 120,
 	        	sortable : false,
