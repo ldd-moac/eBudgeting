@@ -1033,8 +1033,17 @@ public class GenericViewController {
 		setFiscalYearFromSession(model, session);
 		return "m71f02";
 	}
+	
+	
+	@RequestMapping("/page/m71f02_old/")
+	public String render_m71f02_old(Model model, HttpServletRequest request, HttpSession session) {
+		List<Objective> fiscalYears = entityService.findRootFiscalYear();
+		model.addAttribute("rootPage", true);
+		model.addAttribute("fiscalYears", fiscalYears);
+		return "m71f02_old";
+	}
 
-	@RequestMapping("/page/m71f02/{fiscalYear}/{objectiveId}")
+	@RequestMapping("/page/m71f02_old11/{fiscalYear}/{objectiveId}")
 	public String render_m71f02OfYear(@PathVariable Integer fiscalYear,
 			@PathVariable Long objectiveId, Model model,
 			HttpServletRequest request) {
@@ -1059,7 +1068,7 @@ public class GenericViewController {
 			return "redirect:/page/m71f02/";
 		}
 
-		return "m71f02";
+		return "m71f02_old";
 	}
 
 }

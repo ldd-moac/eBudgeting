@@ -332,6 +332,9 @@ public interface EntityService {
 	// ObjectiveAllocationRecord
 	public ObjectiveAllocationRecord findObjectiveAllocationRecordById(Long id);
 	public void updateObjectiveAllocationRecord(Long id, JsonNode data);
+	
+	// ReservedBudget
+	public void updateReservedBudget(Long id, Long amountReserved);
 
 
 

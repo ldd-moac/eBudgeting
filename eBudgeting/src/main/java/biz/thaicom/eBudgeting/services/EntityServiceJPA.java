@@ -4795,6 +4795,18 @@ public class EntityServiceJPA implements EntityService {
 		return;
 		
 	}
+
+	@Override
+	public void updateReservedBudget(Long id, Long amountReserved) {
+		ReservedBudget r = reservedBudgetRepository.findOne(id);
+		if(r != null) {
+			r.setAmountReserved(amountReserved);
+			reservedBudgetRepository.save(r);
+		}
+		
+	}
+	
+	
 	
 	
 	

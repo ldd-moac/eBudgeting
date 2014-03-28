@@ -22,6 +22,14 @@ var DetailModalView = Backbone.View.extend({
 	detailAllocationRecordTemplate: Handlebars.compile($('#detailAllocationRecordTemplate').html()),
 	
 	detailAllocationRecordBasicTemplate: Handlebars.compile($('#detailAllocationRecordBasicTemplate').html()),
+	
+	detailModalBudgetHeaderTemplate: Handlebars.compile($('#detailModalBudgetHeaderTemplate').html()),
+	detailModalBudgetTemplate: Handlebars.compile($('#detailModalBudgetTemplate').html()),
+	reservedBudgetInputTemplate: Handlebars.compile($('#reservedBudgetInputTemplate').html()),
+	
+	strategiesTemplate: Handlebars.compile($('#strategiesTemplate').html()),
+	editProposalFormTemplate : Handlebars.compile($('#editProposalFormTemplate').html()),
+	
 	events: {
 		"click .detailAllocation" : "detailAllocation",
 		"click #cancelBtn" : "cancelBtn",
@@ -33,7 +41,14 @@ var DetailModalView = Backbone.View.extend({
 		"click .updateAllocRec" : "updateAllocRec",
 		"click .updateAllocRecStrgy" : "updateAllocRecStrgy",
 		
-		"change .formulaColumnInput" : "formulaInputChange"
+		"change .formulaColumnInput" : "formulaInputChange",
+			
+		"click #reservedBudgetLnk" : "toggleReservedBudgetCellInput",
+		"click .cancelUpdateReservedBudget" : "cancelUpdateReservedBudget",
+		"click .updateReservedBudget" : "updateReservedBudget",
+		
+		"click .proposalLnk" : "toggleStrategy",
+		"click .editProposal" : "editProposal"
 			
 	},
 	setParentView: function(view) {
@@ -91,7 +106,7 @@ var DetailModalView = Backbone.View.extend({
 			proposal.amountAllocatedR3 = r3.get('amountAllocated');
 			proposal.amountReserved = reserved.get('amountReserved');
 			
-			proposal.amountToBeAllocated = proposal.amountAllocatedR3 - proposal.amountAllocated;
+			proposal.amountToBeAllocated = proposal.amountAllocatedR3 - proposal.amountAllocated - reserved.get('amountReserved');
 			
 			proposal.amountAllocated = sumAllocated;
 			
@@ -105,26 +120,118 @@ var DetailModalView = Backbone.View.extend({
 		return this;
 	},
 	detailAllocation: function(e) {
-		var allocationRecord = AllocationRecord.findOrCreate($(e.target).attr('data-allocationId'));
-		allocationRecord.fetch({
-			success: _.bind(function(model, response, options) {
-				this.$el.find('.modal-footer').html(this.detailAllocationRecordFooterTemplate());
-				e1=model;
-				var json = model.toJSON();
-				var html;
-				if(model.get('allocationRecordStrategies') != null && 
-						model.get('allocationRecordStrategies').length > 0) {
-					html = this.detailAllocationRecordTemplate(json);
-				} else {
-					html = this.detailAllocationRecordBasicTemplate(json);
-				}
-				
-				
-				
-				this.$el.find('.modal-body').html(html);
-			},this)
-		});
+		this.currentBudgetType = BudgetType.findOrCreate($(e.target).attr('data-budgetTypeId'));
+		this.renderBudgetTypeDetail();
+		
 	},
+	
+	renderBudgetTypeDetail: function() {
+		var currentBudgetType = this.currentBudgetType;
+		//get budgetproposal that has this budgetType
+		var proposals = this.currentObjective.get('proposals').where({budgetType: currentBudgetType});
+		
+		var reservedBudget = this.currentObjective.get('reservedBudgets').findWhere({budgetType: currentBudgetType});
+		
+		var json = {};
+		json.allocationRecordR3 = this.currentObjective.get('allocationRecordsR3').findWhere({budgetType: currentBudgetType}).toJSON();
+		
+		json.proposals = [];
+		for(var i=0; i<proposals.length; i++) {
+			json.proposals.push(proposals[i].toJSON());
+		}
+		
+		json.reservedBudget = reservedBudget.toJSON();
+		
+		html = this.detailModalBudgetHeaderTemplate(json);
+		
+		this.$el.find('.modal-body').html(html);
+		
+		html = this.detailModalBudgetTemplate(json.proposals);
+		this.$el.find('.modal-body').append(html);
+		
+		// register current reservedBudget
+		this.currentReservedBudget = reservedBudget;
+
+	},
+	
+	toggleReservedBudgetCellInput: function(e) {
+		var json = this.currentReservedBudget.toJSON();
+		var html = this.reservedBudgetInputTemplate(json);
+		$('#reservedBudgetCell').html(html);
+	},
+	
+	cancelUpdateReservedBudget: function(e) {
+		this.renderBudgetTypeDetail();
+	},
+	
+	updateReservedBudget : function(e) {
+		var reservedAmount = $('#reservedBudgetInput').val();
+		
+		this.currentReservedBudget.set('amountReserved', parseInt(reservedAmount));
+		
+		// now put this change 
+		$.ajax({
+		    url: appUrl('/ReservedBudget/' + this.currentReservedBudget.get('id') + 
+		    		'/amountReserved/'+reservedAmount), 
+		    type: 'PUT',
+		    success: _.bind(function(result) {
+		    	this.renderBudgetTypeDetail();
+		    }, this)
+		});
+		
+		
+		
+	},
+	
+	toggleStrategy : function(e) {
+		var proposalId = $(e.target).attr('data-id');
+		var currentProposal = BudgetProposal.findOrCreate(proposalId);
+		
+		// now make a div after this
+		var nextDiv = $(e.target).parent().next();
+		
+		//prepare for data
+		var json = currentProposal.get('proposalStrategies').toJSON();
+		
+		var html = this.strategiesTemplate(json);
+		
+		nextDiv.html(html);
+		nextDiv.toggle();
+		
+	},
+	editProposal : function(e) {
+		
+		var psId = $(e.target).parent().attr('data-id');
+		// we have to turn this to input 
+		var ps = ProposalStrategy.findOrCreate(psId);
+		
+		var json = ps.toJSON();
+		
+		var l = json.formulaStrategy.formulaColumns.length;
+		
+		json.formulaStrategy.formulaColumns[l-1].$last = true;
+		// now go through and put the requestColumn back on
+		for(var i=0; i<json.formulaStrategy.formulaColumns.length; i++) {
+			if(json.formulaStrategy.formulaColumns[i].isFixed) {
+				var columnId = json.formulaStrategy.formulaColumns[i].id;
+				
+				var fc = FormulaColumn.findOrCreate(columnId);
+				
+				var rc = ps.get('requestColumns').where({column: fc})[0];
+				
+				json.formulaStrategy.formulaColumns[i].requestColumnId = rc.get('id');
+				json.formulaStrategy.formulaColumns[i].requestColumnAllocatedValue = rc.get('allocatedValue');
+				
+			}
+		}
+		
+		var html = this.editProposalFormTemplate(json);
+		
+		$(e.target).parent().html(html);
+		
+	},
+	
+	
 	detailBasicAllocation : function(e) {
 		var allocRec = AllocationRecord.findOrCreate($(e.target).attr('data-allocationId'));
 		this.$el.find('.modal-footer').html(this.detailAllocationBasicFooterTemplate());

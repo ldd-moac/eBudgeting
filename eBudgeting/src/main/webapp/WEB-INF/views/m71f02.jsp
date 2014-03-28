@@ -182,36 +182,94 @@
 <div class="clearfix"></div>
 </script>
 <script id="detailViewTableTemplate" type="text/x-handler-template">
-<table class="table table-bordered" id="detailViewTbl">
+<div style="overflow-x:scroll; overflow-y:visible;width:210px;margin-left:595px;">
+<table class="table table-bordered yscroll" id="detailViewTbl">
 	<thead>
 		<tr>
-			<td>รายการงบประมาณ</td>
-			<td>จัดสรรให้หน่วยงาน</td>
-			<td>จัดสรรเข้าส่วนกลาง</td>
-			<td>คงเหลือจัดสรร</td>
-			<td>ปรับลดครั้งที่3</td>
-			<td>ปรับลดครั้งที่2</td>
-			<td>ปรับลดครั้งที่1</td>
-			<td>ขอตั้ง</td>
+			<td fixed="true" style="position:absolute; left:10px;width:250px;">รายการงบประมาณ<br/>&nbsp;</td>
+			<td fixed="true" style="position:absolute; left:277px;width:100px;">จัดสรรให้หน่วยงาน</td>
+			<td fixed="true" style="position:absolute; left:394px;width:100px;">จัดสรรเข้าส่วนกลาง</td>
+			<td fixed="true" style="position:absolute; left:511px;width:82px;">คงเหลือจัดสรร</td>
+			<td  style="width:400px;">ปรับลดครั้งที่3</td>
+			<td  style="width:400px;">ปรับลดครั้งที่2</td>
+			<td  style="width:400px;">ปรับลดครั้งที่1</td>
+			<td  style="width:400px;">ขอตั้ง</td>
 		</tr>
 	</thead>
 	<tbody>
 		{{#each sumBudgetTypeProposals}}
 		<tr>
-			<td><a href="#" data-allocationId={{allocationId}} class="detailAllocation">{{budgetType.name}}</a></td>
-			<td>{{formatNumber amountAllocated}}</td>
-			<td>{{formatNumber amountReserved}}</td>
-			<td>{{formatNumber amountToBeAllocated}}</td>
-			<td>{{formatNumber amountAllocatedR3}}</td>
-			<td>{{formatNumber amountAllocatedR2}}</td>
-			<td>{{formatNumber amountAllocatedR1}}</td>
-			<td>{{formatNumber amountRequest}}</td>
+			<td fixed="true" style="position:absolute; left:10px;width:250px;"><a href="#" data-budgetTypeId={{budgetType.id}} class="detailAllocation">{{budgetType.name}}</a></td>
+			<td fixed="true" style="position:absolute; left:277px;width:100px;">{{formatNumber amountAllocated}}</td>
+			<td fixed="true" style="position:absolute; left:394px;width:100px;">{{formatNumber amountReserved}}</td>
+			<td fixed="true" style="position:absolute; left:511px;width:82px;">{{formatNumber amountToBeAllocated}}</td>
+			<td  style="width:400px;">{{formatNumber amountAllocatedR3}}</td>
+			<td  style="width:400px;">{{formatNumber amountAllocatedR2}}</td>
+			<td  style="width:400px;">{{formatNumber amountAllocatedR1}}</td>
+			<td  style="width:400px;">{{formatNumber amountRequest}}</td>
 		</tr>
 		{{/each}}
 	</tbody>
 </table>
+</div>
 </script>
 
+<script id="detailModalBudgetHeaderTemplate" type="text/x-handler-template">
+<div>
+	หมวดงบประมาณ {{allocationRecordR3.budgetType.name}}
+	<table>
+		<tr><td>หลังปรับลดครั้งที่ 3 ได้รับ</td><td style="text-align:right">{{formatNumber allocationRecordR3.amountAllocated}} </td><td>บาท</td></tr>
+		<tr><td>จัดสรรให้หน่วยงาน</td><td style="text-align:right">{{sumAllocatedRecord proposals}}</td><td> บาท</td></tr>
+		<tr><td><a href="#" id="reservedBudgetLnk">จัดสรรเข้ายุทธศาสตร์กลาง</td><td style="text-align:right" id="reservedBudgetCell">{{formatNumber reservedBudget.amountReserved}} </td><td>บาท</td></tr>
+		<tr><td>คงเหลือการจัดสรร</td><td style="text-align:right" id="amountLeftCell">{{amountLeft this}}</td><td>บาท</td></tr>
+	</table>
+</div>
+	
+
+</script>
+
+<script id="detailModalBudgetTemplate" type="text/x-handler-template">
+<div><u>รายการขอตั้งประมาณ</u></div>
+	<ul id="budgetProposeLst">	
+	{{#each this}}
+		<li data-id="{{id}}"><a href="#" data-id="{{id}}" class="proposalLnk">{{owner.abbr}} ขอตั้ง = {{formatNumber amountRequest}}</a> บาท </a> / จัดสรร = {{#if amountAllocated}} {{formatNumber amountAllocated}} {{else}} 0 {{/if}} บาท</li> <div class="strategyDetail" style="display:none"/>
+	{{/each}}
+	</ul>
+</div>
+<div id="budgetTypeSelectionDiv"></div>
+</script>
+
+<script id="strategiesTemplate" type="text/x-handler-template">
+<ul>
+{{#each this}} 
+	<li data-id="{{id}}" proposal-id="{{../id}}">
+		<b>ขอตั้ง</b>			
+		{{name}} : {{{formulaLine this false}}} = {{{formatNumber totalCalculatedAmount}}} บาท</li>
+
+	<li style="list-style: none;" data-id="{{id}}"><a href="#" class="editProposal"><span class="label label-info"><i class="icon icon-edit icon-white editProposal"></i></span> จัดสรร </a>:  {{{formulaLine this true}}} = {{{formatNumberNotNull totalCalculatedAllocatedAmount}}} บาท</li>
+
+{{/each}}
+</ul>
+</script>
+
+<script id="editProposalFormTemplate" type="text/x-handler-template">
+	<span class="label label-info"><i class="icon icon-edit icon-white editProposal"></i></span> จัดสรร :  
+	{{#each formulaStrategy.formulaColumns}}
+	{{columnName}}(<input type="text" class="span1 proposalEditInput" id="formulaStrategy-{{id}}" data-id="{{id}}" requestColumn-id="{{requestColumnId}}"
+						 value="{{#if requestColumnId}}{{requestColumnAllocatedValue}}{{else}}{{allocatedAmount}}{{/if}}"/> {{unitName}}) {{#unless $last}} X {{/unless}} 
+	{{/each}}
+	
+	 = <span id="totalCalculatedAllocatedAmount-{{id}}" class="totalCalculatedAllocatedAmount">{{{formatNumberNotNull totalCalculatedAllocatedAmount}}}</span> บาท <button class="btn btn-mini updateProposalStretegy"><i class="icon-ok" icon-white"/> แก้ไข</button>
+		<button class="btn btn-mini cancelUpdateProposalStretegy"><i class="icon-remove" icon-white"/> ยกเลิก</button>
+</script>
+
+<script id="reservedBudgetInputTemplate" type="text/x-handler-template">
+	<div>
+		<input class="span2" type="text" data-id="{{id}}" {{#if amountReserved}}value="{{amountReserved}}"{{/if}} id="reservedBudgetInput"/> 
+		<button class="btn btn-mini updateReservedBudget"><i class="icon-ok" icon-white"/> แก้ไข</button>
+		<button class="btn btn-mini cancelUpdateReservedBudget"><i class="icon-remove" icon-white"/> ยกเลิก</button>
+	</div>
+</script>
 
 <script id="detailModalTemplate" type="text/x-handler-template">
 <div><u>รายการขอตั้งงบประมาณของกิจกรรม</u></div>
@@ -489,6 +547,169 @@ Handlebars.registerHelper("formulaLine", function(strategy){
 	} 
 	
 	
+	return s;
+});
+
+Handlebars.registerHelper("formatNumberNotNull", function(number){
+	if(number == null || isNaN(number)) {
+		return "0";
+	} else {
+		return addCommas(number);
+	}
+	
+});
+
+Handlebars.registerHelper("amountLeft", function(json) {
+	var amountAllocated = json.allocationRecordR3.amountAllocated;
+	var amountDistribute = 0;
+	for(var i=0; i< json.proposals.length; i++){
+		
+		if(json.proposals[i].amountAllocated == null || isNaN(json.proposals[i].amountAllocated)) {
+			//we'll skip this one!
+				
+		} else {
+			amountDistribute = amountDistribute + json.proposals[i].amountAllocated;
+		}
+	}
+	var amountReserved = json.reservedBudget.amountReserved;
+	
+	return addCommas( parseInt(amountAllocated) - parseInt(amountDistribute) - parseInt(amountReserved) );
+
+});
+Handlebars.registerHelper("sumProposal", function(proposals) {
+	var amount = 0;
+	for ( var i = 0; i < proposals.length; i++) {
+		amount += proposals[i].amountRequest;
+	}
+	return addCommas(amount);
+
+});
+Handlebars.registerHelper("sumAllocated", function(proposals) {
+	var amount = 0;
+	for ( var i = 0; i < proposals.length; i++) {
+		amount += proposals[i].amountAllocated;
+	}
+	return addCommas(amount);
+
+});
+Handlebars.registerHelper("sumAllocatedRecord", function(records) {
+	var amount = 0;
+	for(var i=0; i<records.length; i++ ){
+		amount += records[i].amountAllocated;
+	}
+	return addCommas(amount);
+	
+});
+Handlebars.registerHelper("sumAmountReserved", function(records) {
+	var amount = 0;
+	for(var i=0; i<records.length; i++ ){
+		amount += records[i].amountReserved;
+		if(amount == null || isNaN(amount)) {
+			return "จัดสรร";
+		}
+	}
+	return addCommas(amount);
+	
+});
+Handlebars.registerHelper("sumProposalNext1Year", function(proposals) {
+	var amount = 0;
+	for ( var i = 0; i < proposals.length; i++) {
+		amount += proposals[i].amountRequestNext1Year;
+	}
+	return addCommas(amount);
+
+});
+Handlebars.registerHelper("sumProposalNext2Year", function(proposals) {
+	var amount = 0;
+	for ( var i = 0; i < proposals.length; i++) {
+		amount += proposals[i].amountRequestNext2Year;
+	}
+	return addCommas(amount);
+
+});
+Handlebars.registerHelper("sumProposalNext3Year", function(proposals) {
+	var amount = 0;
+	for ( var i = 0; i < proposals.length; i++) {
+		amount += proposals[i].amountRequestNext3Year;
+	}
+	return addCommas(amount);
+
+});
+
+
+Handlebars.registerHelper("formulaLine", function(strategy, isAllocated) {
+
+	var s = "";
+
+	if (strategy.formulaStrategy != null) {
+		var formulaColumns = strategy.formulaStrategy.formulaColumns;
+		for ( var i = 0; i < formulaColumns.length; i++) {
+
+			if (i > 0) {
+				s = s + " X ";
+			}
+			
+			s = s + formulaColumns[i].columnName;
+			
+			if (formulaColumns[i].isFixed) {
+				// now we'll go through requestColumns
+				
+				for (var j = 0; j < strategy.requestColumns.length; j++) {
+					if (strategy.requestColumns[j].column.id == formulaColumns[i].id) {
+						var str = "";
+						
+						if(isAllocated) {
+							
+							if(strategy.requestColumns[j].allocatedAmount==null) {
+								 allocatedAmountStr = "????";
+							} else {
+								allocatedAmountStr = addCommas(strategy.requestColumns[j].allocatedAmount);
+							}
+							
+							str += "("
+								+ allocatedAmountStr
+								+ " "+  formulaColumns[i].unitName
+								+ ")";
+						} else {
+							str +=  "("
+							+ addCommas(strategy.requestColumns[j].amount)
+							+ formulaColumns[i].unitName
+							+ ")";
+						}
+						s = s +  str;
+					}
+				}
+
+			} else {
+				if(isAllocated) {
+					var allocatedValueStr = "";
+					if(formulaColumns[i].allocatedValue == null) {
+						allocatedValueStr = "????";
+					} else {
+						allocatedValueStr = addCommas(formulaColumns[i].allocatedValue);
+					}
+					
+					s = s
+						+ "("
+						+ allocatedValueStr
+						+ " " + formulaColumns[i].unitName
+						+ ")";
+					
+				} else {
+				
+				s = s
+						+ "("
+						+ formulaColumns[i].value
+						+ " " + formulaColumns[i].unitName
+						+ ")";
+				
+				}
+				
+			}
+
+		}
+	}
+
 	return s;
 });
 

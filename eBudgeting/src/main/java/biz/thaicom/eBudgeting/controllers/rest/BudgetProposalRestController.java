@@ -224,6 +224,16 @@ public class BudgetProposalRestController {
 		
 	}
 	
+	@RequestMapping(value="/ReservedBudget/{id}/amountReserved/{amountReserved}", method=RequestMethod.PUT)
+	public @ResponseBody String updateReservedBudgetAmount(
+			@PathVariable Long id,
+			@PathVariable Long amountReserved) {
+		
+		entityService.updateReservedBudget(id, amountReserved);
+		
+		return "ok";
+	}
+	
 	@RequestMapping(value="/AllocationRecord/{id}", method=RequestMethod.PUT)
 	public @ResponseBody String updateAllocationRecord(
 			@PathVariable Long id,
