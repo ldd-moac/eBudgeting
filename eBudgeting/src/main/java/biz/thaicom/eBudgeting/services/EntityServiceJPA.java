@@ -538,12 +538,23 @@ public class EntityServiceJPA implements EntityService {
 		BudgetType b = budgetTypeRepository.findOne(id);
 		if(b!=null) {
 			
-			logger.debug(">> b.getChildren() : " + b.getChildren().size());
+			if(b.getChildren() != null) {
+				logger.debug(">> b.getChildren() : " + b.getChildren().size());
+			} else {
+				logger.debug(">> b.getChildren() is null! ");
+			}
+			
+			
 			b.doBasicLazyLoad();
 			
-			Integer sz = b.getChildren().size();
-			if(sz > 0) {
-				b.getChildren().get(0).getLevel().getName();
+			// get b children
+			b.setChildren(budgetTypeRepository.findAllBudgetTypeHasParent(b));
+			
+			if(b.getChildren() != null) {
+	 			Integer sz = b.getChildren().size();
+				if(sz > 0) {
+					b.getChildren().get(0).getLevel().getName();
+				}
 			}
 			
 			//for each children get

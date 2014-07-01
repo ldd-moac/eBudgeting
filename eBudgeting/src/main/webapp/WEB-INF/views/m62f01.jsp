@@ -4,7 +4,7 @@
 
 <div class="hero-unit white">
 <div id="headLine">
-	<h4>การประมวลผลการกระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม</h4> 
+	<h4>กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม</h4> 
 </div>
 
 <div class="row">
@@ -39,7 +39,7 @@
 
 <script id="mainTblTemplate" type="text/x-handler-template">
 <div style="margin-bottom:20px;">
-	<button id="processBtn" class="btn btn-primary">ประมวลผลข้อมูลระดับรายการสู่ระดับกิจกรรม</button>
+	ยืนยันการประมวลผล <button id="processBtn" class="btn btn-primary">ตกลง</button>
 </div>
 <table class="table table-bordered table-striped">
 	<thead>

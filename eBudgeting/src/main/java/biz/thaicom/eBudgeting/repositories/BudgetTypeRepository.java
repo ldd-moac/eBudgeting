@@ -53,6 +53,12 @@ public interface BudgetTypeRepository extends
 			"FROM BudgetType type " +
 			"WHERE type.level = ?1 ")
 	Integer findMaxCodeAtLevel(BudgetLevel level);
+	
+	@Query("SELECT budgetType "
+			+ "FROM BudgetType budgetType "
+			+ "WHERE budgetType.parent = ?1 "
+			+ "ORDER BY budgetType.code asc ")
+	List<BudgetType> findAllBudgetTypeHasParent(BudgetType parent);
 
 	
 	@Modifying

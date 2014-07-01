@@ -71,8 +71,7 @@ public class BudgetType implements Serializable {
 	@JoinColumn(name="PARENT_BGT_BUDGETTYPE_ID")
 	private BudgetType parent;
 	
-	@OneToMany(mappedBy="parent", fetch=FetchType.LAZY)
-	@OrderColumn(name="IDX")
+	@Transient
 	private List<BudgetType> children;
 	
 	@Basic

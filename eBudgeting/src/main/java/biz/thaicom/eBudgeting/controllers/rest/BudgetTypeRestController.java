@@ -2,7 +2,9 @@ package biz.thaicom.eBudgeting.controllers.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,7 +37,6 @@ import biz.thaicom.eBudgeting.models.bgt.FormulaColumn;
 import biz.thaicom.eBudgeting.models.bgt.FormulaStrategy;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
 import biz.thaicom.eBudgeting.models.webui.PageUI;
-
 import biz.thaicom.eBudgeting.services.EntityService;
 
 @Controller
@@ -71,6 +71,19 @@ public class BudgetTypeRestController {
 	public @ResponseBody List<BudgetType> getRootBudgetType() {
 		return entityService.findRootBudgetType();
 	
+	}
+	
+	@RequestMapping(value="/BudgetType/{id}/ChildrenName", method=RequestMethod.GET) 
+	public @ResponseBody Map<Long, String> getBudgetTypeChildrenName(
+			@PathVariable Long id) {
+		HashMap<Long, String> childrenNameMap = new HashMap<Long, String>();
+		
+		BudgetType t = entityService.findBudgetTypeById(id);
+		for(BudgetType c : t.getChildren()) {
+			childrenNameMap.put(c.getId(), c.getName());
+		}
+		
+		return childrenNameMap;
 	}
 	
 	@RequestMapping(value="/BudgetType", method=RequestMethod.POST)

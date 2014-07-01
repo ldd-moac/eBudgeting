@@ -3,7 +3,7 @@
 
 <div class="hero-unit white">
 <div id="headLine">
-	<h4>การประมวลผลก่อนการปรับลดงบประมาณครั้งที่ 1</h4> 
+	<h4>ประมวลผลก่อนการปรับลดงบประมาณครั้งที่ 1</h4> 
 </div>
 
 
@@ -55,7 +55,7 @@
 
 <script id="mainTblTemplate" type="text/x-handler-template">
 <div style="margin-bottom:20px;">
-	<button id="processBtn" class="btn btn-primary">ประมวลผลก่อนการปรับลดงบประมาณครั้งที่ 1</button>
+	ยืนยันการประมวลผล <button id="processBtn" class="btn btn-primary">ตกลง</button>
 </div>
 <table class="table table-bordered table-striped">
 	<thead>

@@ -343,24 +343,20 @@
 
 <script type="text/javascript">
 Handlebars.registerHelper("budgetTypeName", function(typeId) {
+	if(budgetTypeNameRegistra[typeId] != null) 
+		return budgetTypeNameRegistra[typeId];
+	
 	if(typeId != null) {
+		
 		var type = parentBudgetTypeCollection.get(typeId);
 		if(type != null) {
+			
 			return type.get('name');
 		} else {
-			type = BudgetType.findOrCreate(typeId);
+			type = BudgetType.find(typeId);
 			if(type == null) {
-				type = new BudgetType();
-				type.set('id', typeId);
-				$.ajaxSetup({async:false});
-				type.fetch({
-					success: function() {
-						parentBudgetTypeCollection.add(type);
-						
-					}
-				});
-				$.ajaxSetup({async:true});
-				return type.get('name');
+				
+				return budgetTypeNameRegistra[typeId];
 			} else {
 				parentBudgetTypeCollection.add(type);
 				return type.get('name');
@@ -433,7 +429,6 @@ var e1,e2;
 var formulaStrategyCollection = new FormulaStrategyCollection();
 var parentBudgetTypeCollection = new BudgetTypeCollection();
 var budgetTypeRootCollection = new BudgetTypeCollection();
-
 
 
 var listTargetUnits = new TargetUnitCollection();

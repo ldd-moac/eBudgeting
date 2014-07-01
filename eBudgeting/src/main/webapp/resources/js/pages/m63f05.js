@@ -476,7 +476,10 @@ var MainTblView = Backbone.View.extend({
 			type: 'POST',
 			data: {
 				query: this.searchTxt
-			}
+			},
+			success: _.bind(function() {
+				this.render();
+			},this)
 		});
 		return false;
 	},
@@ -743,11 +746,20 @@ var BudgetSltView = Backbone.View.extend({
 			this.mainTblView.collection.setMainTypeId(budgetTypeSelectedId);
 			this.mainTblView.collection.setLevel(4);
 			this.mainTblView.collection.setCurrentFiscalYear(fiscalYear);
-			this.mainTblView.collection.fetch({
-				success: _.bind(function() {
-					// we should now load it's children?
-					// set this.mainTblV
-					this.mainTblView.render();
+			
+			//first load all children name
+			$.ajax({
+				url: appUrl('/BudgetType/'+budgetTypeSelectedId + '/ChildrenName'),
+				success: _.bind(function(data) {
+					budgetTypeNameRegistra = data;
+					
+					this.mainTblView.collection.fetch({
+						success: _.bind(function() {
+							// we should now load it's children?
+							// set this.mainTblV
+							this.mainTblView.render();
+						},this)
+					});
 				},this)
 			});
 		}

@@ -52,7 +52,7 @@ public class User implements Serializable {
 	private String password;
 
 	@OneToOne
-	@JoinColumn(name="PERSON_HRX_PERSON_ID")
+	@JoinColumn(name="PERSON_HRX_PERSON_ID") 
 	private Person person;
 	
 	@Transient
