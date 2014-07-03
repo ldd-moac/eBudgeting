@@ -31,10 +31,6 @@
 			<div class="modal-body">
 				
 			</div>
-			<div class="modal-footer">
-				<a href="#" class="btn" id="cancelBtn">Close</a> 
-				<a href="#"	class="btn btn-primary" id="saveBtn">Save changes</a>
-			</div>
 		</div>
 	
 		<div id="mainCtr">
@@ -71,6 +67,7 @@
 <script id="tbodyTemplate" type="text/x-handlebars-template">
 {{#each this}}
 <tr data-id="{{id}}">
+	<td>{{fiscalYear}}</td>
 </tr>
 {{/each}}
 </script>
@@ -97,22 +94,42 @@ $(document).ready(function() {
 		tbodyTemplate: Handlebars.compile($("#tbodyTemplate").html()),
 		
 		initFiscalYear: function() {
-			$.ajax({
-				type: 'POST',
-				url: appUrl('/Objective/initFiscalYear'),
-				data: {
-					fiscalYear: $('#fiscalYearTxt').val()
-				},
-				
-				success: function() {
+			// check fist if the input ficalYear has already been init
+			var fyTxt = +($('#fiscalYearTxt').val());
+			if(rootObjective.findWhere({fiscalYear: fyTxt}) != null) {
+				// already has one
+				alert("ปีงบประมาณนี้มีข้อมูลอยู่แล้ว กรุณาระบุปีงบประมาณใหม่");
+			} else {
+				if(isNaN(fyTxt)) {
+					alert("กรุณาระบุปีงบประมาณเป็นตัวเลข");
+				} else {
+					$('#modal').find('.modal-header span').html("เพิ่มข้อมูลปีงบประมาณ " + fyTxt);
+					$('#modal').find('.modal-body').html('<img src=' + appUrl('/resources/graphics/loading.gif') + '/> กรุณารอการประมวลผล ... ');
 					
-					var newRoot = new Objective();
-					newRoot.set('fiscalYear', $('#fiscalYearTxt').val());
+					$('#modal').modal({show: true, backdrop: 'static', keyboard: false});
 					
-					rootObjective.add(newRoot);
-					rootObjective.trigger('reset');
+					$.ajax({
+						type: 'POST',
+						url: appUrl('/Objective/initFiscalYear'),
+						data: {
+							fiscalYear: $('#fiscalYearTxt').val()
+						},
+						success: _.bind(function() {
+							
+							$('#modal').modal('hide');
+							
+							var newRoot = new Objective();
+							newRoot.set('fiscalYear', fyTxt);
+							
+							rootObjective.add(newRoot);
+							
+							this.render();
+						},this)
+					});	
+					
 				}
-			});
+			
+			}
 			
 			return false;
 		},
@@ -124,12 +141,6 @@ $(document).ready(function() {
 				
 			this.$el.find('tbody').html(html);
 			
-			// bind all cell
-			rootObjective.each(function(model){
-				model.bind('change', this.renderObjective, this);
-				this.renderObjective(model);
-			}, this);
-
 			return this;
 		},
 		
@@ -151,7 +162,7 @@ $(document).ready(function() {
 	rootObjective.fetch({
 		url: appUrl('/Objective/root'),
 		success: function() {
-
+			fiscalYearView.render();
 			
 		}
 	});

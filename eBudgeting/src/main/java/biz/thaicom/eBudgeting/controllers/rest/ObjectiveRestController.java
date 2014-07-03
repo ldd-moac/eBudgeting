@@ -51,6 +51,7 @@ public class ObjectiveRestController {
 	
 	@RequestMapping(value="/Objective/root", method=RequestMethod.GET)
 	public @ResponseBody List<Objective> getRootFiscalYear() {
+		logger.debug("/Objective/root is called:");
 		return entityService.findRootFiscalYear();
 	}
 	

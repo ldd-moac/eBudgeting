@@ -23,6 +23,7 @@ import net.bull.javamelody.MonitoredWithSpring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -767,12 +768,21 @@ public class EntityServiceJPA implements EntityService {
 				newFbt.setBudgetType(type);
 				
 				// set the main type to be the same as last year!?
-				FiscalBudgetType lastYearFbt = fiscalBudgetTypeRepository.findOneByBudgetTypeAndFiscalYear(type, fiscalYear-1);
-				if(lastYearFbt == null) {
-					newFbt.setIsMainType(false);
-				} else {
-					newFbt.setIsMainType(lastYearFbt.getIsMainType());
+				FiscalBudgetType lastYearFbt = null; 
+						
+				try{
+					lastYearFbt = fiscalBudgetTypeRepository.findOneByBudgetTypeAndFiscalYear(type, fiscalYear-1);
+					if(lastYearFbt == null) {
+						newFbt.setIsMainType(false);
+					} else {
+						newFbt.setIsMainType(lastYearFbt.getIsMainType());
+					}
+				} catch (IncorrectResultSizeDataAccessException e) {
+					// we find duplicate on last year
+					logger.error("found duplicate FiscalBudgetType: " + type.getId());
+					throw e;
 				}
+				
 				
 				//now save!?
 				fiscalBudgetTypeRepository.save(newFbt);

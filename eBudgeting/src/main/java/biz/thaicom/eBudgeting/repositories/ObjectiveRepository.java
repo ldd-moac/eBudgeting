@@ -23,7 +23,8 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 	@Query("" +
 			"SELECT objective " +
 			"FROM Objective objective " +
-			"WHERE objective.name = 'ROOT' " +
+			"WHERE objective.name = 'ROOT' "
+			+ " ORDER BY objective.fiscalYear asc " +
 			"")
 	public List<Objective> findRootFiscalYear();
 	
