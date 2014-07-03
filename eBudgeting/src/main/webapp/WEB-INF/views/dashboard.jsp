@@ -216,19 +216,11 @@ var menuJson = [{
 		name: "การจัดสรรงบประมาณ (m71)",code: "m71",  menus: [{
 			name: "m71f04: การประมวลผลก่อนการจัดสรรงบประมาณ", code: "m3f04", link: "page/m71f04/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m71f01: การจัดสรรงบประมาณระดับกิจกรรม", code: "m71f01", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
-		},{
-			name: "m71f02: การจัดสรรงบประมาณระดับรายการ", code: "m71f02", link: "page/m71f02/", group: "BGT_BGT_ADMIN"
-		},{
-			name: "m71f03: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m71f03", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
+			name: "m71f02: การจัดสรรงบประมาณ", code: "m71f02", link: "page/m71f02/", group: "BGT_BGT_ADMIN"
 		}]
 	}, {
-		name: "การจัดสรรเพิมเติม (m72)",code: "m72",  menus:[{
-			name: "m72f01: การบจัดสรรงบประมาณเพิ่มเติมระดับกิจกรรม",code: "m72f01",  link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
-		}, {
-			name: "m72f02: การจัดสรรงบประมาณเพิ่มเติมระดับรายการ", code: "m72f02", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
-		}, {
-			name: "m72f03: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)",code: "m72f03",  link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
+		name: "การจัดสรรเพิ่มเติม (m72)",code: "m72",  menus:[{
+			name: "m72f01: การบจัดสรรงบประมาณเพิ่มเติม",code: "m72f01",  link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
 		}]
 	}]
 },{
