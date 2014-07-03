@@ -18,6 +18,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import biz.thaicom.eBudgeting.models.pln.Objective;
+import biz.thaicom.eBudgeting.models.pln.ObjectiveName;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveType;
 
 public class M51R11XLSView extends AbstractPOIExcelView {
@@ -35,7 +36,7 @@ public class M51R11XLSView extends AbstractPOIExcelView {
         Map<String, CellStyle> styles = createStyles(workbook);
 
 		ObjectiveType type = (ObjectiveType) model.get("type");
-		List<Objective> objectiveList = (List<Objective>) model.get("objectiveList");
+		List<ObjectiveName> objectiveNameList = (List<ObjectiveName>) model.get("objectiveNameList");
 		Integer fiscalYear = (Integer) model.get("fiscalYear");
 		Sheet sheet = workbook.createSheet("sheet1");
 
@@ -63,7 +64,7 @@ public class M51R11XLSView extends AbstractPOIExcelView {
 
 		
 		int i = 3;
-		for (Objective o:objectiveList) {
+		for (ObjectiveName o:objectiveNameList) {
 			Row rows = sheet.createRow(i);
 			Cell cellx = rows.createCell(0);
 			cellx.setCellValue(o.getCode());

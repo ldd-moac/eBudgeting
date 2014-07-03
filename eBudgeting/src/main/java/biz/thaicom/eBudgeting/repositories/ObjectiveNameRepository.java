@@ -36,6 +36,15 @@ public interface ObjectiveNameRepository extends JpaSpecificationExecutor<Object
 			"SELECT o " +
 			"FROM ObjectiveName o " +
 			" 	INNER JOIN o.type type " +
+			"WHERE o.fiscalYear=?1 AND o.type.id = ?2 "
+			+ "ORDER BY o.code asc ")
+	public List<ObjectiveName> findAllByFiscalYearAndType_id(
+			Integer fiscalYear, Long typeId);
+	
+	@Query("" +
+			"SELECT o " +
+			"FROM ObjectiveName o " +
+			" 	INNER JOIN o.type type " +
 			"WHERE o.fiscalYear=?1 AND o.type.id = ?2 " +
 			"	AND (o.name like ?3 or o.code like ?3) ")	
 	public Page<ObjectiveName> findAllObjectiveNameByFiscalYearAndTypeIdWithQuery(
@@ -67,6 +76,8 @@ public interface ObjectiveNameRepository extends JpaSpecificationExecutor<Object
 			"WHERE o.type=?1 AND o.fiscalYear=?2 ")
 	public String findMaxCodeOfTypeAndFiscalYear(ObjectiveType type,
 			Integer fiscalYear);
+
+
 
 
 

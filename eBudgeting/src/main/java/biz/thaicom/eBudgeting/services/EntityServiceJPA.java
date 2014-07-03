@@ -609,9 +609,11 @@ public class EntityServiceJPA implements EntityService {
 			}
 			
 			b.getParent().getId();
-			b.getChildren().size();
+			if(b.getChildren()!=null) {
+				b.getChildren().size();
 			
-			logger.debug("children size: " + b.getChildren().size());
+				logger.debug("children size: " + b.getChildren().size());
+			}
 			
 			b.setStrategies(formulaStrategyRepository.findOnlyNonStandardByfiscalYearAndType_id(fiscalYear, b.getId()));
 			b.setStandardStrategy(formulaStrategyRepository.findOnlyStandardByfiscalYearAndType_id(fiscalYear, b.getId()));
@@ -3533,6 +3535,14 @@ public class EntityServiceJPA implements EntityService {
 				obj.getType().getParent().getName();
 			}
 		}
+		
+		return objs;
+	}
+	
+	@Override
+	public List<ObjectiveName> findObjectiveNamesByFiscalyearAndTypeId(
+			Integer fiscalYear, Long typeId) {
+		List<ObjectiveName> objs = objectiveNameRepository.findAllByFiscalYearAndType_id(fiscalYear, typeId);
 		
 		return objs;
 	}

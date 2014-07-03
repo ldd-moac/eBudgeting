@@ -103,6 +103,8 @@ public interface EntityService {
 	
 	public List<Objective> findObjectivesByFiscalyearAndTypeId(
 			Integer fiscalYear, Long typeId);
+	public List<ObjectiveName> findObjectiveNamesByFiscalyearAndTypeId(
+			Integer fiscalYear, Long typeId);
 	public Objective updateObjectiveParent(Long id, Long parentId);
 	public Objective objectiveAddReplaceUnit(Long id, Long unitId);
 	

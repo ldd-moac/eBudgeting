@@ -161,8 +161,6 @@ var menuJson = [{
 		},{
 			name: "m61f04: การบันทึกงบประมาณ ระดับรายการ", code: "m61f04", link: "page/m61f04_1/", group: "BGT_USER"
 		},{
-			name: "m61f06: กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m61f06", link: "page/m61f06/", group: "BGT_USER"
-		},{
 			name: "m61f05: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)",code: "m61f05",  link: "page/m61f05/", group: "BGT_BGT_ADMIN" 
 		}]
 	}, {

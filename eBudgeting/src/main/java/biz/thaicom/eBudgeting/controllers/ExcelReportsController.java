@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 
+
 import biz.thaicom.eBudgeting.models.bgt.BudgetType;
 import biz.thaicom.eBudgeting.models.pln.Objective;
+import biz.thaicom.eBudgeting.models.pln.ObjectiveName;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveType;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveTypeId;
 import biz.thaicom.eBudgeting.models.pln.TargetUnit;
@@ -210,10 +212,10 @@ public class ExcelReportsController {
 		
 		ObjectiveType type = entityService.findObjectiveTypeById((long) 104);
 		
-		List<Objective> objectiveList = entityService.findObjectivesByFiscalyearAndTypeId(fiscalYear, (long) 104);
+		List<ObjectiveName> objectiveNameList = entityService.findObjectiveNamesByFiscalyearAndTypeId(fiscalYear, (long) 104);
 		
 		model.addAttribute("type", type);
-		model.addAttribute("objectiveList", objectiveList);
+		model.addAttribute("objectiveNameList", objectiveNameList);
 		model.addAttribute("fiscalYear", fiscalYear);
 		model.addAttribute("currentUser", currentUser);
 		
@@ -229,10 +231,10 @@ public class ExcelReportsController {
 		
 		ObjectiveType type = entityService.findObjectiveTypeById((long) 105);
 		
-		List<Objective> objectiveList = entityService.findObjectivesByFiscalyearAndTypeId(fiscalYear, (long) 105);
+		List<ObjectiveName> objectiveNameList = entityService.findObjectiveNamesByFiscalyearAndTypeId(fiscalYear, (long) 105);
 		
 		model.addAttribute("type", type);
-		model.addAttribute("objectiveList", objectiveList);
+		model.addAttribute("objectiveNameList", objectiveNameList);
 		model.addAttribute("fiscalYear", fiscalYear);
 		model.addAttribute("currentUser", currentUser);
 	
@@ -249,10 +251,10 @@ public class ExcelReportsController {
 		
 		ObjectiveType type = entityService.findObjectiveTypeById((long) 106);
 		
-		List<Objective> objectiveList = entityService.findObjectivesByFiscalyearAndTypeId(fiscalYear, (long) 106);
+		List<ObjectiveName> objectiveNameList = entityService.findObjectiveNamesByFiscalyearAndTypeId(fiscalYear, (long) 106);
 		
 		model.addAttribute("type", type);
-		model.addAttribute("objectiveList", objectiveList);
+		model.addAttribute("objectiveNameList", objectiveNameList);
 		model.addAttribute("fiscalYear", fiscalYear);
 		model.addAttribute("currentUser", currentUser);
 	
@@ -268,10 +270,10 @@ public class ExcelReportsController {
 		
 		ObjectiveType type = entityService.findObjectiveTypeById((long) 107);
 		
-		List<Objective> objectiveList = entityService.findObjectivesByFiscalyearAndTypeId(fiscalYear, (long) 107);
+		List<ObjectiveName> objectiveNameList = entityService.findObjectiveNamesByFiscalyearAndTypeId(fiscalYear, (long) 107);
 		
 		model.addAttribute("type", type);
-		model.addAttribute("objectiveList", objectiveList);
+		model.addAttribute("objectiveNameList", objectiveNameList);
 		model.addAttribute("fiscalYear", fiscalYear);
 		model.addAttribute("currentUser", currentUser);
 	
@@ -285,12 +287,14 @@ public class ExcelReportsController {
 	public String excelM51R13(@PathVariable Integer fiscalYear, Model model, 
 			@Activeuser ThaicomUserDetail currentUser, HttpServletResponse response) {
 		
+		logger.debug("m51r13...");
+		
 		ObjectiveType type = entityService.findObjectiveTypeById((long) 108);
 		
-		List<Objective> objectiveList = entityService.findObjectivesByFiscalyearAndTypeId(fiscalYear, (long) 108);
+		List<ObjectiveName> objectiveNameList = entityService.findObjectiveNamesByFiscalyearAndTypeId(fiscalYear, (long) 108);
 		
 		model.addAttribute("type", type);
-		model.addAttribute("objectiveList", objectiveList);
+		model.addAttribute("objectiveNameList", objectiveNameList);
 		model.addAttribute("fiscalYear", fiscalYear);
 		model.addAttribute("currentUser", currentUser);
 		
