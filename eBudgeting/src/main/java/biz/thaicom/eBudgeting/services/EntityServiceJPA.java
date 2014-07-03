@@ -1841,7 +1841,12 @@ public class EntityServiceJPA implements EntityService {
 	@Override
 	public List<Objective> findFlatChildrenObjectivewithBudgetProposal(
 			Integer fiscalYear, Long ownerId, Long objectiveId) {
+		
 		String parentPathLikeString = "%."+objectiveId.toString()+"%";
+		
+		logger.debug("fiscalYear: " + fiscalYear );
+		logger.debug("ownerId: " + ownerId );
+		logger.debug("parentPathLikeString: " + parentPathLikeString);
 		List<Objective> list = objectiveRepository.findFlatByObjectiveBudgetProposal(fiscalYear, ownerId, parentPathLikeString);
 	
 		

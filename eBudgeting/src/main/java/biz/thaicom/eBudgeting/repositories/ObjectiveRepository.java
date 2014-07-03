@@ -69,7 +69,9 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 			"WHERE objective.fiscalYear = :fiscalYear AND (objective.parentPath like :parentPathLikeString OR objective.parentPath is null) " +
 			"ORDER BY objective.id asc ")
 	public List<Objective> findFlatByObjectiveBudgetProposal(
-			Integer fiscalYear, Long ownerId, String parentPathLikeString);
+			@Param("fiscalYear") Integer fiscalYear,
+			@Param("ownerId") Long ownerId,
+			@Param("parentPathLikeString") String parentPathLikeString);
 	
 	
 	@Query("" +  
