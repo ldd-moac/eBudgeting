@@ -98,6 +98,9 @@ Handlebars.registerHelper('formatTimeDetail', function(timeStamp){
 
 function addCommas(nStr)
 {
+	if(nStr == null || isNaN(nStr)) {
+		return '-';
+	}
 	nStr += '';
 	x = nStr.split('.');
 	x1 = x[0];

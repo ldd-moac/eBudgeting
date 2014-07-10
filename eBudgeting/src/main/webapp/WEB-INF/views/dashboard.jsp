@@ -262,7 +262,7 @@ var menuJson = [{
 			name: "m51r17: ทะเบียนหน่วยนับ", code: 'm51r01', link: "m51r18.xls/"+fiscalYear+"/file/m51r18.xls",  type: "download", group: "BGT_BGT_ADMIN"
 		}]
 	},{
-		name: "รายงานการตรวจสอบ (m52r)", menus:[{
+		name: "รายงานการตรวจสอบ (m52r)", code: "m52r", menus:[{
 			name: "m52r01: การบันทึกงบประมาณระดับกิจกรรม", code: 'm51r01', link: "m52r01_1.xls/"+fiscalYear+"/file/m52r01_1.xls",  type: "download", group: "BGT_USER"
 		},{
 			name: "m52r02: การบันทึกงบประมาณระดับรายการ", code: 'm51r01', link: "m52r02_1.xls/"+fiscalYear+"/file/m52r02_1.xls",  type: "download", group: "BGT_USER"
