@@ -185,8 +185,8 @@
 		<tr>
 			<td style="width:20px;">#</td>
 			<td style="width:246px;"><strong>แผนงาน/กิจกรรม ประจำปี {{this.0.fiscalYear}}</strong></td>
-			<td style="width:60px;">เป้าหมาย</td>
 			<td style="width:60px;">หน่วยนับ</td>			
+			<td style="width:60px;">เป้าหมาย</td>
 			<td style="width:80px;">งบประมาณปี  {{this.0.fiscalYear}}</td>
 			<td style="width:80px;">ปี  {{next this.0.fiscalYear 1}}</td>
 			<td style="width:80px;">ปี  {{next this.0.fiscalYear 2}}</td>
@@ -253,14 +253,14 @@
 		</td>
 		<td  style="width:60px;" class="{{#if this.children}}disable{{/if}} centerAlign">
 			<span>
-				{{#each filterTargetValues}}
-				{{#if requestedValue}}{{formatNumber requestedValue}}{{else}}0{{/if}}<br/>
-				{{/each}}
+				<ul  style="list-style:none; margin: 0px;">{{#each filterTargetValues}}<li style="list-style:none; padding: 0px;">{{target.unit.name}} ({{#if target.isSumable}}นับ{{else}}ไม่นับ{{/if}})</li>{{/each}}</ul>
 			</span>
 		</td>
 		<td  style="width:60px;" class="{{#if this.children}}disable{{/if}} centerAlign">
 			<span>
-				<ul  style="list-style:none; margin: 0px;">{{#each filterTargetValues}}<li style="list-style:none; padding: 0px;">{{target.unit.name}} ({{#if target.isSumable}}นับ{{else}}ไม่นับ{{/if}})</li>{{/each}}</ul>
+				{{#each filterTargetValues}}
+				{{#if requestedValue}}{{formatNumber requestedValue}}{{else}}0{{/if}}<br/>
+				{{/each}}
 			</span>
 		</td>
 		<td style="width:80px;" class="{{#if this.children}}disable{{/if}} rightAlign">
