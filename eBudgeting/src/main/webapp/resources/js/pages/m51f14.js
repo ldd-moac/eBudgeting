@@ -460,7 +460,12 @@ var MainTblView = Backbone.View.extend({
 	searchDisplayAllBtnClick: function(e) {
 		this.searchTxt = null;
 		this.collection.setTargetPage(1);
-		this.collection.fetch();
+		this.collection.fetch({
+			success: _.bind(function(){
+				this.render();
+				
+			}, this)
+		});
 		return false;
 	},
 	
