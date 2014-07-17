@@ -209,6 +209,8 @@ $(document).ready(function() {
 		
 		saveLine: function(e) {
 			// ok
+			console.log(this.currentBudgetCommonType.urlRoot);
+			
 			var newModel=false;
 			if(this.currentBudgetCommonType.get('id') == null) {
 				newModel = true;
@@ -217,6 +219,7 @@ $(document).ready(function() {
 				name: this.$el.find('input[id=nameTxt]').val(),
 				fiscalYear: fiscalYear
 			},{
+				url: this.currentBudgetCommonType.urlRoot + this.currentBudgetCommonType.id,
 				success : _.bind(function(model) {
 					
 					if(newModel) {
@@ -236,8 +239,9 @@ $(document).ready(function() {
 			var budgetCommonType = BudgetCommonType.findOrCreate(tuId);
 			
 			this.currentBudgetCommonType=budgetCommonType;
+			
 			var html = this.newRowTpl(budgetCommonType.toJSON());
-			console.log(html);
+			
 			this.$el.find('tr[data-id='+ tuId + ']').html(html);
 		},
 		
@@ -247,6 +251,7 @@ $(document).ready(function() {
 			
 			if(confirm('คุณต้องการลบรายการกลาง \"'+ budgetCommonType.get('name') + '\"')==true) {
 				budgetCommonType.destroy({
+					url: budgetCommonType.urlRoot + budgetCommonType.id,
 					success: function() {
 						budgetCommonTypeCollection.trigger('reset');
 					}

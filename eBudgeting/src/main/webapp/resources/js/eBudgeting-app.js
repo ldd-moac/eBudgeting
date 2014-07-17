@@ -248,7 +248,10 @@ ObjectiveType = Backbone.RelationalModel.extend({
 
 BudgetCommonType = Backbone.RelationalModel.extend({
 	idAttribute: 'id',
-	urlRoot: appUrl('/BudgetCommonType/')
+	urlRoot: appUrl('/BudgetCommonType/'),
+	url: function() {
+		return this.urlRoot;
+	}
 });
 
 BudgetType = Backbone.RelationalModel.extend({
