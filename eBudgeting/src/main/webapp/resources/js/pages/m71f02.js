@@ -29,6 +29,7 @@ var DetailModalView = Backbone.View.extend({
 	
 	strategiesTemplate: Handlebars.compile($('#strategiesTemplate').html()),
 	editProposalFormTemplate : Handlebars.compile($('#editProposalFormTemplate').html()),
+	editProposalNoStretegyFormTemplate : Handlebars.compile($('#editProposalNoStretegyFormTemplate').html()),
 	
 	events: {
 		"click .detailAllocation" : "detailAllocation",
@@ -48,7 +49,10 @@ var DetailModalView = Backbone.View.extend({
 		"click .updateReservedBudget" : "updateReservedBudget",
 		
 		"click .proposalLnk" : "toggleStrategy",
-		"click .editProposal" : "editProposal"
+		"click .editProposal" : "editProposal",
+			
+		"click .updateProposalNoStretegy" : "updateProposalNoStretegy",
+		"click .cancelUpdateProposalNoStretegy" : "cancelUpdateProposalNoStretegy"
 			
 	},
 	setParentView: function(view) {
@@ -206,32 +210,51 @@ var DetailModalView = Backbone.View.extend({
 		var ps = ProposalStrategy.findOrCreate(psId);
 		
 		var json = ps.toJSON();
+		var html;
+		
+		if(json.formulaStrategy != null) {
 		
 		var l = json.formulaStrategy.formulaColumns.length;
 		
-		json.formulaStrategy.formulaColumns[l-1].$last = true;
-		// now go through and put the requestColumn back on
-		for(var i=0; i<json.formulaStrategy.formulaColumns.length; i++) {
-			if(json.formulaStrategy.formulaColumns[i].isFixed) {
-				var columnId = json.formulaStrategy.formulaColumns[i].id;
-				
-				var fc = FormulaColumn.findOrCreate(columnId);
-				
-				var rc = ps.get('requestColumns').where({column: fc})[0];
-				
-				json.formulaStrategy.formulaColumns[i].requestColumnId = rc.get('id');
-				json.formulaStrategy.formulaColumns[i].requestColumnAllocatedValue = rc.get('allocatedValue');
-				
+			json.formulaStrategy.formulaColumns[l-1].$last = true;
+			// now go through and put the requestColumn back on
+			for(var i=0; i<json.formulaStrategy.formulaColumns.length; i++) {
+				if(json.formulaStrategy.formulaColumns[i].isFixed) {
+					var columnId = json.formulaStrategy.formulaColumns[i].id;
+					
+					var fc = FormulaColumn.findOrCreate(columnId);
+					
+					var rc = ps.get('requestColumns').where({column: fc})[0];
+					
+					json.formulaStrategy.formulaColumns[i].requestColumnId = rc.get('id');
+					json.formulaStrategy.formulaColumns[i].requestColumnAllocatedValue = rc.get('allocatedValue');
+					
+				}
 			}
+			
+			html = this.editProposalFormTemplate(json);
+			
+		} else {
+		
+			html = this.editProposalNoStretegyFormTemplate(json);
+			
 		}
 		
-		var html = this.editProposalFormTemplate(json);
 		
 		$(e.target).parent().html(html);
 		
 	},
 	
+	cancelUpdateProposalNoStretegy : function (e) {
+		this.renderBudgetTypeDetail();
+	},
 	
+	
+	updateProposalNoStretegy : function(e) {
+		
+	},
+	
+ 	
 	detailBasicAllocation : function(e) {
 		var allocRec = AllocationRecord.findOrCreate($(e.target).attr('data-allocationId'));
 		this.$el.find('.modal-footer').html(this.detailAllocationBasicFooterTemplate());

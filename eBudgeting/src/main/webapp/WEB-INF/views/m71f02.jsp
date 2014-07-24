@@ -259,8 +259,19 @@
 						 value="{{#if requestColumnId}}{{requestColumnAllocatedValue}}{{else}}{{allocatedAmount}}{{/if}}"/> {{unitName}}) {{#unless $last}} X {{/unless}} 
 	{{/each}}
 	
-	 = <span id="totalCalculatedAllocatedAmount-{{id}}" class="totalCalculatedAllocatedAmount">{{{formatNumberNotNull totalCalculatedAllocatedAmount}}}</span> บาท <button class="btn btn-mini updateProposalStretegy"><i class="icon-ok" icon-white"/> แก้ไข</button>
+	 = <span id="totalCalculatedAllocatedAmount-{{id}}" class="totalCalculatedAllocatedAmount">{{{formatNumberNotNull totalCalculatedAllocatedAmount}}}</span> บาท 
+		<button class="btn btn-mini updateProposalStretegy"><i class="icon-ok" icon-white"/> แก้ไข</button>
 		<button class="btn btn-mini cancelUpdateProposalStretegy"><i class="icon-remove" icon-white"/> ยกเลิก</button>
+</script>
+
+<script id="editProposalNoStretegyFormTemplate" type="text/x-handler-template">
+	<span class="label label-info"><i class="icon icon-edit icon-white editProposal"></i></span> จัดสรร :  
+	
+	<input type="text" class="span1 proposalEditInput" id="proposal-{{id}}" data-id="{{id}}" 
+						 value="{{formatNumberNotNull amountallocated}}"/> บาท 
+	
+	 	<button class="btn btn-mini updateProposalNoStretegy"><i class="icon-ok" icon-white"/> แก้ไข</button>
+		<button class="btn btn-mini cancelUpdateProposalNoStretegy"><i class="icon-remove" icon-white"/> ยกเลิก</button>
 </script>
 
 <script id="reservedBudgetInputTemplate" type="text/x-handler-template">
