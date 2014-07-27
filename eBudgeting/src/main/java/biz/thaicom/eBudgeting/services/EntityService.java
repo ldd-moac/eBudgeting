@@ -201,6 +201,8 @@ public interface EntityService {
 	public ProposalStrategy deleteProposalStrategy(Long id);
 	public ProposalStrategy updateProposalStrategy(Long id,
 			JsonNode rootNode) throws JsonParseException, JsonMappingException, IOException;
+	public void updateProposalStrategyTotalCalculatedAllocatedAmount(Long id,
+			Long totalCalculatedAllocatedAmount);
 
 	
 	//RequestColumn
@@ -337,6 +339,7 @@ public interface EntityService {
 	
 	// ReservedBudget
 	public void updateReservedBudget(Long id, Long amountReserved);
+
 
 
 

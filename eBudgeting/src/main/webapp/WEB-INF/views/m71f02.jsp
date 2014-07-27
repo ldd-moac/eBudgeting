@@ -268,7 +268,7 @@
 	<span class="label label-info"><i class="icon icon-edit icon-white editProposal"></i></span> จัดสรร :  
 	
 	<input type="text" class="span1 proposalEditInput" id="proposal-{{id}}" data-id="{{id}}" 
-						 value="{{formatNumberNotNull amountallocated}}"/> บาท 
+						 value="{{formatNumberNotNull totalCalculatedAllocatedAmount}}"/> บาท 
 	
 	 	<button class="btn btn-mini updateProposalNoStretegy"><i class="icon-ok" icon-white"/> แก้ไข</button>
 		<button class="btn btn-mini cancelUpdateProposalNoStretegy"><i class="icon-remove" icon-white"/> ยกเลิก</button>
@@ -774,6 +774,8 @@ $(document).ready(function() {
 		},{
 			name: 'proposals', mapping: 'proposals'
 		},{
+			name: 'reservedBudgets', mappring: 'reservedBudgets'
+		},{
 			name: 'allocationRecordsR1', mapping: 'allocationRecordsR1'
 		},{
 			name: 'allocationRecordsR2', mapping: 'allocationRecordsR2'
@@ -783,12 +785,10 @@ $(document).ready(function() {
 			name: 'sumBudgetReserved', 
             convert: function(v, rec) {
             	var sum = 0;
-            	_.forEach(rec.data.reservedBudgets, function(amountAllocated) {
-            		if(amountAllocated.amountReserved != null) {
-            			sum += amountAllocated.amountReserved;
+            	_.forEach(rec.data.reservedBudgets, function(reservedBudget) {            	
+            		if(reservedBudget.amountReserved != null) {
+            			sum += reservedBudget.amountReserved;
             		}
-            		BudgetType.findOrCreate(proposal.budgetType);
-            		Organization.findOrCreate(proposal.owner);
             	});
             	return sum;		
             }

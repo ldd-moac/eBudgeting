@@ -251,6 +251,34 @@ var DetailModalView = Backbone.View.extend({
 	
 	
 	updateProposalNoStretegy : function(e) {
+		var psId = $(e.target).parent().attr('data-id');
+		// we have to turn this to input 
+		var ps = ProposalStrategy.findOrCreate(psId);
+		
+		var inputText = $(e.target).prev().val().replace(/,/g ,"");
+		
+		if($.isNumeric(inputText)) {
+			ps.set('totalCalculatedAllocatedAmount', parseInt(inputText));
+			ps.get('proposal').set('amountAllocated', parseInt(inputText));
+			
+			// we have to put back this allocation to database
+			$.ajax({
+				url: appUrl('/ProposalStrategy/'+ps.get('id')+'/updateTotalCalculatedAllocatedAmount'),
+				type: 'POST',
+				data : {
+					totalCalculatedAllocatedAmount: ps.get('totalCalculatedAllocatedAmount')
+				},
+				success: _.bind(function() {
+					this.renderBudgetTypeDetail();
+				}, this)
+			});
+			
+			
+			
+		} else {
+			alert('กรุณาระบุการจัดสรรเป็นตัวเลข');
+		}
+		
 		
 	},
 	

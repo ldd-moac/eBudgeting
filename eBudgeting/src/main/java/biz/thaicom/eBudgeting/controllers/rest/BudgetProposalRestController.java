@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -129,6 +130,16 @@ public class BudgetProposalRestController {
 		
 		return entityService.findProposalStrategyByBudgetProposal(budgetProposalId);
 		
+	}
+	
+	@RequestMapping(value="/ProposalStrategy/{id}/updateTotalCalculatedAllocatedAmount", method=RequestMethod.POST)
+	public @ResponseBody String proposalStrategyUpageAllocatedAmount(
+			@PathVariable Long id,
+			@RequestParam Long totalCalculatedAllocatedAmount){
+		
+		entityService.updateProposalStrategyTotalCalculatedAllocatedAmount(id, totalCalculatedAllocatedAmount);
+		
+		return "success";
 	}
 	
 	@RequestMapping(value="/ProposalStrategy/{id}", method=RequestMethod.DELETE)

@@ -47,7 +47,7 @@ public interface BudgetProposalRepository extends
 
 
 	public BudgetProposal findByForObjectiveAndOwnerAndBudgetType(
-			Objective parent, Organization owner, BudgetType budgetType);
+			Objective objective, Organization owner, BudgetType budgetType);
 
 	@Query("" +
 			"SELECT proposal " +

@@ -2751,6 +2751,50 @@ public class EntityServiceJPA implements EntityService {
 	}
 
 	@Override
+	public void updateProposalStrategyTotalCalculatedAllocatedAmount(Long id,
+			Long totalCalculatedAllocatedAmount) {
+		ProposalStrategy ps = proposalStrategyRepository.findOne(id);
+		
+		Long adjAmount = 0L;
+		if(ps.getTotalCalculatedAllocatedAmount() == null) {
+			adjAmount = totalCalculatedAllocatedAmount;
+		} else  {
+			adjAmount = totalCalculatedAllocatedAmount - ps.getTotalCalculatedAllocatedAmount();
+		}
+		
+		logger.debug("adjAmount: "  + adjAmount);
+		
+		ps.setTotalCalculatedAllocatedAmount(totalCalculatedAllocatedAmount);
+		
+		proposalStrategyRepository.save(ps);
+		
+		BudgetProposal p = ps.getProposal();
+		
+		while(p != null) {
+		
+			if(p.getAmountAllocated() == null) {
+				p.setAmountAllocated(ps.getTotalCalculatedAllocatedAmount());
+			} else {
+				p.setAmountAllocated(p.getAmountAllocated() + adjAmount);
+			}
+			
+			budgetProposalRepository.save(p);
+			
+			if(p.getForObjective().getParent() == null) {
+				p = null;
+			} else {
+				p = budgetProposalRepository.findByForObjectiveAndOwnerAndBudgetType(
+						p.getForObjective().getParent(),
+						p.getOwner(),
+						p.getBudgetType()
+					);
+			}
+			
+		}
+		
+	}
+
+	@Override
 	public ProposalStrategy updateProposalStrategy(Long id,
 			JsonNode rootNode) throws JsonParseException, JsonMappingException, IOException {
 
@@ -4835,10 +4879,36 @@ public class EntityServiceJPA implements EntityService {
 	@Override
 	public void updateReservedBudget(Long id, Long amountReserved) {
 		ReservedBudget r = reservedBudgetRepository.findOne(id);
-		if(r != null) {
-			r.setAmountReserved(amountReserved);
-			reservedBudgetRepository.save(r);
+		Long adjAmount = 0L;
+		
+		if(r.getAmountReserved() == null) {
+			adjAmount = amountReserved;
+		} else {
+			adjAmount = amountReserved - r.getAmountReserved();
 		}
+		
+		
+		while (r != null) {
+			if(r.getAmountReserved() == null) {
+				r.setAmountReserved(adjAmount);
+			} else {
+				r.setAmountReserved(r.getAmountReserved() + amountReserved);	
+			}
+			
+			reservedBudgetRepository.save(r);
+			
+			if(r.getForObjective().getParent() == null) {
+				r = null;
+			} else {
+				// now find its parent
+				r = reservedBudgetRepository.findOneByBudgetTypeAndObjective(
+						r.getBudgetType(), 
+						r.getForObjective().getParent());
+			}
+		}
+		
+		
+		
 		
 	}
 	
