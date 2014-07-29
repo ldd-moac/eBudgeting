@@ -774,7 +774,7 @@ $(document).ready(function() {
 		},{
 			name: 'proposals', mapping: 'proposals'
 		},{
-			name: 'reservedBudgets', mappring: 'reservedBudgets'
+			name: 'reservedBudgets', mapping: 'reservedBudgets'
 		},{
 			name: 'allocationRecordsR1', mapping: 'allocationRecordsR1'
 		},{
@@ -882,6 +882,14 @@ $(document).ready(function() {
         		});
         		return sum;
         	}
+        },{
+        	name: 'amountAllocationLeft',
+        	convert: function(v, rec) {
+        		console.log(v);
+        		console.log(rec);
+        		return rec.data.sumAllocationR3 - (rec.data.sumBudgetReserved + rec.data.sumProposalsAllocated);
+        	}
+        
         }]
     });
 	

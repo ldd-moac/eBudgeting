@@ -1143,4 +1143,25 @@ create table BGT_OBJALLOCATIONRECORD (
 	drop CONSTRAINT  SYS_C007049;
 	ALTER TABLE bgt_allocrec_proposalstrgy
 	add CONSTRAINT SYS_C007049 UNIQUE (BGT_ALLOCRECORDSTRATEGY_ID,PROPOSALSTRATEGIES_ID);
+	
+	
+-- version 15
+-- Modified Date: July 30, 2014
+update app_info set db_version = 15;
+create table BGT_ADDITIONALBGTALLOCATION (
+        id number(19,0) not null,
+        amount number(19,0),
+        IDX number(10,0),
+        PROPOSAL_ID number(19,0),
+        allocationtimestamp timestamp,
+        primary key (id)
+    );
+    
+    alter table BGT_ADDITIONALBGTALLOCATION 
+        add constraint FK830847D9EC8937AC
+        foreign key (PROPOSAL_ID) 
+        references BGT_BUDGETPROPOSAL;
+        
+	create sequence BGT_ADDITIONALBGTALLOC_SEQ;
+
     

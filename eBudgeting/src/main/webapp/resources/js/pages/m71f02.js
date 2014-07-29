@@ -916,7 +916,7 @@ var MainCtrView = Backbone.View.extend({
 	        	text: 'เหลือจัดสรร',
 	        	width: 120,
 	        	sortable : false,
-	        	dataIndex: 'sumAllocationR3',
+	        	dataIndex: 'amountAllocationLeft',
 	        	align: 'right',
 	        	renderer: function(value) {
 	        		return addCommas(value);
