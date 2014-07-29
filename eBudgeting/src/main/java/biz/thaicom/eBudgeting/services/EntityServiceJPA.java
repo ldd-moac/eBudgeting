@@ -4695,7 +4695,7 @@ public class EntityServiceJPA implements EntityService {
 			
 			// now find mianType in 
 			for(ObjectiveBudgetProposal budgetProposal : objectiveProposals) {
-				if(budgetProposal.getBudgetType().getId().equals(mainType.getId())) {
+				if(mainType != null && budgetProposal.getBudgetType().getId().equals(mainType.getId())) {
 					found = true;
 					budgetProposal.setAmountRequest(nullZero(proposal.getAmountRequest()) + nullZero(budgetProposal.getAmountRequest()));
 					budgetProposal.setAmountRequestNext1Year(nullZero(proposal.getAmountRequestNext1Year()) + nullZero(budgetProposal.getAmountRequestNext1Year()));
