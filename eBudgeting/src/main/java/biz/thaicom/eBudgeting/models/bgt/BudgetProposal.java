@@ -1,6 +1,7 @@
 package biz.thaicom.eBudgeting.models.bgt;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -66,8 +67,7 @@ public class BudgetProposal implements Serializable {
 	@Basic
 	private Long amountAllocated;
 	
-	@OneToMany(mappedBy="", cascade={CascadeType.ALL})
-    @JoinColumn(name="department_id")
+	@OneToMany(mappedBy="proposal", cascade={CascadeType.ALL})
     @OrderColumn(name="idx")
     private List<AdditionalBudgetAllocation> additionalAllocations;
 	
@@ -220,6 +220,22 @@ public class BudgetProposal implements Serializable {
 		this.amountRequestNext3Year = this.amountRequestNext3Year - adjustedAmountRequestNext3Year;
 		
 	}
+
+	public List<AdditionalBudgetAllocation> getAdditionalAllocations() {
+		return additionalAllocations;
+	}
+
+	public void setAdditionalAllocations(
+			List<AdditionalBudgetAllocation> additionalAllocations) {
+		this.additionalAllocations = additionalAllocations;
+	}
 	
+	public Integer addAdditionalAllocation(AdditionalBudgetAllocation additionalBudgetAllocation) {
+		if(this.additionalAllocations == null) this.additionalAllocations = new ArrayList<AdditionalBudgetAllocation>();
+		
+		this.additionalAllocations.add(additionalBudgetAllocation);
+		
+		return this.additionalAllocations.size();
+	}
 	
 }

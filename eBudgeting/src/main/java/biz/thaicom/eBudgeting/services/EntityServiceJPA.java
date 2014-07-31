@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import biz.thaicom.eBudgeting.exception.ObjectiveHasBudgetProposalException;
+import biz.thaicom.eBudgeting.models.bgt.AdditionalBudgetAllocation;
 import biz.thaicom.eBudgeting.models.bgt.AllocatedFormulaColumnValue;
 import biz.thaicom.eBudgeting.models.bgt.AllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.AllocationRecordStrategy;
@@ -4909,6 +4910,28 @@ public class EntityServiceJPA implements EntityService {
 		
 		
 		
+		
+	}
+
+	@Override
+	public String additionalAllocationToProposal(Long budgetProposalId,
+			Long amount) {
+		BudgetProposal proposal = budgetProposalRepository.findOne(budgetProposalId);
+		if(proposal != null) {
+			// new Additional Allocation
+			AdditionalBudgetAllocation aba = new AdditionalBudgetAllocation();
+			aba.setAllocationTimeStamp(new Date());
+			aba.setAmount(amount);
+			aba.setProposal(proposal);
+			
+			proposal.addAdditionalAllocation(aba);
+			
+			budgetProposalRepository.save(proposal);
+			
+			return "success";
+		} else {
+			return "failed";
+		}
 		
 	}
 	

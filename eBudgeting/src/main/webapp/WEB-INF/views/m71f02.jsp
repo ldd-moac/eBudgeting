@@ -885,8 +885,6 @@ $(document).ready(function() {
         },{
         	name: 'amountAllocationLeft',
         	convert: function(v, rec) {
-        		console.log(v);
-        		console.log(rec);
         		return rec.data.sumAllocationR3 - (rec.data.sumBudgetReserved + rec.data.sumProposalsAllocated);
         	}
         

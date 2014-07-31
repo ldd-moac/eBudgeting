@@ -56,6 +56,16 @@ public class BudgetProposalRestController {
 	}
 	
 	
+	@RequestMapping(value="/BudgetProposal/{budgetProposalId}/additionalAllocation", method=RequestMethod.POST)
+	public @ResponseBody String additionalAllocation(
+			@PathVariable Long budgetProposalId,
+			@RequestParam Long amount) {
+		
+		
+		
+		return entityService.additionalAllocationToProposal(budgetProposalId, amount);
+	};
+	
 	@RequestMapping(value="/BudgetProposal/find/{fiscalYear}/{objectiveId}/{budgetTypeId}", method=RequestMethod.GET)
 	public @ResponseBody List<BudgetProposal> findBudgetProposal(
 			@PathVariable Integer fiscalYear,

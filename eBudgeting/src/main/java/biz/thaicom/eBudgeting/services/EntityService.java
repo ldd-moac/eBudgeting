@@ -339,6 +339,8 @@ public interface EntityService {
 	
 	// ReservedBudget
 	public void updateReservedBudget(Long id, Long amountReserved);
+	public String additionalAllocationToProposal(Long budgetProposalId,
+			Long amount);
 
 
 
