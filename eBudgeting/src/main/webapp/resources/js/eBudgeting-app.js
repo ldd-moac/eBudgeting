@@ -462,6 +462,10 @@ BudgetProposal = Backbone.RelationalModel.extend({
 		type:Backbone.HasOne,
 		key: 'owner',
 		relatedModel: 'Organization'
+	},{
+		type:Backbone.HasMany,
+		key: 'additionalAllocations',
+		relatedModel: 'AdditionalBudgetAllocation'
 	}],
 	urlRoot: appUrl('/BudgetProposal')
 });
@@ -510,6 +514,16 @@ ReservedBudget = Backbone.RelationalModel.extend({
 		relatedModel: 'BudgetType'
 	}],
 	urlRoot: appUrl('/ReservedBudget')
+});
+
+AdditionalBudgetAllocation = Backbone.RelationalModel.extend({
+	idAttribute: 'id',
+	relations: [{
+		type: Backbone.HasOne,
+		key: 'proposal',
+		relatedModel: 'BudgetProposal'
+	}],
+	urlRoot: appUrl('/AdditionalBudgetAllocation')
 });
 
 ProposalStrategy = Backbone.RelationalModel.extend({

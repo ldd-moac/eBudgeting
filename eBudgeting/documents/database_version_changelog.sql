@@ -1162,6 +1162,8 @@ create table BGT_ADDITIONALBGTALLOCATION (
         foreign key (PROPOSAL_ID) 
         references BGT_BUDGETPROPOSAL;
         
+    alter table BGT_BUDGETPROPOSAL add (totalAmountAdditions number(19,0));
+        
 	create sequence BGT_ADDITIONALBGTALLOC_SEQ;
 
     

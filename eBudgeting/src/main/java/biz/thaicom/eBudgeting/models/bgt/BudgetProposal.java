@@ -67,6 +67,9 @@ public class BudgetProposal implements Serializable {
 	@Basic
 	private Long amountAllocated;
 	
+	@Basic
+	private Long totalAmountAdditions;
+	
 	@OneToMany(mappedBy="proposal", cascade={CascadeType.ALL})
     @OrderColumn(name="idx")
     private List<AdditionalBudgetAllocation> additionalAllocations;
@@ -237,5 +240,15 @@ public class BudgetProposal implements Serializable {
 		
 		return this.additionalAllocations.size();
 	}
+
+	public Long getTotalAmountAdditions() {
+		return totalAmountAdditions;
+	}
+
+	public void setTotalAmountAdditions(Long totalAmountAdditions) {
+		this.totalAmountAdditions = totalAmountAdditions;
+	}
+	
+	
 	
 }

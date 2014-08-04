@@ -1663,6 +1663,8 @@ public class EntityServiceJPA implements EntityService {
 		List<BudgetProposal> proposalList = budgetProposalRepository
 				.findBudgetProposalByFiscalYearAndParentPath(fiscalYear, parentPathLikeString);
 		
+		logger.debug("fiscalYear: " + fiscalYear + " proposalListSize: " + proposalList.size());
+		
 		//loop through proposalList
 		for(BudgetProposal proposal : proposalList) {
 			Integer index = list.indexOf(proposal.getForObjective());
@@ -1671,7 +1673,7 @@ public class EntityServiceJPA implements EntityService {
 			
 			o.addToSumBudgetTypeProposalsOnlyAmount(proposal);
 			
-			//logger.debug("AAding proposal {} to objective: {}", proposal.getId(), o.getId());
+			logger.debug("AAding proposal {} to objective: {}", proposal.getId(), o.getId());
 			
 			//o.getProposals().add(proposal);
 			//logger.debug("proposal size is " + o.getProposals().size());
@@ -4925,6 +4927,14 @@ public class EntityServiceJPA implements EntityService {
 			aba.setProposal(proposal);
 			
 			proposal.addAdditionalAllocation(aba);
+			
+			if(proposal.getTotalAmountAdditions() == null) {
+				proposal.setTotalAmountAdditions(amount);
+			} else {
+				proposal.setTotalAmountAdditions(
+						proposal.getTotalAmountAdditions() + amount);
+			}
+			
 			
 			budgetProposalRepository.save(proposal);
 			
