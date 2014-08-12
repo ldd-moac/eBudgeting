@@ -209,17 +209,22 @@ $(document).ready(function() {
 		
 		saveLine: function(e) {
 			// ok
-			console.log(this.currentBudgetCommonType.urlRoot);
 			
 			var newModel=false;
+			var url = "";
 			if(this.currentBudgetCommonType.get('id') == null) {
 				newModel = true;
+				url = this.currentBudgetCommonType.urlRoot;
+			} else {
+				url = this.currentBudgetCommonType.urlRoot + 
+					this.currentBudgetCommonType.get('id');
 			}
+			
 			this.currentBudgetCommonType.save({
 				name: this.$el.find('input[id=nameTxt]').val(),
 				fiscalYear: fiscalYear
 			},{
-				url: this.currentBudgetCommonType.urlRoot + this.currentBudgetCommonType.id,
+				url : url,
 				success : _.bind(function(model) {
 					
 					if(newModel) {
