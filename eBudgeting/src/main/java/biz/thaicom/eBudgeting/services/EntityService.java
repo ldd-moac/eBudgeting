@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import biz.thaicom.eBudgeting.exception.ObjectiveHasBudgetProposalException;
+import biz.thaicom.eBudgeting.models.bgt.AdditionalBudgetAllocation;
 import biz.thaicom.eBudgeting.models.bgt.AllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.BudgetCommonType;
 import biz.thaicom.eBudgeting.models.bgt.BudgetProposal;
@@ -339,7 +340,7 @@ public interface EntityService {
 	
 	// ReservedBudget
 	public void updateReservedBudget(Long id, Long amountReserved);
-	public String additionalAllocationToProposal(Long budgetProposalId,
+	public AdditionalBudgetAllocation additionalAllocationToProposal(Long budgetProposalId,
 			Long amount);
 
 

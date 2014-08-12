@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import biz.thaicom.eBudgeting.models.bgt.AdditionalBudgetAllocation;
 import biz.thaicom.eBudgeting.models.bgt.AllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.BudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.BudgetSignOff;
@@ -57,13 +58,18 @@ public class BudgetProposalRestController {
 	
 	
 	@RequestMapping(value="/BudgetProposal/{budgetProposalId}/additionalAllocation", method=RequestMethod.POST)
-	public @ResponseBody String additionalAllocation(
+	public @ResponseBody AdditionalBudgetAllocation additionalAllocation(
 			@PathVariable Long budgetProposalId,
 			@RequestParam Long amount) {
 		
 		
+		AdditionalBudgetAllocation aba = entityService.additionalAllocationToProposal(budgetProposalId, amount); 
 		
-		return entityService.additionalAllocationToProposal(budgetProposalId, amount);
+		logger.debug("New additionalBudgetAllocation Id: " + aba.getId());
+		
+		return aba;
+		
+		
 	};
 	
 	@RequestMapping(value="/BudgetProposal/find/{fiscalYear}/{objectiveId}/{budgetTypeId}", method=RequestMethod.GET)

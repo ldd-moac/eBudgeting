@@ -214,6 +214,23 @@ var DetailModalView = Backbone.View.extend({
 		
 	},
 	
+	renderAdditionalAllocation : function(proposalId) {
+		var currentProposal = BudgetProposal.findOrCreate(proposalId);
+		
+		// now make a div after this
+		var nextDiv = $('li[data-id=' + proposalId+ ']').next();
+		
+		//prepare for data
+		var json = currentProposal.toJSON();
+		
+		var html = this.additionalAllocationTemplate(json);
+		
+		nextDiv.empty();
+		nextDiv.html(html);
+		
+	},
+	
+	
 	addAddtionalBudgetAllocation: function(e) {
 		t = $(e.target);
 		var proposalId = $(e.target).prev().attr('proposal-id');
@@ -226,9 +243,17 @@ var DetailModalView = Backbone.View.extend({
 			data : {
 				amount: amount
 			}, 
-			success: function() {
-				console.log('hey');
-			}
+			success: _.bind(function(data, textStatus, jqXHR) {
+				// update new additionalAllocation
+				alert("บันทึกข้อมูลสำเร็จ");
+				
+				var newABA = new AdditionalBudgetAllocation(data);
+				
+				
+				this.renderAdditionalAllocation(proposalId);
+				
+				
+			}, this)
 		});
 		
 	},

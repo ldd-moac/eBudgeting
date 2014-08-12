@@ -4916,7 +4916,7 @@ public class EntityServiceJPA implements EntityService {
 	}
 
 	@Override
-	public String additionalAllocationToProposal(Long budgetProposalId,
+	public AdditionalBudgetAllocation additionalAllocationToProposal(Long budgetProposalId,
 			Long amount) {
 		BudgetProposal proposal = budgetProposalRepository.findOne(budgetProposalId);
 		if(proposal != null) {
@@ -4938,9 +4938,9 @@ public class EntityServiceJPA implements EntityService {
 			
 			budgetProposalRepository.save(proposal);
 			
-			return "success";
+			return aba;
 		} else {
-			return "failed";
+			return null;
 		}
 		
 	}
