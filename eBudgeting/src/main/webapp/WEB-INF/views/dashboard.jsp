@@ -160,12 +160,12 @@ var menuJson = [{
 			name: "m61f03: การบันทึกงบประมาณ ระดับกิจกรรม",code: "m61f03",  link: "page/m61f03_1/", group: "BGT_USER"
 		},{
 			name: "m61f04: การบันทึกงบประมาณ ระดับรายการ", code: "m61f04", link: "page/m61f04_1/", group: "BGT_USER"
-		},{
-			name: "m61f05: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)",code: "m61f05",  link: "page/m61f05/", group: "BGT_BGT_ADMIN" 
 		}]
 	}, {
-		name: "การกระทบยอดงบประมาณ (m62)", code: "m62", menus: [{
+		name: "การกระทบยอด และนำส่งคำของบประมาณ (m62)", code: "m62", menus: [{
 			name: "m62f01: กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m62f01", link: "page/m62f01/", group: "BGT_BGT_ADMIN"
+		},{
+			name: "m62f02: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release) การกระทบยอดงบประมาณ ",code: "m61f05",  link: "page/m61f05/", group: "BGT_BGT_ADMIN" 
 		}]
 	},{
 		name: "กรอบวงเงินเพื่อตั้งคำของบประมาณ (เข้าระบบ e-Budgeting) (m63)",code: "m63",  menus:[{
