@@ -553,10 +553,12 @@ public class GenericViewController {
 		setFiscalYearFromSession(model, session);
 		model.addAttribute("typeId", 114);
 
-		String relatedTypeString = "";
+		String relatedTypeString = ""
+				+ ObjectiveTypeId.เป้าประสงค์เชิงนโยบาย.getValue();
 		model.addAttribute("relatedTypeString", relatedTypeString);
 
-		String relatedTypeNameString = "";
+		String relatedTypeNameString = ""
+				+ ObjectiveTypeId.เป้าประสงค์เชิงนโยบาย.getName();
 		model.addAttribute("relatedTypeNameString", relatedTypeNameString);
 
 		model.addAttribute("hasParent", "");

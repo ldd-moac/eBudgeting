@@ -149,9 +149,15 @@ public class BudgetTypeRestController {
 			@PathVariable Long typeId,
 			@PathVariable Integer level,
 			@PathVariable Integer pageNumber,
-			@RequestParam (required=false) String query) {
+			@RequestParam (required=false) String query,
+			@RequestParam (required=false) String sortField) {
+		
+		if(sortField == null || sortField.length() == 0) {
+			sortField = "code";
+		}
+		
 		PageRequest pageRequest =
-	            new PageRequest(pageNumber - 1, PageUI.PAGE_SIZE, Sort.Direction.ASC, "code");
+	            new PageRequest(pageNumber - 1, PageUI.PAGE_SIZE, Sort.Direction.ASC, sortField);
 		if(query == null || query.length() == 0) {
 			query = "%";
 		} else {

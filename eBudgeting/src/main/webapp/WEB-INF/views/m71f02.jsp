@@ -49,7 +49,7 @@
 			</div>
 		</div>
 	
-		<div id="mainCtr">
+		<div id="mainCtr" style="margin-left: -50px;">
 
 		</div>
 		

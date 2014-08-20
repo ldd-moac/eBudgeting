@@ -265,6 +265,7 @@ var MainTblView = Backbone.View.extend({
 	el: "#mainCtr",
 	selectedObjective: null,
 	currentLineVal: null,
+	sortField: "code",
 	
 	newRowTemplate: Handlebars.compile($("#newRowTemplate").html()),
 	editRowTemplate: Handlebars.compile($("#editRowTemplate").html()),
@@ -313,7 +314,7 @@ var MainTblView = Backbone.View.extend({
 		
 		this.collection.fetch({
 			type: 'POST',
-			data: {query: this.searchTxt},
+			data: {query: this.searchTxt, sortField: this.sortField},
 			success: _.bind(function() {
 				this.render();
 			},this)
@@ -341,6 +342,8 @@ var MainTblView = Backbone.View.extend({
 
 		"click a.pageLink" : "gotoPage",
 		
+		"click a#sortName" : "sortName",
+		
 		"click a.showFormulaToolBar" : "showFormulaToolBar",
 		
 		"click button.addFormula" : "addFormula",
@@ -353,6 +356,12 @@ var MainTblView = Backbone.View.extend({
 		"click .editFormulaLineBtn" : "editFormulaLine"
 			
 		
+	},
+	
+	sortName: function(e) {
+		// we have to refresh collection
+		this.sortField = "name";
+		this.renderTargetPage(1);
 	},
 	
 	gotoPage: function(e) {
@@ -471,17 +480,7 @@ var MainTblView = Backbone.View.extend({
 	
 	searchBtnClick: function(e) {
 		this.searchTxt = this.$el.find('#searchQuery').val();
-		this.collection.setTargetPage(1);
-		this.collection.fetch({
-			type: 'POST',
-			data: {
-				query: this.searchTxt
-			},
-			success: _.bind(function(){
-				this.render();
-			}, this)
-		
-		});
+		this.renderTargetPage(1);
 		return false;
 	},
 	

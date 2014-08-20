@@ -231,7 +231,7 @@
 			<td style="width:80px;">หมวดหลัก</td>
 			<td style="width:80px;">หมวดย่อย</td>
 			<td style="width:100px;">รายการหลัก</td>
-			<td >รายการ</td>		
+			<td ><a href="#" id="sortName">รายการ</a></td>		
 
 			<td style="width:60px;">หน่วยนับ</td>
 			<td style="width:100px;">รายการกลาง</td>

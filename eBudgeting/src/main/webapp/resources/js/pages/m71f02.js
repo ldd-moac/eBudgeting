@@ -862,7 +862,7 @@ var MainCtrView = Backbone.View.extend({
 		this.tree = Ext.create('Ext.tree.Panel', {
 			id: 'treeGrid',
 	        title: 'การของบประมาณ',
-	        width: 820,
+	        width: 920,
 	        height: 300,
 	        renderTo: Ext.getElementById('mainTbl'),
 	        collapsible: false,
@@ -892,21 +892,31 @@ var MainCtrView = Backbone.View.extend({
 	        	width: 80,
 	        	sortable: false,
 	        	align: 'center'
-	        }, {
-	        	text: 'จัดสรรให้หน่วยงาน',
+	        },  {
+	        	text: 'พรบ.งบฯ',
 	        	width: 120,
 	        	sortable : false,
-	        	dataIndex: 'sumProposalsAllocated',
+	        	dataIndex: 'sumAllocationR3',
 	        	align: 'right',
 	        	renderer: function(value) {
 	        		return addCommas(value);
 	        	}
 	        		
 	        }, {
-	        	text: 'จัดสรรเข้ายุทธศาสตร์',
+	        	text: 'จัดสรรไว้ส่วนกลาง',
 	        	width: 120,
 	        	sortable : false,
 	        	dataIndex: 'sumBudgetReserved',
+	        	align: 'right',
+	        	renderer: function(value) {
+	        		return addCommas(value);
+	        	}
+	        		
+	        }, {
+	        	text: 'จัดสรรให้เจ้าของงาน',
+	        	width: 120,
+	        	sortable : false,
+	        	dataIndex: 'sumProposalsAllocated',
 	        	align: 'right',
 	        	renderer: function(value) {
 	        		return addCommas(value);
@@ -922,76 +932,6 @@ var MainCtrView = Backbone.View.extend({
 	        		return addCommas(value);
 	        	}
 	        		
-	        },  {
-	        	text: 'ปรับลดครั้งที่ 3',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumAllocationR3',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'ปรับลดครั้งที่ 2',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumAllocationR2',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'ปรับลดครั้งที่ 1',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumAllocationR1',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'ขอตั้งปี ' + fiscalYear,
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumProposals',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
-	        }, {
-	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+1),
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumProposalsNext1year',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
-	        }, {
-	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+2),
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumProposalsNext2year',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
-	        }, {
-	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+3),
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumProposalsNext3year',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
 	        }]
 		});	
 	}
