@@ -1404,7 +1404,10 @@ public class EntityServiceJPA implements EntityService {
 				
 				
 				for(BudgetProposal p : o.getProposals()) {
-					AllocationRecord ar = budgetTypeMap.get(p.getBudgetType().getId());
+					AllocationRecord ar = null;
+					if(p.getBudgetType() != null) {
+						ar = budgetTypeMap.get(p.getBudgetType().getId());
+					}
 
 					if(ar == null) {
 						ar = new AllocationRecord();
