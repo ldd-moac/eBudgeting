@@ -187,10 +187,10 @@
 	<thead>
 		<tr>
 			<td fixed="true" style="position:absolute; left:10px;width:250px;">รายการงบประมาณ<br/>&nbsp;</td>
-			<td fixed="true" style="position:absolute; left:277px;width:100px;">จัดสรรให้หน่วยงาน</td>
-			<td fixed="true" style="position:absolute; left:394px;width:100px;">จัดสรรเข้าส่วนกลาง</td>
+			<td fixed="true" style="position:absolute; left:277px;width:100px;">จัดสรรให้เจ้าของงาน</td>
+			<td fixed="true" style="position:absolute; left:394px;width:100px;">จัดสรรไว้ส่วนกลาง</td>
 			<td fixed="true" style="position:absolute; left:511px;width:82px;">คงเหลือจัดสรร</td>
-			<td  style="width:400px;">ปรับลดครั้งที่3</td>
+			<td  style="width:400px;">พรบ.งบฯ</td>
 			<td  style="width:400px;">ปรับลดครั้งที่2</td>
 			<td  style="width:400px;">ปรับลดครั้งที่1</td>
 			<td  style="width:400px;">ขอตั้ง</td>
@@ -218,10 +218,10 @@
 <div>
 	หมวดงบประมาณ {{allocationRecordR3.budgetType.name}}
 	<table>
-		<tr><td>หลังปรับลดครั้งที่ 3 ได้รับ</td><td style="text-align:right">{{formatNumber allocationRecordR3.amountAllocated}} </td><td>บาท</td></tr>
-		<tr><td>จัดสรรให้หน่วยงาน</td><td style="text-align:right">{{sumAllocatedRecord proposals}}</td><td> บาท</td></tr>
-		<tr><td><a href="#" id="reservedBudgetLnk">จัดสรรเข้ายุทธศาสตร์กลาง</td><td style="text-align:right" id="reservedBudgetCell">{{formatNumber reservedBudget.amountReserved}} </td><td>บาท</td></tr>
-		<tr><td>คงเหลือการจัดสรร</td><td style="text-align:right" id="amountLeftCell">{{amountLeft this}}</td><td>บาท</td></tr>
+		<tr><td>พรบ.งบฯ</td><td style="text-align:right">{{formatNumber allocationRecordR3.amountAllocated}} </td><td>บาท</td></tr>
+		<tr><td>จัดสรรให้เจ้าของงาน</td><td style="text-align:right">{{sumAllocatedRecord proposals}}</td><td> บาท</td></tr>
+		<tr><td><a href="#" id="reservedBudgetLnk">จัดสรรไว้ส่วนกลาง</td><td style="text-align:right" id="reservedBudgetCell">{{formatNumber reservedBudget.amountReserved}} </td><td>บาท</td></tr>
+		<tr><td>เหลือจัดสรร</td><td style="text-align:right" id="amountLeftCell">{{amountLeft this}}</td><td>บาท</td></tr>
 	</table>
 </div>
 	
@@ -244,7 +244,7 @@
 {{#each this}} 
 	<li data-id="{{id}}" proposal-id="{{../id}}">
 		<b>ขอตั้ง</b>			
-		{{name}} : {{{formulaLine this false}}} = {{{formatNumber totalCalculatedAmount}}} บาท</li>
+		{{name}} : {{{formulaLine this false}}} = {{{formatNumber totalCalculatedAmount}}} บาท / เป้าหมาย : {{targetValue}} {{targetUnit.name}} </li>
 
 	<li style="list-style: none;" data-id="{{id}}"><a href="#" class="editProposal"><span class="label label-info"><i class="icon icon-edit icon-white editProposal"></i></span> จัดสรร </a>:  {{{formulaLine this true}}} = {{{formatNumberNotNull totalCalculatedAllocatedAmount}}} บาท</li>
 
@@ -260,7 +260,7 @@
 	{{/each}}
 	
 	 = <span id="totalCalculatedAllocatedAmount-{{id}}" class="totalCalculatedAllocatedAmount">{{{formatNumberNotNull totalCalculatedAllocatedAmount}}}</span> บาท 
-		<button class="btn btn-mini updateProposalStretegy"><i class="icon-ok" icon-white"/> แก้ไข</button>
+		<button class="btn btn-mini updateProposalStretegy"><i class="icon-ok" icon-white"/> บันทึก</button>
 		<button class="btn btn-mini cancelUpdateProposalStretegy"><i class="icon-remove" icon-white"/> ยกเลิก</button>
 </script>
 
@@ -270,14 +270,14 @@
 	<input type="text" class="span1 proposalEditInput" id="proposal-{{id}}" data-id="{{id}}" 
 						 value="{{formatNumberNotNull totalCalculatedAllocatedAmount}}"/> บาท 
 	
-	 	<button class="btn btn-mini updateProposalNoStretegy"><i class="icon-ok" icon-white"/> แก้ไข</button>
+	 	<button class="btn btn-mini updateProposalNoStretegy"><i class="icon-ok" icon-white"/> บันทึก</button>
 		<button class="btn btn-mini cancelUpdateProposalNoStretegy"><i class="icon-remove" icon-white"/> ยกเลิก</button>
 </script>
 
 <script id="reservedBudgetInputTemplate" type="text/x-handler-template">
 	<div>
 		<input class="span2" type="text" data-id="{{id}}" {{#if amountReserved}}value="{{amountReserved}}"{{/if}} id="reservedBudgetInput"/> 
-		<button class="btn btn-mini updateReservedBudget"><i class="icon-ok" icon-white"/> แก้ไข</button>
+		<button class="btn btn-mini updateReservedBudget"><i class="icon-ok" icon-white"/> บันทึก</button>
 		<button class="btn btn-mini cancelUpdateReservedBudget"><i class="icon-remove" icon-white"/> ยกเลิก</button>
 	</div>
 </script>

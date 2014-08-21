@@ -1377,7 +1377,11 @@ public class EntityServiceJPA implements EntityService {
 				HashMap<FormulaColumn, RequestColumn> columnMap = new HashMap<FormulaColumn, RequestColumn>();
 
 				for(ObjectiveBudgetProposal p : o.getObjectiveProposals()) {
-					ObjectiveAllocationRecord r = objBudgetTypeMap.get(p.getBudgetType().getId());
+					ObjectiveAllocationRecord r = null;
+					if(p.getBudgetType() != null) {
+						 r = objBudgetTypeMap.get(p.getBudgetType().getId());
+					}
+					
 					if(r == null) {
 						r = new ObjectiveAllocationRecord();
 						r.setIndex(round-1);
@@ -2376,39 +2380,44 @@ public class EntityServiceJPA implements EntityService {
 		
 		
 		//lastly the unit
-		if(objectiveJsonNode.get("units") != null ) {
-			objective.setUnits(new ArrayList<TargetUnit>());
-			if(objective.getTargets() != null) {
-				List<ObjectiveTarget> tList = new ArrayList<ObjectiveTarget>();
-				for(ObjectiveTarget t : objective.getTargets()) {
-					tList.add(t);
-				}
-				
-				// now delete t here?
-				while(tList.isEmpty() == false) {
-					ObjectiveTarget t = tList.remove(0);
-					objective.getTargets().remove(t);
-					objectiveTargetRepository.delete(t);
-				}
-				
-			}
-			
-			for(JsonNode unit : objectiveJsonNode.get("units")) {
-				TargetUnit unitJpa = targetUnitRepository.findOne(unit.get("id").asLong());
-				objective.addUnit(unitJpa);
-				
-				ObjectiveTarget t = new ObjectiveTarget();
-				t.setFiscalYear(objective.getFiscalYear());
-				t.setUnit(unitJpa);
-				
-				objectiveTargetRepository.save(t);
-				
-				objective.addTarget(t);
-					
-			}
-			
-			
+		
+		if(objective.getTargets() != null) {
+			objective.getTargets().size();
 		}
+		
+//		if(objectiveJsonNode.get("units") != null ) {
+//			objective.setUnits(new ArrayList<TargetUnit>());
+//			if(objective.getTargets() != null) {
+//				List<ObjectiveTarget> tList = new ArrayList<ObjectiveTarget>();
+//				for(ObjectiveTarget t : objective.getTargets()) {
+//					tList.add(t);
+//				}
+//				
+//				// now delete t here?
+//				while(tList.isEmpty() == false) {
+//					ObjectiveTarget t = tList.remove(0);
+//					objective.getTargets().remove(t);
+//					objectiveTargetRepository.delete(t);
+//				}
+//				
+//			}
+//			
+//			for(JsonNode unit : objectiveJsonNode.get("units")) {
+//				TargetUnit unitJpa = targetUnitRepository.findOne(unit.get("id").asLong());
+//				objective.addUnit(unitJpa);
+//				
+//				ObjectiveTarget t = new ObjectiveTarget();
+//				t.setFiscalYear(objective.getFiscalYear());
+//				t.setUnit(unitJpa);
+//				
+//				objectiveTargetRepository.save(t);
+//				
+//				objective.addTarget(t);
+//					
+//			}
+//			
+//			
+//		}
 		 
 		
 		logger.debug("1. {} " , objectiveJsonNode.get("parent"));

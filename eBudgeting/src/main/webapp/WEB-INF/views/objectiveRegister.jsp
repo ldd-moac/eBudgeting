@@ -357,6 +357,9 @@ $(document).ready(function() {
 						var target = new ObjectiveTarget(response);
 						
 						this.currentObjective.get('targets').add(target);
+						
+						console.log(this.currentObjective.get('targets').toJSON());
+						
 						this.render();
 						
 					}, this)
