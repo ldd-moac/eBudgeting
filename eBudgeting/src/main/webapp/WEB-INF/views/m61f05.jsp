@@ -99,6 +99,10 @@
 	var fiscalYear = parseInt("${fiscalYear}");
 	
 	var mainCtrView = null;
+	
+	var sumObjectiveProposal = null;
+	var sumProposal = null;
+	
 	mainCtrView = new MainCtrView();
 	
 	$(document).ready(function() {
@@ -108,6 +112,8 @@
 			success: function() {
 				$.get(appUrl('/BudgetProposal/sumTotalOfOwner/' + fiscalYear),
 					function(response) {
+						sumObjectiveProposal = response[1];
+						sumProposal = response[0];
 						budgetSignOff.set('sumTotalBudgetProposal', response[0]);
 						budgetSignOff.set('sumTotalObjectiveBudgetProposal', response[1]);
 						mainCtrView.renderWith(budgetSignOff);		

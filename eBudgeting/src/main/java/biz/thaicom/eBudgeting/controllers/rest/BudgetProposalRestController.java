@@ -350,7 +350,24 @@ public class BudgetProposalRestController {
 			@PathVariable Integer fiscalYear,
 			@Activeuser ThaicomUserDetail currentUser) {
 		
-		return entityService.findBudgetSignOffByFiscalYearAndOrganization(fiscalYear, currentUser.getWorkAt());
+		BudgetSignOff so = entityService.findBudgetSignOffByFiscalYearAndOrganization(fiscalYear, currentUser.getWorkAt());
+		
+		if(so.getLock1TimeStamp()!=null) {
+			logger.debug("so.getLock1: " + so.getLock1TimeStamp().toString());
+		} 
+		if(so.getUnLock1TimeStamp()!=null) {
+			logger.debug("so.getUnLock1: " + so.getUnLock1TimeStamp().toString());
+		} 
+		
+		
+		if(so.getLock2TimeStamp()!=null) {
+			logger.debug("so.getLock2: " + so.getLock2TimeStamp().toString());
+		}
+		if(so.getUnLock2TimeStamp()!=null) {
+			logger.debug("so.getUnLock2: " + so.getUnLock2TimeStamp().toString());
+		}
+		return so;
+		
 	}
 	
 	

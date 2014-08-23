@@ -4091,6 +4091,9 @@ public class EntityServiceJPA implements EntityService {
 		Objective o = obp.getForObjective().getParent();
 		BudgetType budgetType = obp.getBudgetType();
 		while(o != null) {
+			if(o.getParent() == null) {
+				logger.debug(">>>>>>>>>>>>>WE GET TO ROOT!");
+			}
 			ObjectiveBudgetProposal obpParent = objectiveBudgetProposalRepository.findByForObjectiveAndOwnerAndBudgetType(o, workAt, budgetType);
 			if(obpParent == null) {
 				obpParent= new ObjectiveBudgetProposal();
@@ -4679,6 +4682,9 @@ public class EntityServiceJPA implements EntityService {
 			copyFromProposalToObjectiveProposal(obj.getChildren(), workAt, budgetMainType);
 			copyFromProposalToObjectiveProposal(obj, workAt, budgetMainType);
 		}
+		
+		copyFromProposalToObjectiveProposal(root, workAt, budgetMainType);
+		
 		
  	}
 	

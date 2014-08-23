@@ -38,10 +38,21 @@ var MainCtrView = Backbone.View.extend({
 					this.budgetSignOff.set(buttonId+'TimeStamp', response.timeStamp);
 					
 					if(buttonId == 'lock1') {
+						if(sumObjectiveProposal != sumProposal) {
+							alert("ยอดรวมเงินกิจกรรมกับเงินรายการไม่เทากัน กรุณากระทบยอดก่อน SignOff");
+							return false;
+						}
+						
+						
 						this.budgetSignOff.set('unLock1Person', null);
 						this.budgetSignOff.set('unLock1TimeStamp', null);
 						
 					} else if(buttonId == 'lock2') {
+						if(sumObjectiveProposal != sumProposal) {
+							alert("ยอดรวมเงินกิจกรรมกับเงินรายการไม่เทากัน กรุณากระทบยอดก่อน SignOff");
+							return false;
+						}
+						
 						this.budgetSignOff.set('unLock2Person', null);
 						this.budgetSignOff.set('unLock2TimeStamp', null);
 						
