@@ -1377,6 +1377,10 @@ public class EntityServiceJPA implements EntityService {
 				HashMap<FormulaColumn, RequestColumn> columnMap = new HashMap<FormulaColumn, RequestColumn>();
 
 				for(ObjectiveBudgetProposal p : o.getObjectiveProposals()) {
+					if(p.getBudgetType() == null) {
+						logger.error("error!  : " + p.getId());
+					}
+					
 					ObjectiveAllocationRecord r = null;
 					if(p.getBudgetType() != null) {
 						 r = objBudgetTypeMap.get(p.getBudgetType().getId());

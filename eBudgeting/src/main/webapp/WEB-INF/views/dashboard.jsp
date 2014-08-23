@@ -163,9 +163,9 @@ var menuJson = [{
 		}]
 	}, {
 		name: "การกระทบยอด และนำส่งคำของบประมาณ (m62)", code: "m62", menus: [{
-			name: "m62f01: กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m62f01", link: "page/m62f01/", group: "BGT_BGT_ADMIN"
+			name: "m62f01: กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m62f01", link: "page/m62f01/", group: "BGT_USER"
 		},{
-			name: "m62f02: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release) การกระทบยอดงบประมาณ ",code: "m61f05",  link: "page/m61f05/", group: "BGT_BGT_ADMIN" 
+			name: "m62f02: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release) การกระทบยอดงบประมาณ ",code: "m61f05",  link: "page/m61f05/", group: "BGT_USER" 
 		}]
 	},{
 		name: "กรอบวงเงินเพื่อตั้งคำของบประมาณ (เข้าระบบ e-Budgeting) (m63)",code: "m63",  menus:[{

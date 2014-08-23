@@ -105,7 +105,8 @@ public class ObjectiveRestController {
 
 	@RequestMapping(value="/Objective/{id}/allChildrenWithProposals", method=RequestMethod.GET)
 	public @ResponseBody List<Objective> getAllChildrenObjectiveByIdAndLoadProposals(
-			@PathVariable Long id 
+			@PathVariable Long id,
+			@Activeuser ThaicomUserDetail currentUser
 			) {
 		logger.debug("id: " + id);
 		List<Objective> list =entityService.findObjectiveAllChildrenByObjectiveIdLoadProposal(id);
