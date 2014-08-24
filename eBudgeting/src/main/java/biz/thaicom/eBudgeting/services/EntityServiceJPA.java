@@ -1256,55 +1256,55 @@ public class EntityServiceJPA implements EntityService {
 //				.findBudgetProposalByFiscalYearAndParentPath(fiscalYear, parentPathLikeString);
 		
 
-			// we update all formulaStrategy here
-			List<FormulaStrategy> formulaList = formulaStrategyRepository.findAllByFiscalYear(fiscalYear);
-			for(FormulaStrategy fs : formulaList) {
-				AllocationStandardPrice asp;
-				if(fs.getAllocationStandardPriceMap()==null) {
-					fs.setAllocationStandardPriceMap(new ArrayList<AllocationStandardPrice>());
-				}
-				
-				if(fs.getAllocationStandardPriceMap().size() < round ){
-					asp = new AllocationStandardPrice();
-					asp.setIndex(round-1);
-					
-					fs.getAllocationStandardPriceMap().add(round-1, asp);
-				} else{
-					asp = fs.getAllocationStandardPriceMap().get(round-1);	
-				}
-				 
-				
-				if(round ==1) {
-					asp.setStandardPrice(fs.getStandardPrice());
-				} else {
-					// will have to come from previous round?
-					asp.setStandardPrice(fs.getAllocationStandardPriceMap().get(round-2).getStandardPrice());
-				}
-				for(FormulaColumn fc: fs.getFormulaColumns()) {
-					AllocatedFormulaColumnValue afcv;
-					if(fc.getAllocatedFormulaColumnValueMap() == null) {
-						fc.setAllocatedFormulaColumnValueMap(new ArrayList<AllocatedFormulaColumnValue>());
-					} 
-					
-					if(fc.getAllocatedFormulaColumnValueMap().size() < round) {
-						afcv = new AllocatedFormulaColumnValue();
-						afcv.setIndex(round-1);
-						
-						fc.getAllocatedFormulaColumnValueMap().add(round-1, afcv);
-					} else {
-						 afcv = fc.getAllocatedFormulaColumnValueMap().get(round-1);	
-					}
-					
-					if(round==1) {
-						afcv.setAllocatedValue(fc.getValue());
-					} else {
-						// will have to com from previous round
-						afcv.setAllocatedValue(fc.getAllocatedFormulaColumnValueMap().get(round-2).getAllocatedValue());
-					}
-				}
-				formulaColumnRepository.save(fs.getFormulaColumns());
+		// we update all formulaStrategy here
+		List<FormulaStrategy> formulaList = formulaStrategyRepository.findAllByFiscalYear(fiscalYear);
+		for(FormulaStrategy fs : formulaList) {
+			AllocationStandardPrice asp;
+			if(fs.getAllocationStandardPriceMap()==null) {
+				fs.setAllocationStandardPriceMap(new ArrayList<AllocationStandardPrice>());
 			}
-			formulaStrategyRepository.save(formulaList);
+			
+			if(fs.getAllocationStandardPriceMap().size() < round ){
+				asp = new AllocationStandardPrice();
+				asp.setIndex(round-1);
+				
+				fs.getAllocationStandardPriceMap().add(round-1, asp);
+			} else{
+				asp = fs.getAllocationStandardPriceMap().get(round-1);	
+			}
+			 
+			
+			if(round ==1) {
+				asp.setStandardPrice(fs.getStandardPrice());
+			} else {
+				// will have to come from previous round?
+				asp.setStandardPrice(fs.getAllocationStandardPriceMap().get(round-2).getStandardPrice());
+			}
+			for(FormulaColumn fc: fs.getFormulaColumns()) {
+				AllocatedFormulaColumnValue afcv;
+				if(fc.getAllocatedFormulaColumnValueMap() == null) {
+					fc.setAllocatedFormulaColumnValueMap(new ArrayList<AllocatedFormulaColumnValue>());
+				} 
+				
+				if(fc.getAllocatedFormulaColumnValueMap().size() < round) {
+					afcv = new AllocatedFormulaColumnValue();
+					afcv.setIndex(round-1);
+					
+					fc.getAllocatedFormulaColumnValueMap().add(round-1, afcv);
+				} else {
+					 afcv = fc.getAllocatedFormulaColumnValueMap().get(round-1);	
+				}
+				
+				if(round==1) {
+					afcv.setAllocatedValue(fc.getValue());
+				} else {
+					// will have to com from previous round
+					afcv.setAllocatedValue(fc.getAllocatedFormulaColumnValueMap().get(round-2).getAllocatedValue());
+				}
+			}
+			formulaColumnRepository.save(fs.getFormulaColumns());
+		}
+		formulaStrategyRepository.save(formulaList);
 			
 			
 			
@@ -1353,6 +1353,7 @@ public class EntityServiceJPA implements EntityService {
 				
 				// here we have to remove objAllocationRecord and its associated 
 				List<ObjectiveAllocationRecord> objArList = objectiveAllocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, round-1);
+				logger.debug("deleting... " + objArList.size()+ " records...") ;
 				objectiveAllocationRecordRepository.delete(objArList);
 				
 				List<ObjectiveAllocationRecord> previousObjArList = objectiveAllocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, round-2);
@@ -1368,6 +1369,13 @@ public class EntityServiceJPA implements EntityService {
 				
 				
 			} else {
+
+			// here we have to remove objAllocationRecord and its associated 
+			List<ObjectiveAllocationRecord> objArList = objectiveAllocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, round-1);
+			logger.debug("deleting... " + objArList.size()+ " records...") ;
+			objectiveAllocationRecordRepository.delete(objArList);
+				
+				
 			for(Objective o : list) {
 				HashMap<Long, AllocationRecord> budgetTypeMap = new HashMap<Long, AllocationRecord>();
 				HashMap<Long, ObjectiveAllocationRecord> objBudgetTypeMap = new HashMap<Long, ObjectiveAllocationRecord>();

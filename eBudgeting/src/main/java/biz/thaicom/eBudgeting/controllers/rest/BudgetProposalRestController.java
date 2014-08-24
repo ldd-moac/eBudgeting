@@ -235,7 +235,7 @@ public class BudgetProposalRestController {
 			@Activeuser ThaicomUserDetail currentUser){
 		
 		
-		
+		logger.debug("init alloc record of "+ fiscalYear + " round " + round);
 		return entityService.initAllocationRecord(fiscalYear, round);
 		
 	}
