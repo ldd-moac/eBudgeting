@@ -17,6 +17,6 @@ public interface BudgetSignOffRepository extends JpaSpecificationExecutor<Budget
 
 	public List<BudgetSignOff> findAllByFiscalYearAndOwner_Parent(Integer fiscalYear, Organization parent);
 
-	public BudgetSignOff findOneByFiscalYearAndOwner(Integer fiscalYear,
-			Organization workAt);
+	public BudgetSignOff findOneByFiscalYearAndOwnerAndRound(Integer fiscalYear,
+			Organization workAt, Integer round);
 }

@@ -281,15 +281,16 @@ public class BudgetProposalRestController {
 		return "success";
 	}
 	
-	@RequestMapping(value="/BudgetSignOff/{fiscalYear}/updateCommand/{command}", method=RequestMethod.GET)
+	@RequestMapping(value="/BudgetSignOff/{fiscalYear}/R{round}/updateCommand/{command}", method=RequestMethod.GET)
 	public @ResponseBody Map<String, Object> updateBudgetSignOff(
 			@PathVariable Integer fiscalYear,
+			@PathVariable Integer round,
 			@Activeuser ThaicomUserDetail currentUser,
 			@PathVariable String command){
 		
 		Map<String,Object> map = new HashMap<String, Object>();
 		
-		BudgetSignOff budgetSignOff = entityService.updateBudgetSignOff(fiscalYear, currentUser, command);
+		BudgetSignOff budgetSignOff = entityService.updateBudgetSignOff(fiscalYear, currentUser, round, command);
 		
 		if(command.equals("lock1")) {
 			map.put("person", budgetSignOff.getLock1Person());
@@ -314,15 +315,20 @@ public class BudgetProposalRestController {
 		
 	}
 	
-	@RequestMapping(value="/BudgetProposal/sumTotalOfOwner/{fiscalYear}") 
+	@RequestMapping(value="/BudgetProposal/sumTotalOfOwner/{fiscalYear}/Round/{round}") 
 	public @ResponseBody List<Long> findSumTotalProposalOfOwner(
 			@PathVariable Integer fiscalYear,
+			@PathVariable Integer round,
 			@Activeuser ThaicomUserDetail currentUser) {
 		
 		List<Long> returnList = new ArrayList<Long>();
 		
-		returnList.add(entityService.findSumTotalBudgetProposalOfOwner(fiscalYear, currentUser.getWorkAt()));
-		returnList.add(entityService.findSumTotalObjectiveBudgetProposalOfOwner(fiscalYear, currentUser.getWorkAt()));
+		if(round == 0) {
+			returnList.add(entityService.findSumTotalBudgetProposalOfOwner(fiscalYear, currentUser.getWorkAt()));
+			returnList.add(entityService.findSumTotalObjectiveBudgetProposalOfOwner(fiscalYear, currentUser.getWorkAt()));
+		} else {
+			// we need to get allocation round!
+		}
 		
 		
 		return returnList;
@@ -345,12 +351,13 @@ public class BudgetProposalRestController {
 		return "success";
 	}
  	
-	@RequestMapping(value="/BudgetSignOff/{fiscalYear}")
+	@RequestMapping(value="/BudgetSignOff/{fiscalYear}/Round/{round}")
 	public @ResponseBody BudgetSignOff findBudgetSignOffByFiscalYear(
 			@PathVariable Integer fiscalYear,
+			@PathVariable Integer round,
 			@Activeuser ThaicomUserDetail currentUser) {
 		
-		BudgetSignOff so = entityService.findBudgetSignOffByFiscalYearAndOrganization(fiscalYear, currentUser.getWorkAt());
+		BudgetSignOff so = entityService.findBudgetSignOffByFiscalYearAndOrganizationAndRound(fiscalYear, currentUser.getWorkAt(),round);
 		
 		if(so.getLock1TimeStamp()!=null) {
 			logger.debug("so.getLock1: " + so.getLock1TimeStamp().toString());

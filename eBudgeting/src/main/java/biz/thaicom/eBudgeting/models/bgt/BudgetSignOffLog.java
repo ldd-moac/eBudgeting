@@ -17,6 +17,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import biz.thaicom.eBudgeting.models.hrx.Person;
 import biz.thaicom.security.models.User;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -43,16 +44,22 @@ public class BudgetSignOffLog implements Serializable {
 	@JoinColumn(name="USER_ID")
 	private User user;
 	
-
+	@ManyToOne
+	@JoinColumn(name="PERSON")
+	private Person person;
+	
 	@Enumerated(EnumType.STRING)
 	private SignOffStatus toStatus;
 	
 	@Basic
 	private Integer round;
 	
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date timestamp;
 
+	@Basic
+	private Integer lockLevel;
+	
 	public Long getId() {
 		return id;
 	}
@@ -92,6 +99,27 @@ public class BudgetSignOffLog implements Serializable {
 	public void setRound(Integer round) {
 		this.round = round;
 	}
+
+	public Integer getLockLevel() {
+		return lockLevel;
+	}
+
+	public void setLockLevel(Integer lockLevel) {
+		this.lockLevel = lockLevel;
+	}
+
+	public Person getPerson() {
+		return person;
+	}
+
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+
+
+
+
+	
 	
 	
 	

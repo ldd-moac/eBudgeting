@@ -165,7 +165,7 @@ var menuJson = [{
 		name: "การกระทบยอด และนำส่งคำของบประมาณ (m62)", code: "m62", menus: [{
 			name: "m62f01: กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m62f01", link: "page/m62f01/", group: "BGT_USER"
 		},{
-			name: "m62f02: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release) การกระทบยอดงบประมาณ ",code: "m61f05",  link: "page/m61f05/", group: "BGT_USER" 
+			name: "m62f02: การนำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release) การกระทบยอดงบประมาณ ",code: "m62f02",  link: "page/m62f02/", group: "BGT_USER" 
 		}]
 	},{
 		name: "กรอบวงเงินเพื่อตั้งคำของบประมาณ (เข้าระบบ e-Budgeting) (m63)",code: "m63",  menus:[{
@@ -179,7 +179,7 @@ var menuJson = [{
 		},{
 			name: "m63f06: กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m63f06", link: "page/m63f06/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m63f03: นำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m63f03", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
+			name: "m63f03: นำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m63f03", link: "page/m63f03/", group: "BGT_BGT_ADMIN"
 		}]
 	}, {
 		name: "การพิจารณาตามชั้นกรรมาธิการ (วาระที่ 1 - 3) (m64)", code: "m64", menus:[{
@@ -193,7 +193,7 @@ var menuJson = [{
 		},{
 			name: "m64f06: กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m64f06", link: "page/m64f06/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m64f03: นำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m64f03", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
+			name: "m64f03: นำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m64f03", link: "page/m64f03/", group: "BGT_BGT_ADMIN"
 		}]
 	},{
 		name: "การอนุมัติงบประมาณ ตาม พ.ร.บ. (m65)",code: "m65",  menus: [{
@@ -207,7 +207,7 @@ var menuJson = [{
 		},{
 			name: "m65f06:  กระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม", code: "m65f06", link: "page/m65f06/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m65f03: นำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m65f03", link: "page/m2f14/", disabled: "disabled", group: "BGT_BGT_ADMIN"
+			name: "m65f03: นำส่งคำของบประมาณ (Sign off) / ถอนนำส่ง (Release)", code: "m65f03", link: "page/m65f03/", group: "BGT_BGT_ADMIN"
 		}]
 	}]
 },{

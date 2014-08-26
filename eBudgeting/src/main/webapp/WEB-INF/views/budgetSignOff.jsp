@@ -93,10 +93,11 @@
 </table>
 </script>
 
-<script src="<c:url value='/resources/js/pages/m61f05.js'/>"></script>
+<script src="<c:url value='/resources/js/pages/budgetSignOff.js'/>"></script>
 
 <script type="text/javascript">
 	var fiscalYear = parseInt("${fiscalYear}");
+	var round = parseInt("${round}");
 	
 	var mainCtrView = null;
 	
@@ -107,10 +108,10 @@
 	
 	$(document).ready(function() {
 		budgetSignOff = new BudgetSignOff();
-		budgetSignOff.url = appUrl('/BudgetSignOff/' + fiscalYear);
+		budgetSignOff.url = appUrl('/BudgetSignOff/' + fiscalYear +'/Round/'+round);
 		budgetSignOff.fetch({
 			success: function() {
-				$.get(appUrl('/BudgetProposal/sumTotalOfOwner/' + fiscalYear),
+				$.get(appUrl('/BudgetProposal/sumTotalOfOwner/' + fiscalYear+'/Round/'+round),
 					function(response) {
 						sumObjectiveProposal = response[1];
 						sumProposal = response[0];

@@ -1166,4 +1166,17 @@ create table BGT_ADDITIONALBGTALLOCATION (
         
 	create sequence BGT_ADDITIONALBGTALLOC_SEQ;
 
+	
+-- version 16
+-- Modified Date: August 27, 2014
+update app_info set db_version = 16;
+
+alter table BGT_BUDGETSIGNOFFLOG add (locklevel number(4,0));
+alter table BGT_BUDGETSIGNOFFLOG add (person number(19,0));
+alter table BGT_BUDGETSIGNOFFLOG modify (timestamp timestamp(6));
+
+alter table BGT_BUDGETSIGNOFFLOG
+        add constraint FK2165A16E216F1655 
+        foreign key (PERSON) 
+        references HRX_PERSON;
     

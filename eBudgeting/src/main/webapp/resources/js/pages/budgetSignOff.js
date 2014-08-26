@@ -28,7 +28,15 @@ var MainCtrView = Backbone.View.extend({
 	
 	buttonClick: function(e) {
 		var buttonId = $(e.target).prop('id');
-		$.get(appUrl('/BudgetSignOff/'+fiscalYear +'/updateCommand/' + buttonId),
+		if(buttonId == 'lock1'  || buttonId == 'lock2') {
+			if(sumObjectiveProposal != sumProposal) {
+				alert("ยอดรวมเงินกิจกรรมกับเงินรายการไม่เทากัน กรุณากระทบยอดก่อน SignOff");
+				return false;
+			}
+		}
+		
+		
+		$.get(appUrl('/BudgetSignOff/'+fiscalYear +'/R'+round+'/updateCommand/' + buttonId),
 				_.bind(function(response) {
 					var responsePerson = Person.findOrCreate(response.person.id);
 					if(responsePerson == null) {
@@ -38,21 +46,10 @@ var MainCtrView = Backbone.View.extend({
 					this.budgetSignOff.set(buttonId+'TimeStamp', response.timeStamp);
 					
 					if(buttonId == 'lock1') {
-						if(sumObjectiveProposal != sumProposal) {
-							alert("ยอดรวมเงินกิจกรรมกับเงินรายการไม่เทากัน กรุณากระทบยอดก่อน SignOff");
-							return false;
-						}
-						
-						
 						this.budgetSignOff.set('unLock1Person', null);
 						this.budgetSignOff.set('unLock1TimeStamp', null);
 						
 					} else if(buttonId == 'lock2') {
-						if(sumObjectiveProposal != sumProposal) {
-							alert("ยอดรวมเงินกิจกรรมกับเงินรายการไม่เทากัน กรุณากระทบยอดก่อน SignOff");
-							return false;
-						}
-						
 						this.budgetSignOff.set('unLock2Person', null);
 						this.budgetSignOff.set('unLock2TimeStamp', null);
 						

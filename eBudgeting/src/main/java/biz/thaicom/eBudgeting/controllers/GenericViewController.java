@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import biz.thaicom.eBudgeting.models.bgt.BudgetSignOff;
-import biz.thaicom.eBudgeting.models.bgt.BudgetType;
 import biz.thaicom.eBudgeting.models.pln.Objective;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveTypeId;
 import biz.thaicom.eBudgeting.models.pln.TargetUnit;
@@ -698,8 +697,8 @@ public class GenericViewController {
 
 		// check the budgetSignOff
 		BudgetSignOff bso = entityService
-				.findBudgetSignOffByFiscalYearAndOrganization(fy,
-						currentUser.getWorkAt());
+				.findBudgetSignOffByFiscalYearAndOrganizationAndRound(fy,
+						currentUser.getWorkAt(), 0);
 
 		if (bso.getLock1Person() != null) {
 			// should not be able to edit!
@@ -739,9 +738,9 @@ public class GenericViewController {
 	// return "m61f04";
 	// }
 
-	// --------------------------------------------------------------m61f05:
+	// --------------------------------------------------------------m62f02:
 	// การบันทึก SignOff/Release
-	@RequestMapping("/page/m61f05/")
+	@RequestMapping("/page/m62f02/")
 	public String render_m61f05(Model model, HttpServletRequest request,
 			HttpSession session) {
 
@@ -754,9 +753,70 @@ public class GenericViewController {
 				.findOneRootObjectiveByFiscalyear(fy);
 
 		model.addAttribute("objectiveId", rootObjective.getId());
+		model.addAttribute("round", 0);
 
-		return "m61f05";
+		return "budgetSignOff";
 	}
+	
+	// --------------------------------------------------------------m63f03:
+	// การบันทึก SignOff/Release
+	@RequestMapping("/page/m63f03/")
+	public String render_m63f03(Model model, HttpServletRequest request,
+			HttpSession session) {
+
+		model.addAttribute("rootPage", false);
+
+		setFiscalYearFromSession(model, session);
+
+		Integer fy = getCurrentFiscalYearFromSession(session);
+		Objective rootObjective = entityService
+				.findOneRootObjectiveByFiscalyear(fy);
+
+		model.addAttribute("objectiveId", rootObjective.getId());
+		model.addAttribute("round", 1);
+
+		return "budgetSignOff";
+	}
+	
+	// --------------------------------------------------------------m64f03:
+	// การบันทึก SignOff/Release
+	@RequestMapping("/page/m64f03/")
+	public String render_m64f03(Model model, HttpServletRequest request,
+			HttpSession session) {
+
+		model.addAttribute("rootPage", false);
+
+		setFiscalYearFromSession(model, session);
+
+		Integer fy = getCurrentFiscalYearFromSession(session);
+		Objective rootObjective = entityService
+				.findOneRootObjectiveByFiscalyear(fy);
+
+		model.addAttribute("objectiveId", rootObjective.getId());
+		model.addAttribute("round", 2);
+
+		return "budgetSignOff";
+	}
+	
+	// --------------------------------------------------------------m65f03:
+	// การบันทึก SignOff/Release
+	@RequestMapping("/page/m65f03/")
+	public String render_m65f03(Model model, HttpServletRequest request,
+			HttpSession session) {
+
+		model.addAttribute("rootPage", false);
+
+		setFiscalYearFromSession(model, session);
+
+		Integer fy = getCurrentFiscalYearFromSession(session);
+		Objective rootObjective = entityService
+				.findOneRootObjectiveByFiscalyear(fy);
+
+		model.addAttribute("objectiveId", rootObjective.getId());
+		model.addAttribute("round", 3);
+
+		return "budgetSignOff";
+	}	
 
 	// --------------------------------------------------------------m61f04:
 	// การบันทึกงบประมาณ ระดับรายการ
@@ -776,8 +836,8 @@ public class GenericViewController {
 
 		// check the budgetSignOff
 		BudgetSignOff bso = entityService
-				.findBudgetSignOffByFiscalYearAndOrganization(fy,
-						currentUser.getWorkAt());
+				.findBudgetSignOffByFiscalYearAndOrganizationAndRound(fy,
+						currentUser.getWorkAt(), 0);
 
 		if (bso.getLock1Person() != null) {
 			// should not be able to edit!
@@ -837,15 +897,6 @@ public class GenericViewController {
 		return "m62f01";
 	}
 
-	// --------------------------------------------------------------m62f02:
-	// การประมวลผลการกระทบยอดเงินงบประมาณจากระดับรายการมาที่ระดับกิจกรรม
-	@RequestMapping("/page/m62f02/")
-	public String render_m62f02(Model model, HttpServletRequest request) {
-		List<Objective> fiscalYears = entityService.findRootFiscalYear();
-		model.addAttribute("rootPage", true);
-		model.addAttribute("fiscalYears", fiscalYears);
-		return "m62f01";
-	}
 
 	// ==============================================================m63:
 	// การพิจารณากรอบวงเงินเพื่อตั้งคำของบประมาณ (เข้าระบบ e-Budgeting) (m63)

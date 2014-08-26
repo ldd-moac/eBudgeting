@@ -308,14 +308,14 @@ public interface EntityService {
 	
 	
 	//BudgetSignOff
-	public BudgetSignOff findBudgetSignOffByFiscalYearAndOrganization(
-			Integer fiscalYear, Organization workAt);
+	public BudgetSignOff findBudgetSignOffByFiscalYearAndOrganizationAndRound(
+			Integer fiscalYear, Organization workAt, Integer round);
 	public Long findSumTotalBudgetProposalOfOwner(Integer fiscalYear,
 			Organization workAt);
 	public Long findSumTotalObjectiveBudgetProposalOfOwner(Integer fiscalYear,
 			Organization workAt);
 	public BudgetSignOff updateBudgetSignOff(Integer fiscalYear, ThaicomUserDetail currentUser,
-			String command);
+			Integer round, String command);
 	
 	
 	//ObjectiveDetail
