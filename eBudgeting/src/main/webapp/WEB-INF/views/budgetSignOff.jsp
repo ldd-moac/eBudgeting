@@ -8,7 +8,7 @@
 </div>
 
 <div class="row">
-	<div class="span11">
+	<div class="span11" id="mainCtr">
 		
 		<div id="modal" class="modal wideModal hide fade">
 			<div class="modal-header">
@@ -21,32 +21,23 @@
 			</div>
 		</div>
 
-		<div id="mainCtr">
-			<c:choose>
-				<c:when test="${rootPage}">
-					<table class="table table-bordered" id="mainTbl">
-						<thead>
-							<tr>
-								<td>เลือกปีงบประมาณ</td>
-							</tr>
-						</thead>
-						<tbody>
-							<c:forEach items="${fiscalYears}" var="fiscalYear">
-							<tr>
-								
-									<td><a href="./${fiscalYear.fiscalYear}/${fiscalYear.id}/"
-										class="nextChildrenLnk">${fiscalYear.fiscalYear} <i
-											class="icon icon-chevron-right nextChildrenLnk"></i>
-									</a></td>
-							
-							</tr>
-							</c:forEach>
-						</tbody>
-					</table>
-				</c:when>
-			</c:choose>
+		<div id="signOffTbl" style="margin-bottom: 45px;">
+			
 		</div>
 
+
+		<h4>ประวัติการ sign off</h4>
+		<div >
+			<table class="table table-bordered"  style="margin-bottom:10px; width:875px; table-layout:fixed;">
+				<thead>
+					<tr>
+						<td width="80">วันที่/เวลา</td>
+						<td width="150">ผู้ดำเนินการ</td>
+						<td>การดำเนินการ</td>
+				</thead>
+				<tbody id="signOffLog"></tbody>
+			</table>
+		</div>
 	</div>
 </div>
 </div>
@@ -56,13 +47,18 @@
 </script>
 
 
-<script id="mainCtrTemplate" type="text/x-handler-template">
-<div id="mainTbl">
-</div>
+<script id="signOffLogTbodyTemplate" type="text/x-handler-template">
+{{#each this}}
+<tr>
+	<td>{{formatTimeDetail timestamp}}</td>
+	<td>{{person.firstName}} {{person.lastName}}</td>
+	<td>{{toStatus}}</td>
+</tr>
+{{/each}}
 </script>
 
 <script id="mainTblTemplate" type="text/x-handler-template">
-<table class="table table-bordered"  style="margin-bottom:0px; width:875px; table-layout:fixed;">
+<table class="table table-bordered"  style="margin-bottom:10px; width:875px; table-layout:fixed;">
 	<thead>
 		<tr>
 			<td>เลือกทั้งหมด</td>
@@ -78,7 +74,7 @@
 	</thead>
 	<tbody>
 		<tr>
-			<td> {{owner.name}} 
+			<td> {{headline}} 
 					<ul>
 						<li>เงินกิจกรรม : {{formatNumber sumTotalObjectiveBudgetProposal}} บาท</li>
 						<li>เงินรายการ : {{formatNumber sumTotalBudgetProposal}} บาท</li>
@@ -103,6 +99,7 @@
 	
 	var sumObjectiveProposal = null;
 	var sumProposal = null;
+	var signOfflogs = new BudgetSignOffLogCollection();
 	
 	mainCtrView = new MainCtrView();
 	

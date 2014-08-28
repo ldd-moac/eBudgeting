@@ -17,6 +17,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import biz.thaicom.eBudgeting.models.hrx.Organization;
 import biz.thaicom.eBudgeting.models.hrx.Person;
 import biz.thaicom.security.models.User;
 
@@ -48,11 +49,18 @@ public class BudgetSignOffLog implements Serializable {
 	@JoinColumn(name="PERSON")
 	private Person person;
 	
+	@ManyToOne
+	@JoinColumn(name="ORGANIZATION_ID")
+	private Organization organization;
+	
 	@Enumerated(EnumType.STRING)
 	private SignOffStatus toStatus;
 	
 	@Basic
 	private Integer round;
+	
+	@Basic
+	private Integer fiscalYear;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date timestamp;
@@ -116,11 +124,22 @@ public class BudgetSignOffLog implements Serializable {
 		this.person = person;
 	}
 
+	public Organization getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(Organization organization) {
+		this.organization = organization;
+	}
+
+	public Integer getFiscalYear() {
+		return fiscalYear;
+	}
+
+	public void setFiscalYear(Integer fiscalYear) {
+		this.fiscalYear = fiscalYear;
+	}
 
 
-
-	
-	
-	
 	
 }

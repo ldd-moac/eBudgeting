@@ -3,7 +3,7 @@ var MainCtrView = Backbone.View.extend({
      *  @memberOf MainCtrView
      */
 	initialize : function() {
-
+		
 	},
 
 	el : "#mainCtr",
@@ -12,19 +12,39 @@ var MainCtrView = Backbone.View.extend({
 	},
 	
 	mainTblTemplate : Handlebars.compile($("#mainTblTemplate").html()),
+	signOffLogTbodyTemplate : Handlebars.compile($("#signOffLogTbodyTemplate").html()),
 	
 	render : function() {
 		
 		if(this.budgetSignOff != null) {
 			var json = this.budgetSignOff.toJSON();
-			this.$el.html(this.mainTblTemplate(json));
+			if(round == 0) {
+				json.headline = json.owner.name;
+			}  else {
+				json.headline = "งบประมาณที่ขอตั้งรวม";
+			}
+			this.$el.find('#signOffTbl').html(this.mainTblTemplate(json));
 		}
 	},
 	
 	renderWith : function(budgetSignOff) {
 		this.budgetSignOff = budgetSignOff;
 		this.render();
+		
+		signOfflogs.fetch({
+			url: appUrl('/BudgetSignOffLog/'+fiscalYear+'/Round/'+round),
+			success: _.bind(function() {
+				this.renderLogs();
+			},this)
+		})
 	},
+	
+	renderLogs : function() {
+		var json = signOfflogs.toJSON();
+		this.$el.find('#signOffLog').html(this.signOffLogTbodyTemplate(json));
+	},
+	
+	
 	
 	buttonClick: function(e) {
 		var buttonId = $(e.target).prop('id');
@@ -38,12 +58,11 @@ var MainCtrView = Backbone.View.extend({
 		
 		$.get(appUrl('/BudgetSignOff/'+fiscalYear +'/R'+round+'/updateCommand/' + buttonId),
 				_.bind(function(response) {
-					var responsePerson = Person.findOrCreate(response.person.id);
-					if(responsePerson == null) {
-						responsePerson = new Person(response.person);
-					}
-					this.budgetSignOff.set(buttonId+'Person', responsePerson);
-					this.budgetSignOff.set(buttonId+'TimeStamp', response.timeStamp);
+					
+					var log = new BudgetSignOffLog(response);
+					
+					this.budgetSignOff.set(buttonId+'Person', log.get('person'));
+					this.budgetSignOff.set(buttonId+'TimeStamp', log.get('timestamp'));
 					
 					if(buttonId == 'lock1') {
 						this.budgetSignOff.set('unLock1Person', null);
@@ -62,6 +81,9 @@ var MainCtrView = Backbone.View.extend({
 						this.budgetSignOff.set('lock2TimeStamp', null);
 					}
 					this.render();
+					
+					signOfflogs.add(log, {at:0});
+					this.renderLogs();
 		},this));
 	}
 	

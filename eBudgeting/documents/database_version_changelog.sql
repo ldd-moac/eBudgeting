@@ -1179,4 +1179,14 @@ alter table BGT_BUDGETSIGNOFFLOG
         add constraint FK2165A16E216F1655 
         foreign key (PERSON) 
         references HRX_PERSON;
-    
+
+        
+-- version 17
+-- Modified Date: August 29, 2014 
+update app_info set db_version = 17; 
+alter table bgt_budgetsignofflog add (fiscalyear number(4,0));
+alter table bgt_budgetsignofflog add (organization_id number(19,0));
+alter table BGT_BUDGETSIGNOFFLOG
+		add constraint FK213AB321D26C15E8 
+        foreign key (organization_id) 
+        references HRX_ORGANIZATION;

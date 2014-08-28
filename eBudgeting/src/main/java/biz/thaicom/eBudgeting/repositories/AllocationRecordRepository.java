@@ -60,6 +60,15 @@ public interface AllocationRecordRepository extends
 			"WHERE record.forObjective = ?1 and record.index =?2 ")
 	public List<AllocationRecord> findAllByForObjectiveAndIndex(
 			Objective objectvie, int i);
+
+	@Query(""
+			+ "SELECT sum(record.amountAllocated) "
+			+ "FROM AllocationRecord record "
+			+ "WHERE record.forObjective.fiscalYear = ?1 "
+			+ "		and record.forObjective.parent.name like 'ROOT' "
+			+ "		and record.index = ?2 ")
+	public Long findSumAllocation(Integer fiscalYear, Integer round);
+	
 	
 
 	

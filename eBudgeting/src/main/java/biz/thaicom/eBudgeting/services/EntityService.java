@@ -19,6 +19,7 @@ import biz.thaicom.eBudgeting.models.bgt.AllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.BudgetCommonType;
 import biz.thaicom.eBudgeting.models.bgt.BudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.BudgetSignOff;
+import biz.thaicom.eBudgeting.models.bgt.BudgetSignOffLog;
 import biz.thaicom.eBudgeting.models.bgt.BudgetType;
 import biz.thaicom.eBudgeting.models.bgt.FiscalBudgetType;
 import biz.thaicom.eBudgeting.models.bgt.FormulaColumn;
@@ -179,6 +180,10 @@ public interface EntityService {
 			JsonNode data);
 
 	
+	public Long findSumTotalAllocationRound(Integer fiscalYear, Integer round);
+	public Long findSumTotalObjectiveAllocationRound(Integer fiscalYear,
+			Integer round);
+	
 	//FormulaColumn
 	public void deleteFormulaColumn(Long id);
 	public FormulaColumn saveFormulaColumn(FormulaColumn formulaColumn);
@@ -319,7 +324,7 @@ public interface EntityService {
 			Organization workAt);
 	public Long findSumTotalObjectiveBudgetProposalOfOwner(Integer fiscalYear,
 			Organization workAt);
-	public BudgetSignOff updateBudgetSignOff(Integer fiscalYear, ThaicomUserDetail currentUser,
+	public BudgetSignOffLog updateBudgetSignOff(Integer fiscalYear, ThaicomUserDetail currentUser,
 			Integer round, String command);
 	
 	
@@ -347,6 +352,11 @@ public interface EntityService {
 	public void updateReservedBudget(Long id, Long amountReserved);
 	public AdditionalBudgetAllocation additionalAllocationToProposal(Long budgetProposalId,
 			Long amount);
+	
+	// BudgetSignOffLog
+	public List<BudgetSignOffLog> findAllBudgetSignOffLog(Integer fiscalYear,
+			Integer round, ThaicomUserDetail currentUser);
+
 	
 
 

@@ -51,4 +51,12 @@ public interface ObjectiveAllocationRecordRepository extends
 	List<ObjectiveAllocationRecord> findAllByForObjectiveAndIndex(
 			Objective objectvie, int i);
 
+	@Query(""
+			+ "SELECT sum(record.amountAllocated) "
+			+ "FROM ObjectiveAllocationRecord record "
+			+ "WHERE record.forObjective.fiscalYear =?1 "
+			+ "		AND record.forObjective.parent.name like 'ROOT' "
+			+ "		AND record.index = ?2 ")
+	Long findSumAllocationForObjectiveAndIndex(Integer fiscalYear, Integer round);
+
 }

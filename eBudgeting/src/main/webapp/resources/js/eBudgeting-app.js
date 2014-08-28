@@ -664,6 +664,19 @@ BudgetSignOff = Backbone.RelationalModel.extend({
 	}]
 });
 
+BudgetSignOffLog = Backbone.RelationalModel.extend({
+	idAttribute: 'id',
+	relations: [{
+		type: Backbone.HasOne,
+		key: 'person',
+		relatedModel: 'Person'
+	},{
+		type: Backbone.HasOne,
+		key: 'organization',
+		relatedModel: 'Organization'
+	}]
+});
+
 
 // PagableCollection
 PagableCollection = Backbone.Collection.extend({
@@ -917,6 +930,9 @@ ObjectiveBudgetProposalTargetCollection = Backbone.Collection.extend({
 
 ObjectiveDetailCollection = Backbone.Collection.extend({
 	model: ObjectiveDetail
+});
+BudgetSignOffLogCollection = Backbone.Collection.extend({
+	model: BudgetSignOffLog
 });
 
 //Handlebars Utils

@@ -4465,7 +4465,7 @@ public class EntityServiceJPA implements EntityService {
 	}
 
 	@Override
-	public BudgetSignOff updateBudgetSignOff(Integer fiscalYear,ThaicomUserDetail currentUser, Integer round,
+	public BudgetSignOffLog updateBudgetSignOff(Integer fiscalYear,ThaicomUserDetail currentUser, Integer round,
 			String command) {
 		
 		
@@ -4528,11 +4528,17 @@ public class EntityServiceJPA implements EntityService {
 		bsoLog.setPerson(currentUser.getPerson());
 		bsoLog.setTimestamp(currentTime);
 		bsoLog.setRound(bso.getRound());
+		bsoLog.setFiscalYear(fiscalYear);
+		if(bsoLog.getRound()==0) {
+			bsoLog.setOrganization(currentUser.getWorkAt());
+		} else {
+			bsoLog.setOrganization(null);
+		}
 		
 		budgetSignOffLogRepository.save(bsoLog);
 		
 		
-		return bso;
+		return bsoLog;
 	}
 	
 	public List<List<Objective>> findObjectivesByFiscalyearAndTypeIdAndInitBudgetProposal(
@@ -5082,6 +5088,31 @@ public class EntityServiceJPA implements EntityService {
 			return null;
 		}
 		
+	}
+
+	@Override
+	public Long findSumTotalAllocationRound(Integer fiscalYear, Integer round) {
+		Long sum = allocationRecordRepository.findSumAllocation(fiscalYear,round);
+		return sum;
+	}
+
+	@Override
+	public Long findSumTotalObjectiveAllocationRound(Integer fiscalYear,
+			Integer round) {
+		Long sum = objectiveAllocationRecordRepository.findSumAllocationForObjectiveAndIndex(fiscalYear, round);
+		return sum;
+	}
+
+	@Override
+	public List<BudgetSignOffLog> findAllBudgetSignOffLog(Integer fiscalYear,
+			Integer round, ThaicomUserDetail currentUser) {
+		List<BudgetSignOffLog> logs;
+		if(round == 0) {
+			logs = budgetSignOffLogRepository.findAllByFiscalYearRoundAndOrganization(fiscalYear, round, currentUser.getWorkAt());
+		} else {
+			logs = budgetSignOffLogRepository.findAllByFiscalYearRound(fiscalYear, round);
+		}
+		return logs;
 	}
 	
 	
