@@ -57,6 +57,20 @@
 <div style="margin-bottom:20px;">
 	ยืนยันการประมวลผล <button id="processBtn" class="btn btn-primary">ตกลง</button>
 </div>
+<h4>สรุปหน่วยงานที่ขอตั้งงบประมาณ</h4>
+<table class="table table-bordered table-striped">
+	<thead>
+		<tr>
+			<td style="width: 400px;">หน่วยงานที่ขอตั้ง</td>
+			<td style="width: 100px;">ขอตั้งระดับกิจกรรม</td>
+			<td style="width: 100px;">ขอตั้งระดับรายการ</td>
+		</tr>
+	</thead>
+	<tbody id="org">
+	</tbody>
+</table>
+
+<h4>สรุปงบประมาณในภาพรวมแยกตามแผนงาน</h4>
 <table class="table table-bordered table-striped">
 	<thead>
 		<tr>
@@ -65,9 +79,19 @@
 			<td style="width: 100px;">ขอตั้งระดับรายการ</td>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody id="budget">
 	</tbody>
 </table>
+</script>
+
+<script id="mainTblOrgTbodyTemplate" type="text/x-handler-template">
+{{#each this}}
+<tr>
+	<td>{{name}}</td>
+	<td style="text-align: right; padding-right: 15px;"> <br/>{{formatNumber sum1}}</td>
+	<td style="text-align: right; padding-right: 15px;"> <br/>{{formatNumber sum2}}</td>
+</tr>
+{{/each}}
 </script>
 
 <script id="mainTblTbodyTemplate" type="text/x-handler-template">

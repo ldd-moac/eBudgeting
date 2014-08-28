@@ -79,6 +79,14 @@ public interface BudgetProposalRepository extends
 			"	AND proposal.owner = ?2 ")
 	public Long findSumTotalOfOwner(Integer fiscalYear, Organization workAt);
 
+	@Query("" +
+			"SELECT owner.id, sum(proposal.amountRequest) " +
+			"FROM BudgetProposal proposal " +
+			"WHERE proposal.forObjective.parent is null " +
+			"	AND proposal.forObjective.fiscalYear = ?1 " +
+			"GROUP BY proposal.owner") 
+	public List<Object[]> findSumTotalOfOwnerAll(Integer fiscalYear);
+
 
 	public List<BudgetProposal> findAllByForObjectiveAndOwner(Objective obj,
 			Organization workAt);
@@ -98,5 +106,17 @@ public interface BudgetProposalRepository extends
 			"	INNER JOIN FETCH proposal.budgetType type " +
 			"WHERE proposal.forObjective.id = ?1 ")
 	public List<BudgetProposal> findByForObjective_id(Long objectiveId);
+
+
+
+	@Query(""
+			+ "SELECT distinct(owner) " 
+			+ "FROM BudgetProposal proposal "
+			+ "	INNER JOIN proposal.owner owner " 
+			+ "	INNER JOIN proposal.forObjective objective " 
+			+ "	INNER JOIN proposal.budgetType type " 
+			+ "WHERE proposal.forObjective.fiscalYear = ?1 "
+			+ "ORDER BY owner.id ")
+	public List<Organization> findAllOrganizationWhoProposed(Integer fiscalYear);
 	
 }

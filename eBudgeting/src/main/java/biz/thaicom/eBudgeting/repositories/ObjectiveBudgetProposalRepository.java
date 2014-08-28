@@ -22,10 +22,10 @@ public interface ObjectiveBudgetProposalRepository extends
 			"	LEFT OUTER JOIN FETCH obp.targets target " +
 			"	LEFT OUTER JOIN FETCH target.unit unit " +
 			"WHERE objective.id = ?1 and obp.owner.id = ?2 ")
-	List<ObjectiveBudgetProposal> findAllByForObjective_IdAndOwner_Id(
+	public List<ObjectiveBudgetProposal> findAllByForObjective_IdAndOwner_Id(
 			Long objectiveId, Long ownerId);
 
-	ObjectiveBudgetProposal findByForObjectiveAndOwnerAndBudgetType(Objective o,
+	public ObjectiveBudgetProposal findByForObjectiveAndOwnerAndBudgetType(Objective o,
 			Organization workAt, BudgetType budgetType);
 
 	@Query("" +
@@ -34,8 +34,15 @@ public interface ObjectiveBudgetProposalRepository extends
 			"WHERE proposal.forObjective.parent is null " +
 			"	AND proposal.forObjective.fiscalYear = ?1 " +
 			"	AND proposal.owner = ?2 ")
-
-	Long findSumTotalOfOwner(Integer fiscalYear, Organization workAt);
+	public Long findSumTotalOfOwner(Integer fiscalYear, Organization workAt);
+	
+	@Query("" +
+			"SELECT owner.id, sum(proposal.amountRequest) " +
+			"FROM ObjectiveBudgetProposal proposal " +
+			"WHERE proposal.forObjective.parent is null " +
+			"	AND proposal.forObjective.fiscalYear = ?1 "
+			+ "GROUP BY proposal.owner ")
+	public List<Object[]>findSumTotalOfOwnerGroupByOwner(Integer fiscalYear);
 
 	@Query("" +
 			"SELECT distinct proposal " +
@@ -44,7 +51,7 @@ public interface ObjectiveBudgetProposalRepository extends
 			"	INNER JOIN FETCH proposal.owner owner " +
 			"WHERE objective.fiscalYear =?1 and objective.parentPath like ?2 " +
 			"ORDER BY proposal.budgetType.id asc")
-	List<ObjectiveBudgetProposal> findObjBudgetProposalByFiscalYearAndParentPath(
+	public List<ObjectiveBudgetProposal> findObjBudgetProposalByFiscalYearAndParentPath(
 			Integer fiscalYear, String parentPathLikeString);
 
 

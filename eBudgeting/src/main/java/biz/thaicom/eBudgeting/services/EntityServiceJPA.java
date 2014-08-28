@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.Stack;
+import java.util.TreeMap;
 
 import javassist.expr.NewArray;
 
@@ -4390,6 +4392,73 @@ public class EntityServiceJPA implements EntityService {
 	public Long findSumTotalObjectiveBudgetProposalOfOwner(Integer fiscalYear,
 			Organization workAt) {
 		return objectiveBudgetProposalRepository.findSumTotalOfOwner(fiscalYear,workAt);
+	}
+
+	
+	
+	@Override
+	public SortedMap<Long, List<Object>> findSumTotalOfOwnerAll(
+			Integer fiscalYear) {
+		
+		List<Organization> orgList = budgetProposalRepository.findAllOrganizationWhoProposed(fiscalYear);
+		HashMap<Long, Organization> orgMap = new HashMap<Long, Organization>();
+		for(Organization org: orgList) {
+			orgMap.put(org.getId(), org);
+		}
+		
+		
+		TreeMap<Long, List<Object>> returnMap = new TreeMap<Long, List<Object>>();
+		
+		// first find all Organization who propose budget
+		List<Object[]> sumTotalProposal = budgetProposalRepository.findSumTotalOfOwnerAll(fiscalYear);
+		for(Object[] line : sumTotalProposal ) {
+			Long ownerId  = (Long) line[0];
+			Organization owner = orgMap.get(ownerId);
+			if(owner ==  null) {
+				owner = organizationRepository.findOne(ownerId);
+			}
+			
+			Long sumProposal = (Long) line[1];
+			logger.debug(owner.getName() + " proposed for " + sumProposal);
+			
+			if(returnMap.get(owner.getId())  == null) {
+				List<Object> list = new ArrayList<Object>();
+				list.add(owner.getName());
+				list.add(owner.getAbbr());
+				list.add(sumProposal);
+				list.add(0L);
+				
+				returnMap.put(owner.getId(),list);
+			}
+		}
+		
+		List<Object[]> sumObjTotalProposal = objectiveBudgetProposalRepository.findSumTotalOfOwnerGroupByOwner(fiscalYear);
+		for(Object[] line : sumObjTotalProposal) {
+			Long ownerId  = (Long) line[0];
+			Organization owner = orgMap.get(ownerId);
+			if(owner ==  null) {
+				owner = organizationRepository.findOne(ownerId);
+			}
+			
+			Long sumProposal = (Long) line[1];
+			logger.debug(owner.getName() + " proposed for Objective " + sumProposal);
+			
+			if(returnMap.get(owner.getId()) == null) {
+				List<Object> list = new ArrayList<Object>();
+				list.add(owner.getName());
+				list.add(owner.getAbbr());
+				list.add(0L);
+				list.add(sumProposal);
+				
+				returnMap.put(owner.getId(),list);
+			} else {
+				List<Object> list = returnMap.get(owner.getId());
+				list.remove(3);
+				list.add(sumProposal);
+			}
+		}
+		
+		return returnMap;
 	}
 
 	@Override

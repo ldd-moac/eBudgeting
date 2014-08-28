@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +32,7 @@ import biz.thaicom.eBudgeting.models.bgt.BudgetSignOff;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
+import biz.thaicom.eBudgeting.models.hrx.Organization;
 import biz.thaicom.eBudgeting.services.EntityService;
 import biz.thaicom.security.models.Activeuser;
 import biz.thaicom.security.models.ThaicomUserDetail;
@@ -332,6 +335,25 @@ public class BudgetProposalRestController {
 		
 		
 		return returnList;
+	}
+	
+	
+	@RequestMapping(value="/BudgetProposal/sumTotalOfOwnerAll/{fiscalYear}/Round/{round}") 
+	public @ResponseBody SortedMap<Long, List<Object>> findSumTotalProposalOfOwnerAll(
+			@PathVariable Integer fiscalYear,
+			@PathVariable Integer round,
+			@Activeuser ThaicomUserDetail currentUser) {
+		
+		SortedMap<Long, List<Object>> returnMap = new TreeMap<Long, List<Object>>(); 
+		
+		if(round == 0) {
+			returnMap = entityService.findSumTotalOfOwnerAll(fiscalYear);
+		} else {
+			// we need to get allocation round!
+		}
+		
+		
+		return returnMap;
 	}
 	
 	@RequestMapping(value="/BudgetProposal/{fiscalYear}/copyFromProposalToObjectiveProposal")

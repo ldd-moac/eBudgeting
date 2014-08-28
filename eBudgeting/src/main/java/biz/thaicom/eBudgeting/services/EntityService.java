@@ -2,7 +2,10 @@ package biz.thaicom.eBudgeting.services;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import net.bull.javamelody.MonitoredWithSpring;
 
@@ -191,6 +194,8 @@ public interface EntityService {
 			Integer roundNum);
 	
 	public List<BudgetProposal> findBudgetProposalByObjectiveId(Long objectiveId);
+	public SortedMap<Long,List<Object>> findSumTotalOfOwnerAll(Integer fiscalYear);
+
 	
 	//ProposalStrategy
 	public List<ProposalStrategy> findProposalStrategyByBudgetProposal(
@@ -342,7 +347,7 @@ public interface EntityService {
 	public void updateReservedBudget(Long id, Long amountReserved);
 	public AdditionalBudgetAllocation additionalAllocationToProposal(Long budgetProposalId,
 			Long amount);
-
+	
 
 
 

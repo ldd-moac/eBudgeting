@@ -31,6 +31,7 @@ var MainTblView = Backbone.View.extend({
 	
 	mainTblTemplate: Handlebars.compile($("#mainTblTemplate").html()),
 	mainTblTbodyTemplate: Handlebars.compile($("#mainTblTbodyTemplate").html()),
+	mainTblOrgTbodyTemplate: Handlebars.compile($("#mainTblOrgTbodyTemplate").html()),
 	processingTemplate :Handlebars.compile($("#processingTemplate").html()),
 	
 	processCalculation: function(e) {
@@ -128,7 +129,27 @@ var MainTblView = Backbone.View.extend({
 			});
 		});
 		var tbodyHtml = this.mainTblTbodyTemplate(json);
-		this.$el.find('tbody').html(tbodyHtml);
+		this.$el.find('tbody#budget').html(tbodyHtml);
+		
+		
+		this.$el.find('tbody#org').html('<td colspan="3"><div>Loading <img src="/eBudgeting/resources/graphics/spinner_bar.gif"/></div></td>');
+		
+		
+		
+		// now render the org
+		$.get(appUrl("/BudgetProposal/sumTotalOfOwnerAll/"+fiscalYear+"/Round/0"), 
+				_.bind(function(response) {
+			
+			var jsonOrg = new Array();
+			for(var k in response) {
+				var v = response[k];
+				
+				jsonOrg.push({name: v[0], sum1: v[3], sum2:v[2]});
+			}
+					
+			var orgHtml = this.mainTblOrgTbodyTemplate(jsonOrg);
+			this.$el.find('tbody#org').html(orgHtml);
+		}, this));
 		
 		return this;
 	}

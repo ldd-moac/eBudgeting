@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 @Table(name="HRX_ORGANIZATION")
 @SequenceGenerator(name="HRX_ORGANIZATION_SEQ", sequenceName="HRX_ORGANIZATION_SEQ", allocationSize=1)
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
-public class Organization implements Serializable {
+public class Organization implements Serializable, Comparable<Organization> {
 	
 	/**
 	 * 
@@ -98,6 +98,12 @@ public class Organization implements Serializable {
 
 	public void setChildren(List<Organization> children) {
 		this.children = children;
+	}
+
+	@Override
+	public int compareTo(Organization o) {
+		// TODO Auto-generated method stub
+		return this.getId().compareTo(o.getId());
 	}
 
 	
