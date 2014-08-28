@@ -4763,7 +4763,7 @@ public class EntityServiceJPA implements EntityService {
 				Long sum =0L;
 				List<AllocationRecord> newList = new ArrayList<AllocationRecord>();
 				for(AllocationRecord ar : ars) {
-					if(ar.getBudgetType().getParentPath().contains(oar.getBudgetType().getId().toString())) {
+					if(ar.getBudgetType().getParentPath().contains("."+oar.getBudgetType().getId().toString()+".")) {
 						newList.add(ar);
 						sum += ar.getAmountAllocated();
 					}
@@ -4774,7 +4774,7 @@ public class EntityServiceJPA implements EntityService {
 			} else {
 				Long sum =0L;
 				for(AllocationRecord ar : ars) {
-					if(ar.getBudgetType().getParentPath().contains(oar.getBudgetType().getId().toString())) {
+					if(ar.getBudgetType().getParentPath().contains("."+oar.getBudgetType().getId().toString()+".")) {
 						sum += ar.getAmountAllocated();
 					}
 				}
