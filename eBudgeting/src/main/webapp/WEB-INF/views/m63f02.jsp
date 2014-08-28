@@ -133,7 +133,7 @@
 			{{#if strategy}}
 			<td><a href="#" data-allocationStrategyId="{{id}}" class="detailAllocationStrategy">{{strategy.name}}</a></td>
 			{{else}}
-			<td><a href="#" data-allocationStrategyId="{{id}}" class="detailAllocationStrategy">default</a></td>
+			<td><a href="#" data-allocationStrategyId="{{id}}" class="detailAllocationStrategy">{{../../budgetType.name}}</a></td>
 			{{/if}}
 			<td>{{formatNumber totalCalculatedAmount}}</td>
 		</tr>

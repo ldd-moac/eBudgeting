@@ -1471,8 +1471,11 @@ public class EntityServiceJPA implements EntityService {
 							
 							ars.setTotalCalculatedAmount(ps.getTotalCalculatedAmount());
 							
-							
-							formulaStrategyMap.put(ps.getFormulaStrategy(), ars);
+							if(ps.getFormulaStrategy() == null) {
+								allocStrgyBudgetTypeMap.put(ar.getBudgetType(), ars);
+							} else {
+								formulaStrategyMap.put(ps.getFormulaStrategy(), ars);
+							}
 							allocationRecordStrategyRepository.save(ars);
 						} else {
 							
