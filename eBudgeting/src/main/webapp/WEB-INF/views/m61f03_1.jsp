@@ -338,6 +338,12 @@
 {{/unless}}
 			
 		</td>
+
+		<td  style="width:60px;" class="{{#if this.children}}disable{{/if}} centerAlign">
+			<span>
+				<ul  style="list-style:none; margin: 0px;">{{#each filterTargetValues}}<li style="list-style:none; padding: 0px;">{{target.unit.name}} ({{#if target.isSumable}}นับ{{else}}ไม่นับ{{/if}})</li>{{/each}}</ul>
+			</span>
+		</td>
 		<td  style="width:60px;" class="{{#if this.children}}disable{{/if}} centerAlign">
 			<span>
 				<ul  style="list-style:none; margin: 0px;">
@@ -345,11 +351,6 @@
 							<li style="list-style:none; padding: 0px;">{{sumTargetValue target.unit.id ../filterObjectiveBudgetProposals}}</li>
 					{{/each}}
 				</ul>
-			</span>
-		</td>
-		<td  style="width:60px;" class="{{#if this.children}}disable{{/if}} centerAlign">
-			<span>
-				<ul  style="list-style:none; margin: 0px;">{{#each filterTargetValues}}<li style="list-style:none; padding: 0px;">{{target.unit.name}} ({{#if target.isSumable}}นับ{{else}}ไม่นับ{{/if}})</li>{{/each}}</ul>
 			</span>
 		</td>
 		<td style="width:80px;" class="{{#if this.children}}disable{{/if}} rightAlign">
