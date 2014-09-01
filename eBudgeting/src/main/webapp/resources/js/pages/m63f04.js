@@ -26,6 +26,7 @@ var MainTblView = Backbone.View.extend({
 	el: "#mainCtr",
 	events: {
 		"click .drillDown" : "loadChildren",
+		"click .rollUp" : "unloadChildren",
 		"click #processBtn" : "processCalculation"
 	},
 	
@@ -47,6 +48,34 @@ var MainTblView = Backbone.View.extend({
 				}
 			});
 		}
+	},
+	unloadChildren: function(e) {
+		var parentId = $(e.target).parents('tr').attr('data-id');
+		var parentObjective = Objective.findOrCreate(parentId);
+		
+		this.$el.find('#caret-' + parentId).removeClass('icon-chevron-down');
+		this.$el.find('#link-' + parentId).removeClass('rollUp');
+		var currTR = $(e.target).parents('tr');
+		var currTRmargin = parseInt(currTR.children().first().css('padding-left'), 10); 
+		var nextTR = $(e.target).parents('tr').next();
+		var nextTRmargin = parseInt(nextTR.children().first().css('padding-left'), 10);
+		console.log("currTR: " + currTR.attr('data-id') + " : nextTr.size() = " + nextTR.size());
+		console.log("currTR style:" + currTR.children().first().attr('style'));
+		console.log("nextTR style:" + nextTR.children().first().attr('style'));
+		
+		while(nextTR.size() > 0 && 
+				currTRmargin < nextTRmargin) {
+			
+			
+			var nextNextTR = nextTR.next();
+			nextTR.remove();
+			nextTR = nextNextTR;
+			nextTRmargin = parseInt(nextTR.children().first().css('padding-left'), 10);
+		}
+		
+		this.$el.find('#link-' + parentId).addClass('drillDown');
+		this.$el.find('#caret-' + parentId).addClass('icon-chevron-right');
+		
 	},
 	loadChildren: function(e) {
 		var parentId = $(e.target).parents('tr').attr('data-id');
@@ -108,6 +137,9 @@ var MainTblView = Backbone.View.extend({
 			});
 			var tbodyHtml = this.mainTblTbodyTemplate(json);
 			this.$el.find('tr[data-id='+parentId+']').after(tbodyHtml);
+			
+			this.$el.find('#caret-' + parentId).removeClass('icon-spin icon-refresh');
+			this.$el.find('#caret-' + parentId).addClass('icon-chevron-down');
 		}
 		return false;
 	},
