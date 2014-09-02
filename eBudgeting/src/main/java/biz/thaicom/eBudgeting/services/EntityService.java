@@ -294,7 +294,8 @@ public interface EntityService {
 	public BudgetCommonType updateBudgetCommonType(JsonNode node);
 	public BudgetCommonType saveBudgetCommonType(JsonNode node);
 	public BudgetCommonType deleteBudgetCommonType(Long id);
-	
+	public Page<BudgetCommonType> findAllBudgetCommonTypesByFiscalYearAndName(
+			Integer fiscalYear, String query, PageRequest pageRequest);
 	
 	//ObjectiveBudgetProposal
 	public List<ObjectiveBudgetProposal> findObjectiveBudgetproposalByObjectiveIdAndOwnerId(
@@ -356,6 +357,7 @@ public interface EntityService {
 	// BudgetSignOffLog
 	public List<BudgetSignOffLog> findAllBudgetSignOffLog(Integer fiscalYear,
 			Integer round, ThaicomUserDetail currentUser);
+
 
 	
 

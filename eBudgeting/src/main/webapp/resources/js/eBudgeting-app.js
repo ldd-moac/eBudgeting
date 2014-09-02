@@ -828,6 +828,25 @@ ObjectivePagableCollection = PagableCollection.extend({
 	
 });
 
+BudgetCommonTypePagableCollection = PagableCollection.extend({
+	initialize: function(models, options) {
+	    this.fiscalYear = options.fiscalYear;
+	    this.targetPage = options.targetPage;
+	  },
+	
+	model: BudgetCommonType,
+	
+	url: function() {
+	    return appUrl('/BudgetCommonType/fiscalYear/'+ this.fiscalYear +'/page/'+this.targetPage);
+	},
+	
+	setParams: function(fiscalYear, targetPage) {
+		this.fiscalYear = fiscalYear;
+	    this.targetPage = targetPage;
+	}
+	
+});
+
 BudgetTypePagableCollection = PagableCollection.extend({
 	initialize: function(models, options) {
 		if(options!=null) {

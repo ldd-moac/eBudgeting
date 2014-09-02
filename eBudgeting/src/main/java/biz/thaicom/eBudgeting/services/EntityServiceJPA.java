@@ -3920,6 +3920,14 @@ public class EntityServiceJPA implements EntityService {
 		return "success";
 	}
 
+	
+	
+	@Override
+	public Page<BudgetCommonType> findAllBudgetCommonTypesByFiscalYearAndName(
+			Integer fiscalYear, String query, PageRequest pageRequest) {
+		return budgetCommonTypeRepository.findAllByFiscalYearAndNameLike(fiscalYear, query, pageRequest);
+	}
+
 	@Override
 	public List<BudgetCommonType> findAllBudgetCommonTypes(Integer fiscalYear) {
 		

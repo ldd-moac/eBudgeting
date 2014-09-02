@@ -167,6 +167,22 @@ public class BudgetTypeRestController {
 	}
 	
 	
+	@RequestMapping(value="/BudgetCommonType/fiscalYear/{fiscalYear}/page/{pageNumber}", method=RequestMethod.POST)
+	public @ResponseBody Page<BudgetCommonType> findAllBudgetCommonTypeByFiscalYearAndName(
+			@RequestParam (required=false) String query,
+			@PathVariable Integer fiscalYear,
+			@PathVariable Integer pageNumber) {
+		
+		PageRequest pageRequest =
+				new PageRequest(pageNumber-1, PageUI.PAGE_SIZE, Sort.Direction.ASC, "name");
+		if(query == null || query.length() == 0) {
+			query = "%";
+		} else {
+			query = "%" + query + "%";
+		}
+		return entityService.findAllBudgetCommonTypesByFiscalYearAndName(fiscalYear, query, pageRequest);
+	}
+	
 	@RequestMapping(value="/BudgetCommonType/fiscalYear/{fiscalYear}/", method=RequestMethod.GET)
 	public @ResponseBody List<BudgetCommonType> findAllBudgetCommonType(
 			@PathVariable Integer fiscalYear) {

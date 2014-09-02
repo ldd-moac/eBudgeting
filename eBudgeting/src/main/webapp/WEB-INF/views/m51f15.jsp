@@ -18,8 +18,8 @@
 				
 			</div>
 			<div class="modal-footer">
-				<a href="#" class="btn" id="cancelBtn">Close</a> 
-				<a href="#"	class="btn btn-primary" id="saveBtn">Save changes</a>
+				<a href="#"	class="btn btn-primary" id="saveBtn">บันทึกข้อมูล</a>
+				<a href="#" class="btn" id="cancelBtn">ยกเลิก</a> 
 			</div>
 		</div>
 	
@@ -59,16 +59,43 @@
 </script>
 
 <script id="mainCtrTemplate" type="text/x-handler-template">
+<div>
+	<form class="form-search" style="margin-bottom:10px;" id="objectiveSearchFrm">
+		<div class="input-append">
+    		<input type="text" class="span2 search-query" id="queryTxt" value="{{queryTxt}}">
+    			<button class="btn" type="submit" id="SearchBtn">ค้นหาทะเบียน</button>
+    	</div>
+    </form>
+</div>
+
 <div class="controls" style="margin-bottom: 15px;">
 	<a href="#" class="btn btn-info menuNew"><i class="icon icon-file icon-white"></i> เพิ่มชื่อทะเบียน</a>
-	<a href="#" class="btn btn-primary menuEdit"><i class="icon icon-edit icon-white"></i> แก้ไข</a>
-	<a href="#" class="btn btn-danger menuDelete"><i class="icon icon-trash icon-white"></i> ลบ</a> 
+	<a href="#" class="btn btn-primary menuEdit"><i class="icon icon-edit icon-white"></i> แก้ไขทะเบียน</a>
+	<a href="#" class="btn btn-danger menuDelete"><i class="icon icon-trash icon-white"></i> ลบ</a>
+
+	{{#if pageParams}}
+	{{#with pageParams}}
+    <div class="pagination pagination-small">
+        <span style="border: 1px;">พบทั้งสิ้น {{totalElements}} รายการ </span> <b>หน้า : </b> <ul>
+		{{#each page}}
+	    <li {{#if isActive}}class="active"{{/if}}><a href="#" class="pageLink" data-id="{{pageNumber}}">
+				{{#if isPrev}}&laquo;{{/if}} 
+				{{#if isNext}}&raquo;{{/if}}
+				{{#if showPageNumber}} {{pageNumber}} {{/if}}
+
+			</a>
+		</li>
+	    {{/each}}
+    </div>
+	{{/with}}
+	{{/if}}
+
 </div>
-<table class="table table-bordered" id="mainTbl">
+<table class="table table-bordered table-striped" id="mainTbl">
 	<thead>
 		<tr>
-			<td width="20"></td>
-			<td>ชื่อรายการกลาง</td>
+			<td style="width:20px;"></td>
+			<td>ชื่อ</td>
 		</tr>
 	</thead>
 	<tbody>
@@ -103,18 +130,21 @@
 </script>
 	
 <script type="text/javascript">
-var budgetCommonTypeCollection = new BudgetCommonTypeCollection();
-var fiscalYear = "${fiscalYear}";
 
+var fiscalYear = "${fiscalYear}";
+var bctPage = new BudgetCommonTypePagableCollection(fiscalYear, 1);
 
 $(document).ready(function() {
 	
 	var ModalView = Backbone.View.extend({
-		initialize: function(){
-		    
+		initialize: function(params){
+			this.parent = params.parent;
+			
+			this.currentBudgetCommonType = null;
+			
 		},
 		el: "#modal",
-		budgetCommonType : null,
+		
 		modalTemplate: Handlebars.compile($("#modalTemplate").html()),
 		
 		events: {
@@ -136,8 +166,8 @@ $(document).ready(function() {
 			}	
 		},
 		
-		renderWith: function(BudgetCommonType) {
-			this.currentBudgetCommonType = BudgetCommonType;
+		renderWith: function(budgetCommonType) {
+			this.currentBudgetCommonType = budgetCommonType;
 			this.render();
 		},
 		
@@ -154,11 +184,8 @@ $(document).ready(function() {
 			},{
 				success : _.bind(function(model) {
 					
-					if(newModel) {
-						budgetCommonTypeCollection.add(model);
-					}
-					budgetCommonTypeCollection.trigger('reset');
 					this.$el.modal('hide');
+					this.parent.refresh();
 				},this)
 			});
 		},
@@ -170,40 +197,77 @@ $(document).ready(function() {
 	});
 	
 	var MainCtrView = Backbone.View.extend({
-		initialize: function() {
+		initialize: function(options) {
+			this.collection = options.collection;
 			this.collection.bind('reset', this.render, this);
+			this.queryTxt = "";
+			
+			this.modal = new ModalView({parent: this});
 		},
 		events: {
 			"click .menuNew" : "newBudgetCommonType",
 			"click .menuEdit" : "editBudgetCommonType",
 			"click .menuDelete" : "deleteBudgetCommonType",
 			"click .lineSave" : "saveLine",
-			"click .cancelLineSave" : "cancelSaveLine"
+			"click .cancelLineSave" : "cancelSaveLine",
+			
+			"click a.pageLink" : "gotoPage",
+			"click #SearchBtn" : "searchBtn"
 		},
 		mainCtrTpl: Handlebars.compile($("#mainCtrTemplate").html()),
 		newRowTpl : Handlebars.compile($('#newRowTemplate').html()),
 		rowTpl : Handlebars.compile($("#rowTemplate").html()),
 		el: '#mainCtr',
-		collection : budgetCommonTypeCollection,
 		
-		modalView : new ModalView(),
+		gotoPage: function(e) {
+			var pageNumber = $(e.target).attr('data-id');
+			this.renderPage(pageNumber);
+		},
+		
+		searchBtn: function(e) {
+			this.queryTxt = this.$el.find('#queryTxt').val();
+			this.renderPage(1);
+		},
+		refresh: function() {
+			this.renderPage(this.collection.targetPage);
+		},
+		renderPage: function(pageNumber) {
+			this.collection.setTargetPage(pageNumber);
+			bctPage.fetch({
+				reset: true,
+				type: 'POST',
+				url: appUrl('/BudgetCommonType/fiscalYear/' + fiscalYear + '/page/'+pageNumber),
+				data: {query: this.queryTxt},
+				success: function() {
+					bctPage.trigger('reset');
+				}
+			});
+		},
 		
 		render: function() {
-			this.$el.html(this.mainCtrTpl());
-			this.$el.find('tbody').html(this.rowTpl(this.collection.toJSON()));
+			var json = {};
+			json.pageParams = this.collection.toPageParamsJSON();
+			json.queryTxt = this.queryTxt;
+			
+			this.$el.html(this.mainCtrTpl(json));
+			
+			
+			json=this.collection.toJSON();
+			this.$el.find('tbody').html(this.rowTpl(json));
 		},
 		
 		newBudgetCommonType: function(e) {
 			if(! $(e.currentTarget).hasClass('disabled') ) {
 				
-				var html = this.newRowTpl({name:null});
+				//var html = this.newRowTpl({name:null});
 				
-				$('#mainCtr tbody').append('<tr>'+html+'</tr>');
+				//$('#mainCtr tbody').append('<tr>'+html+'</tr>');
 				
 				
-				this.$el.find('a.btn').toggleClass('disabled');
+				//this.$el.find('a.btn').toggleClass('disabled');
 				
-				this.currentBudgetCommonType = new BudgetCommonType();
+				//this.currentBudgetCommonType = new BudgetCommonType();
+				this.modal.renderWith(new BudgetCommonType());
 			}
 		},
 		
@@ -226,11 +290,7 @@ $(document).ready(function() {
 			},{
 				url : url,
 				success : _.bind(function(model) {
-					
-					if(newModel) {
-						budgetCommonTypeCollection.add(model);
-					}
-					budgetCommonTypeCollection.trigger('reset');
+					this.refresh();
 				},this)
 			});
 		},
@@ -244,10 +304,12 @@ $(document).ready(function() {
 			var budgetCommonType = BudgetCommonType.findOrCreate(tuId);
 			
 			this.currentBudgetCommonType=budgetCommonType;
+			this.currentBudgetCommonType.url=appUrl('/BudgetCommonType/'+this.currentBudgetCommonType.get('id'));
+			this.modal.renderWith(this.currentBudgetCommonType);
 			
-			var html = this.newRowTpl(budgetCommonType.toJSON());
+			//var html = this.newRowTpl(budgetCommonType.toJSON());
 			
-			this.$el.find('tr[data-id='+ tuId + ']').html(html);
+			//this.$el.find('tr[data-id='+ tuId + ']').html(html);
 		},
 		
 		deleteBudgetCommonType: function(e) {
@@ -257,24 +319,19 @@ $(document).ready(function() {
 			if(confirm('คุณต้องการลบรายการกลาง \"'+ budgetCommonType.get('name') + '\"')==true) {
 				budgetCommonType.destroy({
 					url: budgetCommonType.urlRoot + budgetCommonType.id,
-					success: function() {
-						budgetCommonTypeCollection.trigger('reset');
-					}
+					success: _.bind(function() {
+						this.refresh()
+					},this)
 				});
 			}
 			
 		}
 	});
 	
-	mainCtrView = new MainCtrView();
+	mainCtrView = new MainCtrView({collection: bctPage});
+	bctPage.setTargetPage(1);
+	mainCtrView.renderPage(1);
 	
-	budgetCommonTypeCollection.fetch({
-		url: appUrl('/BudgetCommonType/fiscalYear/' + fiscalYear + '/'),
-		success: function() {
-			
-			budgetCommonTypeCollection.trigger('reset');
-		}
-	});
 	
 });
 </script>

@@ -31,7 +31,7 @@
 				
 			</div>
 			<div class="modal-footer">
-				<a href="#" class="btn" id="saveBtn">บันทึกข้อมูล</a>  
+				<a href="#" class="btn btn-primary" id="saveBtn">บันทึกข้อมูล</a>  
 				<a href="#" class="btn" id="closeBtn">ยกเลิก</a>
 			</div>
 		</div>
