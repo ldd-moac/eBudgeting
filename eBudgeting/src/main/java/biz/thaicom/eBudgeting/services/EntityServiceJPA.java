@@ -4270,6 +4270,11 @@ public class EntityServiceJPA implements EntityService {
 		}
 		
 		objectiveNameRepository.save(on);
+		
+		if(on.getTargets() != null) {
+			on.getTargets().size();
+		}
+		
 		return on;
 	}
 
