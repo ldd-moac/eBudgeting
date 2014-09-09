@@ -184,9 +184,8 @@
 	<thead>
 		<tr>
 			<td style="width:20px;">#</td>
-			<td style="width:246px;"><strong>แผนงาน/กิจกรรม ประจำปี {{this.0.fiscalYear}}</strong></td>
+			<td style="width:306px;"><strong>แผนงาน/กิจกรรม ประจำปี {{this.0.fiscalYear}}</strong></td>
 			<td style="width:60px;">หน่วยนับ</td>			
-			<td style="width:60px;">เป้าหมาย</td>
 			<td style="width:80px;">งบประมาณปี  {{this.0.fiscalYear}}</td>
 			<td style="width:80px;">ปี  {{next this.0.fiscalYear 1}}</td>
 			<td style="width:80px;">ปี  {{next this.0.fiscalYear 2}}</td>
@@ -198,7 +197,6 @@
 		<tr>
 			<td></td>
 			<td style="text-align:right; padding-right: 20px;"><strong>รวมทั้งสิ้น</strong></td>
-			<td></td>
 			<td></td>
 			<td><strong>{{sumProposal allProposal}}</td>
 			<td><strong>{{sumProposalNext1Year allProposal}}</strong></td>
@@ -226,8 +224,8 @@
 </script>
 <script id="childrenNodeTemplate" type="text/x-handler-template">
 	<tr data-level="{{this.level}}" data-id="{{this.id}}" class="type-{{type.id}}" showChildren="true" parentPath="{{this.parentPath}}">
-		<td style="width:20px;"></td>
-		<td style="width:246px;" class="{{#if this.children}}disable{{/if}}">
+		<td style="width:20px;" rowspan="{{this.rowSpan}}"></td>
+		<td style="width:315px;" class="{{#if this.children}}disable{{/if}}" rowspan="{{this.rowSpan}}">
 			<div class="pull-left" style="margin-left:{{this.padding}}px; width:18px;">
 					{{#if this.children}}
 					<input class="checkbox_tree bullet" type="checkbox" id="bullet_{{this.id}}"/>
@@ -253,14 +251,7 @@
 		</td>
 		<td  style="width:60px;" class="{{#if this.children}}disable{{/if}} centerAlign">
 			<span>
-				<ul  style="list-style:none; margin: 0px;">{{#each filterTargetValues}}<li style="list-style:none; padding: 0px;">{{target.unit.name}} ({{#if target.isSumable}}นับ{{else}}ไม่นับ{{/if}})</li>{{/each}}</ul>
-			</span>
-		</td>
-		<td  style="width:60px;" class="{{#if this.children}}disable{{/if}} centerAlign">
-			<span>
-				{{#each filterTargetValues}}
-				{{#if requestedValue}}{{formatNumber requestedValue}}{{else}}0{{/if}}<br/>
-				{{/each}}
+				งบประมาณ				
 			</span>
 		</td>
 		<td style="width:80px;" class="{{#if this.children}}disable{{/if}} rightAlign">
@@ -277,6 +268,16 @@
 				{{sumProposalNext3Year this.filterProposals}}
 		</td>
 	</tr>
+{{#each filterTargetValues}}
+	<tr>
+		<td style="border-left: 1px solid #dddddd;" class="{{#if this.children}}disable{{/if}} centerAlign">{{target.unit.name}} ({{#if target.isSumable}}นับ{{else}}ไม่นับ{{/if}})</td>
+		<td>{{#if requestedValue}}{{formatNumber requestedValue}}{{else}}0{{/if}}</td>
+		<td>	</td>
+		<td>	</td>
+		<td>	</td>
+
+	</tr>
+{{/each}}
 	{{{childrenNodeTpl this.children this.level}}}  
 </script>
 
@@ -785,7 +786,13 @@
 					
 					child["padding"] = parseInt(level) * 20;
 					
-					child["nameWidth"] = 246 - 18 - child["padding"];
+					child["nameWidth"] = 306 - 18 - child["padding"];
+					
+					console.log(child["filterTargetValues"]);
+					e1=child["filterTargetValues"];
+					
+					child["rowSpan"] = child["filterTargetValues"].length + 1;
+					
 					out = out + childNodeTpl(child);
 				});
 

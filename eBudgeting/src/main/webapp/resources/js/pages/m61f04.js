@@ -1186,9 +1186,9 @@ var MainCtrView = Backbone.View.extend({
 				
 					this.$el.find('#mainTbl').html(this.mainTblTpl(json));
 					
-					this.$el.find('#mainTbl tbody td:first-child', this).each(function(i){
-				        $(this).html((i+1) + ".");
-				    });
+					//this.$el.find('#mainTbl tbody td:first-child', this).each(function(i){
+				    //    $(this).html((i+1) + ".");
+				    //});
 				
 				}, this)
 			});
