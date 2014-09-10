@@ -124,14 +124,14 @@ private static final Logger logger = LoggerFactory.getLogger(ObjectiveTargetRest
 	}
 	
 	@RequestMapping(value="/TargetValue/", method=RequestMethod.POST)
-	public @ResponseBody TargetValue saveTargetValue(
+	public @ResponseBody List<TargetValue> saveTargetValue(
 			@RequestBody JsonNode node,
 			@Activeuser ThaicomUserDetail currentUser) throws Exception {
 		return entityService.saveTargetValue(node, currentUser.getWorkAt());
 	}
 	
 	@RequestMapping(value="/TargetValue/{id}", method=RequestMethod.PUT)
-	public @ResponseBody TargetValue updateTargetValue(
+	public @ResponseBody List<TargetValue> updateTargetValue(
 			@PathVariable Long id,
 			@RequestBody JsonNode node,
 			@Activeuser ThaicomUserDetail currentUser) throws Exception {

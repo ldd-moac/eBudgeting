@@ -273,7 +273,7 @@ public interface EntityService {
 	public TargetUnit deleteTargetUnit(Long id);
 	
 	//TargetValue
-	public TargetValue saveTargetValue(JsonNode node, Organization workAt) throws 	Exception;
+	public List<TargetValue> saveTargetValue(JsonNode node, Organization workAt) throws 	Exception;
 	public void saveLotsTargetValue(JsonNode node);
 	
 	//TargetValueAllocationRecord

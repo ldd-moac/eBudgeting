@@ -711,7 +711,11 @@ var MainCtrView = Backbone.View.extend({
 	        	text: 'เป้าหมาย',
 	        	width: 80,
 	        	sortable: false,
-	        	align: 'center'
+	        	dataIndex: 'targetValueAllocationRecordsR1',
+	        	align: 'center',
+	        	render:function(value, metaData, record, rowIdx, colIdx, store) {
+	        		return "";
+	        	}
 	        }, {
 	        	text: 'ขอตั้งปี ' + fiscalYear,
 	        	width: 120,

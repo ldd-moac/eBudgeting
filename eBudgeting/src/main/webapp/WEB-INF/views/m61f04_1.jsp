@@ -26,15 +26,15 @@
 			</div>
 		</div>
 
-		<div id="targetValueModal" class="modal hide fade">
+		<div id="targetValueModal" class="modal wideModal hide fade">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 				<span style="font-weight: bold;"></span>
 			</div>
 			<div class="modal-body"></div>
 			<div class="modal-footer">
-				<a href="#" class="btn" id="saveBtn">บันทึกข้อมูล</a>  
-				<a href="#" class="btn" id="cancelBtn">ยกเลิก</a>
+				<a href="#" class="btn" id="targetValueSaveBtn">บันทึกข้อมูล</a>  
+				<a href="#" class="btn" id="targetValueCancelBtn">ยกเลิก</a>
 			</div>
 		</div>
 
@@ -180,11 +180,11 @@
 </div>
 </script>
 <script id="mainTblTemplate" type="text/x-handler-template">
-<table class="table table-bordered" id="headerTbl" style="margin-bottom:0px; width:875px; table-layout:fixed;">
+<table class="table table-bordered" id="headerTbl" style="margin-bottom:0px; width:860px; table-layout:fixed;">
 	<thead>
 		<tr>
 			<td style="width:20px;">#</td>
-			<td style="width:306px;"><strong>แผนงาน/กิจกรรม ประจำปี {{this.0.fiscalYear}}</strong></td>
+			<td style="width:323px;"><strong>แผนงาน/กิจกรรม ประจำปี {{this.0.fiscalYear}}</strong></td>
 			<td style="width:60px;">หน่วยนับ</td>			
 			<td style="width:80px;">งบประมาณปี  {{this.0.fiscalYear}}</td>
 			<td style="width:80px;">ปี  {{next this.0.fiscalYear 1}}</td>
@@ -207,13 +207,13 @@
 	</tbody>
 </table>
 <div class="inRow" style="height: 600px;overflow-y: scroll; width:860px; border-left:1px solid #DDDDDD;">
-<table class="table table-bordered" id="mainTbl" style="width:720px; table-layout:fixed; margin: 0px; border-radius: 0px;">
+<table class="table table-bordered" id="mainTbl" style="width:845px; table-layout:fixed; margin: 0px; border-radius: 0px;">
 	<tbody>
 			{{{childrenNodeTpl this 0}}}
 	</tbody>
 </table>
 </div>
-<table class="table table-bordered" id="headerTbl" style="margin-bottom:0px; width:875px; table-layout:fixed;">
+<table class="table table-bordered" id="headerTbl" style="margin-bottom:0px; width:100%; table-layout:fixed;">
 	<thead>
 		<tr>
 			<td>&nbsp;</td>
@@ -225,7 +225,7 @@
 <script id="childrenNodeTemplate" type="text/x-handler-template">
 	<tr data-level="{{this.level}}" data-id="{{this.id}}" class="type-{{type.id}}" showChildren="true" parentPath="{{this.parentPath}}">
 		<td style="width:20px;" rowspan="{{this.rowSpan}}"></td>
-		<td style="width:315px;" class="{{#if this.children}}disable{{/if}}" rowspan="{{this.rowSpan}}">
+		<td style="width:323px;" class="{{#if this.children}}disable{{/if}}" rowspan="{{this.rowSpan}}">
 			<div class="pull-left" style="margin-left:{{this.padding}}px; width:18px;">
 					{{#if this.children}}
 					<input class="checkbox_tree bullet" type="checkbox" id="bullet_{{this.id}}"/>
@@ -269,12 +269,16 @@
 		</td>
 	</tr>
 {{#each filterTargetValues}}
-	<tr>
-		<td style="border-left: 1px solid #dddddd;" class="{{#if this.children}}disable{{/if}} centerAlign">{{target.unit.name}} ({{#if target.isSumable}}นับ{{else}}ไม่นับ{{/if}})</td>
-		<td>{{#if requestedValue}}{{formatNumber requestedValue}}{{else}}0{{/if}}</td>
-		<td>	</td>
-		<td>	</td>
-		<td>	</td>
+	<tr targetValue-id="{{id}}" objective-id="{{forObjective}}" target-id="{{target.id}}" class="targetValue">
+		<td style="border-left: 1px solid #dddddd;" class="{{#if this.children}}disable{{/if}} centerAlign">
+			<a href="#" class="targetValueModal">
+			{{target.unit.name}} ({{#if target.isSumable}}นับ{{else}}ไม่นับ{{/if}})
+			</a>
+		</td>
+		<td class="{{#if this.children}}disable{{/if}} centerAlign">{{#if requestedValue}}{{formatNumber requestedValue}}{{else}}0{{/if}}</td>
+		<td class="{{#if this.children}}disable{{/if}} centerAlign">{{#if requestedValueNext1Year}}{{formatNumber requestedValueNext1Year}}{{else}}0{{/if}}</td>
+		<td class="{{#if this.children}}disable{{/if}} centerAlign">{{#if requestedValueNext2Year}}{{formatNumber requestedValueNext2Year}}{{else}}0{{/if}}</td>
+		<td class="{{#if this.children}}disable{{/if}} centerAlign">{{#if requestedValueNext3Year}}{{formatNumber requestedValueNext3Year}}{{else}}0{{/if}}</td>
 
 	</tr>
 {{/each}}
@@ -429,10 +433,33 @@
 </script>
 
 <script id="targetValueModalTemplate" type="text/x-handler-template">
-<form>
-	<label>ระบุค่าเป้าหมาย</label>
-	<input type="text" value="{{value}}"/> {{target.unit.name}}
-</form>
+<div id="formulaBox">
+	<div>
+		<div style="vertical-align:middle"> <strong>ระบุค่าเป้าหมาย:</strong></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div class="input-append"><input style="width:80px;" type="text" class="targetRV" id="requestedValue" data-unitId="{{target.Id}}" value="{{requestedValue}}"/><span class="add-on">{{target.unit.name}}</span></div>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div id="formulaBox">
+	<div>
+		<div style="text-align:right; padding-top:10px;"> <button class="btn copyTargetToNextYear">คัดลอกเป้าหมาย</button></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next1Year}}:</b></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" class="targetRV" id="requestedValueNext1Year" value="{{requestedValueNext1Year}}"/><span class="add-on">{{target.unit.name}}</span></div></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next2Year}}:</b></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" class="targetRV" id="requestedValueNext2Year" value="{{requestedValueNext2Year}}"/><span class="add-on">{{target.unit.name}}</span></div></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next3Year}}:</b></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" class="targetRV" id="requestedValueNext3Year" value="{{requestedValueNext3Year}}"/><span class="add-on">{{target.unit.name}}</span></div></div>
+	</div>
+</div>
+<div class="clearfix"></div>
 </script>
 
 <script id="defaultInputTemplate" type="text/x-handler-template">
@@ -786,7 +813,7 @@
 					
 					child["padding"] = parseInt(level) * 20;
 					
-					child["nameWidth"] = 306 - 18 - child["padding"];
+					child["nameWidth"] = 323 - 18 - child["padding"];
 					
 					console.log(child["filterTargetValues"]);
 					e1=child["filterTargetValues"];

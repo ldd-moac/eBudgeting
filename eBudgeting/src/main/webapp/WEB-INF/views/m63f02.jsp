@@ -635,6 +635,8 @@ $(document).ready(function() {
 		},{
 			name: 'proposals', mapping: 'proposals'
 		},{
+			name: 'targetValueAllocationRecords', mapping: 'targetValueAllocationRecords'
+		},{
 			name: 'allocationRecordsR1', mapping: 'allocationRecordsR1'
 		},{
 			name: 'sumProposals', 
@@ -691,6 +693,7 @@ $(document).ready(function() {
         		});
         		return sum;
         	}
+        
         }]
     });
 	

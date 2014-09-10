@@ -50,7 +50,18 @@ public class TargetValue implements Serializable{
 	
 	@Basic
 	private Long requestedValue;
-		
+
+	@Basic
+	private Long requestedValueNext1Year;
+	
+	@Basic
+	private Long requestedValueNext2Year;
+	
+	@Basic
+	private Long requestedValueNext3Year;
+	
+	
+	
 	@Basic
 	private Long allocatedValue;
 
@@ -101,12 +112,60 @@ public class TargetValue implements Serializable{
 	public void setForObjective(Objective forObjective) {
 		this.forObjective = forObjective;
 	}
+	
+	
 
-	public void adjustRequestedValue(Long adjustedRequestedValue) {
+	public Long getRequestedValueNext1Year() {
+		return requestedValueNext1Year;
+	}
+
+	public void setRequestedValueNext1Year(Long requestedValueNext1Year) {
+		this.requestedValueNext1Year = requestedValueNext1Year;
+	}
+
+	public Long getRequestedValueNext2Year() {
+		return requestedValueNext2Year;
+	}
+
+	public void setRequestedValueNext2Year(Long requestedValueNext2Year) {
+		this.requestedValueNext2Year = requestedValueNext2Year;
+	}
+
+	public Long getRequestedValueNext3Year() {
+		return requestedValueNext3Year;
+	}
+
+	public void setRequestedValueNext3Year(Long requestedValueNext3Year) {
+		this.requestedValueNext3Year = requestedValueNext3Year;
+	}
+
+	public void adjustRequestedValue(Long adjustedRequestedValue,
+			Long adjustedRequestedValueNext1Year,
+			Long adjustedRequestedValueNext2Year,
+			Long adjustedRequestedValueNext3Year) {
+		
 		if(this.requestedValue != null) {
 			this.requestedValue -= adjustedRequestedValue;
 		} else {
 			this.requestedValue = 0L - adjustedRequestedValue;
+		}
+		
+		if(this.requestedValueNext1Year != null) {
+			this.requestedValueNext1Year -= adjustedRequestedValueNext1Year;
+		} else {
+			this.requestedValueNext1Year = 0L - adjustedRequestedValueNext1Year;
+		}
+		
+		if(this.requestedValueNext2Year != null) {
+			this.requestedValueNext2Year -= adjustedRequestedValueNext2Year;
+		} else {
+			this.requestedValueNext2Year = 0L - adjustedRequestedValueNext2Year;
+		}
+		
+		if(this.requestedValueNext3Year != null) {
+			this.requestedValueNext3Year -= adjustedRequestedValueNext3Year;
+		} else {
+			this.requestedValueNext3Year = 0L - adjustedRequestedValueNext3Year;
 		}
 		
 	}

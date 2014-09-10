@@ -1508,8 +1508,36 @@ public class EntityServiceJPA implements EntityService {
 				allocationRecordRepository.save(budgetTypeMap.values());
 				allocationRecordStrategyRepository.save(formulaStrategyMap.values());
 				requestColumnRepositories.save(columnMap.values());
+				
+				
+				// now we'll deal with TargetValue!
+				List<TargetValueAllocationRecord> tvars = 
+						targetValueAllocationRecordRepository.findAllByForObjectiveAndIndex(o, round-1);
+				targetValueAllocationRecordRepository.delete(tvars);
+				Map<Long, TargetValueAllocationRecord> tvarMap = new HashMap<Long, TargetValueAllocationRecord>();
+				tvars = new ArrayList<TargetValueAllocationRecord>();
+				
+				for(ObjectiveTarget target : o.getTargets()) {
+					TargetValueAllocationRecord tvar = new TargetValueAllocationRecord();
+					tvar.setForObjective(o);
+					tvar.setTarget(target);
+					tvar.setIndex(round-1);
+					tvar.setAmountAllocated(0L);
+					
+					tvarMap.put(target.getId(), tvar);
+					
+					tvars.add(tvar);
+				}
+				
+				
+				for(TargetValue tv : o.getTargetValues()) {
+					TargetValueAllocationRecord tvar = tvarMap.get(tv.getTarget().getId());
+						
+					tvar.setAmountAllocated(tvar.getAmountAllocated() + tv.getRequestedValue());
+				}
+				targetValueAllocationRecordRepository.save(tvars);
 			}
-			}
+		}
 
 //			//loop through proposalList
 //			for(BudgetProposal proposal : proposalList) {
@@ -2118,7 +2146,8 @@ public class EntityServiceJPA implements EntityService {
 							
 							tv = tvInList;
 							
-							tv.adjustRequestedValue(oldStrategy.getTargetValue()-strategy.getTargetValue());
+							// Need to check this out!
+							tv.adjustRequestedValue(oldStrategy.getTargetValue()-strategy.getTargetValue(), 0L, 0L, 0L);
 						} else {
 							break;
 						}
@@ -3393,7 +3422,9 @@ public class EntityServiceJPA implements EntityService {
 	}
 
 	@Override
-	public TargetValue saveTargetValue(JsonNode node, Organization workAt) throws Exception {
+	public List<TargetValue> saveTargetValue(JsonNode node, Organization workAt) throws Exception {
+		List<TargetValue> returnList = new  ArrayList<TargetValue>();
+		
 		Long targetValueId = null;
 		if(node.get("id") != null) {
 			targetValueId = node.get("id").asLong();
@@ -3406,7 +3437,13 @@ public class EntityServiceJPA implements EntityService {
 		ObjectiveTarget target = objectiveTargetRepository.findOne(objectiveTargetId);
 		
 		Long adjustedRequestedValue = 0L;
+		Long adjustedRequestedValueNext1Year = 0L;
+		Long adjustedRequestedValueNext2Year = 0L;
+		Long adjustedRequestedValueNext3Year = 0L;
 		Long requestedValue = node.get("requestedValue").asLong();
+		Long requestedValueNext1Year = node.get("requestedValueNext1Year").asLong();
+		Long requestedValueNext2Year = node.get("requestedValueNext2Year").asLong();
+		Long requestedValueNext3Year = node.get("requestedValueNext3Year").asLong();
 		
 		TargetValue tv;
 		if(targetValueId == null) {
@@ -3420,12 +3457,24 @@ public class EntityServiceJPA implements EntityService {
 			tv = targetValueRepository.findOne(targetValueId);
 			tv.setOwner(workAt);
 			adjustedRequestedValue = tv.getRequestedValue();
+			adjustedRequestedValueNext1Year = tv.getRequestedValueNext1Year();
+			adjustedRequestedValueNext2Year = tv.getRequestedValueNext2Year();
+			adjustedRequestedValueNext3Year = tv.getRequestedValueNext3Year();
 			
 		}
 		
 		tv.setRequestedValue(node.get("requestedValue").asLong());
+		tv.setRequestedValueNext1Year(requestedValueNext1Year);
+		tv.setRequestedValueNext2Year(requestedValueNext1Year);
+		tv.setRequestedValueNext3Year(requestedValueNext3Year);
+		
 		adjustedRequestedValue -= requestedValue;
+		adjustedRequestedValueNext1Year -= requestedValueNext1Year;
+		adjustedRequestedValueNext2Year -= requestedValueNext2Year;
+		adjustedRequestedValueNext3Year -= requestedValueNext3Year;
+		
 		targetValueRepository.save(tv);
+		returnList.add(tv);
 		
 		if(target.getIsSumable() == true ) {
 		
@@ -3463,15 +3512,17 @@ public class EntityServiceJPA implements EntityService {
 					
 					logger.debug("---------adding new tv with target.id: {}, requestedValue : {}",  matchingTarget.getId(), requestedValue);
 					targetValueRepository.save(newTv);
+					returnList.add(newTv);
 					
 				} else if (tvs.size() == 1) {
 					TargetValue matchTv = tvs.get(0);
 					logger.debug("---------updating tv with adjustedReqeust : {}",  adjustedRequestedValue);
 					logger.debug("----------oldone is {}", matchTv.getRequestedValue());
-					matchTv.adjustRequestedValue(adjustedRequestedValue);
+					matchTv.adjustRequestedValue(adjustedRequestedValue, adjustedRequestedValueNext1Year, adjustedRequestedValueNext2Year, adjustedRequestedValueNext3Year);
 					logger.debug("----------newone is {}", matchTv.getRequestedValue());
 					
 					targetValueRepository.save(matchTv);
+					returnList.add(matchTv);
 				}
 				
 				logger.debug("-------------------------------parents: " + parent.getId());
@@ -3489,7 +3540,7 @@ public class EntityServiceJPA implements EntityService {
 				parent = parent.getParent();
 			}
 		}
-		return tv;
+		return returnList;
 	}
 
 	@Override

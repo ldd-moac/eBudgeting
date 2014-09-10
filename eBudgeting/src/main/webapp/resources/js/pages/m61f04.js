@@ -355,6 +355,133 @@ var BudgetTypeAllSelectionView = Backbone.View.extend({
 	
 });
 
+var TargetValueModalView = Backbone.View.extend({
+	/**
+	 * @memberOf TargetValueModalView
+	 */
+	initialize : function() {
+		
+	},
+	
+	
+	
+	el : "#targetValueModal",
+	targetValue: null,
+	objective : null,
+	target : null,
+	targetValueModalTemplate : Handlebars.compile($('#targetValueModalTemplate').html()),
+	
+	events: {
+		"click .copyTargetToNextYear" : "copyTargetToNextYear",
+		"change input.targetRV" : "valueChange",
+		"click a#targetValueSaveBtn" : "saveTargetValue"
+	},
+	
+	saveTargetValue: function(e) {
+		if(this.targetValue.get('requestedValueNext1Year') == null) {
+			this.targetValue.set('requestedValueNext1Year',0);
+		}
+		
+		if(this.targetValue.get('requestedValueNext2Year') == null) {
+			this.targetValue.set('requestedValueNext2Year',0);
+		}
+		
+		if(this.targetValue.get('requestedValueNext3Year') == null) {
+			this.targetValue.set('requestedValueNext3Year',0);
+		}
+		
+		//now ready to save
+		$.ajax({
+			type : 'POST',
+			url : appUrl('/TargetValue/'),
+			dataType: "json",
+			contentType: "application/json; charset=utf-8",
+			data:  JSON.stringify(this.targetValue.toJSON()),
+			success : _.bind(function(data, txtStatus, jqXHR ) {
+				
+				this.targetValue.set('id', data[0].id);
+				
+				// update row
+				_.each(data, _.bind(function(targetValue) {
+								
+					var objectiveId=targetValue.forObjective.id;
+					if(objectiveId == null) {
+						objectiveId=targetValue.forObjective;
+					}
+					var targetId=targetValue.target.id;
+					if(targetId == null) {
+						targetId =targetValue.target;
+					}
+					var trStr = 'tr.targetValue[objective-id='+objectiveId+'][target-id='+targetId+']';
+					var rows = $(trStr);
+					var tds = rows.children();
+					
+					e1=tds;
+					$(tds[1]).html(addCommas(targetValue.requestedValue));
+					$(tds[2]).html(addCommas(targetValue.requestedValueNext1Year));
+					$(tds[3]).html(addCommas(targetValue.requestedValueNext2Year));
+					$(tds[4]).html(addCommas(targetValue.requestedValueNext3Year));
+					
+					
+				},this));
+				
+				// hide!
+				this.$el.modal('hide');
+				}, this)
+			});
+	},
+	
+	valueChange: function(e) {
+		var field = $(e.target).attr('id');
+		
+		this.targetValue.set(field,parseInt($(e.target).val()));
+		
+	},
+	
+	copyTargetToNextYear : function(e) {
+		var valueToCopy = $('#requestedValue').val();
+		valueToCopy = parseInt(valueToCopy.replace(/,/g, ''));
+		this.$el.find('#requestedValueNext1Year').val(valueToCopy);
+		this.$el.find('#requestedValueNext2Year').val(valueToCopy);
+		this.$el.find('#requestedValueNext3Year').val(valueToCopy);
+		
+		this.targetValue.set('requestedValueNext1Year',valueToCopy);
+		this.targetValue.set('requestedValueNext2Year',valueToCopy);
+		this.targetValue.set('requestedValueNext3Year',valueToCopy);
+		
+	},
+	
+	
+	renderWith: function(objective, target, targetValue) {
+		
+		this.targetValue = targetValue;
+		this.objective = objective;
+		this.target = target;
+		
+		
+		return this.render();
+	},
+	
+	render: function() {
+		this.$el.find('.modal-header span').html(this.objective.get('name'));
+		
+		var json = this.targetValue.toJSON();
+		json.next1Year = fiscalYear +1;
+		json.next2Year = fiscalYear +2;
+		json.next3Year = fiscalYear +3;
+		
+		
+		this.$el.find('.modal-body').html(this.targetValueModalTemplate(json));
+		
+		this.$el.modal({
+			show : true,
+			backdrop : 'static',
+			keyboard : false
+		});
+		return this;
+	}
+});
+
 var ModalView = Backbone.View.extend({
 	/**
 	 * @memberOf ModalView
@@ -1084,21 +1211,32 @@ var MainCtrView = Backbone.View.extend({
 	mainCtrTemplate : Handlebars.compile($("#mainCtrTemplate").html()),
 	mainTblTpl : Handlebars.compile($("#mainTblTemplate").html()),
 	modalView : new ModalView(),
+	targetValueModalView : new TargetValueModalView(),
 	
 	events : {
 		"click input[type=checkbox].bullet" : "toggle",
 		"click .detail" : "detailModal",
-		"click .targetValueModal" : "detailTargetValue"
+		"click .targetValueModal" : "targetValueModal"
 	},
 	
-	detailTargetValue: function(e) {
-		var currentObjectiveId = $(e.target).parents('tr').attr('data-id');
-		var currentObjective = Objective.findOrCreate(currentObjectiveId);
+	targetValueModal: function(e) {
+		var valueId = $(e.target).parents('tr').attr('targetValue-id');
+		var objectiveId = $(e.target).parents('tr').attr('objective-id');
+		var targetId = $(e.target).parents('tr').attr('target-id');
 		
-		var targetId = $(e.target).attr('target-id');
-		var valueId = $(e.target).attr('data-id');
 		
-		this.targetValueModalView.renderWith(currentObjective, targetId, valueId);
+		
+		var target = ObjectiveTarget.findOrCreate(targetId);
+		var objective = Objective.findOrCreate(objectiveId);
+		
+		var currentTargetValue = TargetValue.findOrCreate(valueId);
+		if(currentTargetValue == null) {
+			currentTargetValue = new TargetValue();
+			currentTargetValue.set('forObjective', objective);
+			currentTargetValue.set('target', target)
+		} 
+		
+		this.targetValueModalView.renderWith(objective, target, currentTargetValue);
 		
 		
 	},

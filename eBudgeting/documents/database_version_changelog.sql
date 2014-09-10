@@ -1190,3 +1190,12 @@ alter table BGT_BUDGETSIGNOFFLOG
 		add constraint FK213AB321D26C15E8 
         foreign key (organization_id) 
         references HRX_ORGANIZATION;
+        
+        
+-- version 18
+-- Modified Date: September 10, 2014
+alter table PLN_TARGETVALUE 
+add (requestedValueNext1Year number(19,0),
+	requestedValueNext2Year number(19,0),
+	requestedValueNext3Year number(19,0));
+        

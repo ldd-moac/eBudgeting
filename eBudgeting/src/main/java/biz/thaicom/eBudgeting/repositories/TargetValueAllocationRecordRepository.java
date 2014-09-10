@@ -3,6 +3,7 @@ package biz.thaicom.eBudgeting.repositories;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import biz.thaicom.eBudgeting.models.pln.Objective;
@@ -15,8 +16,8 @@ public interface TargetValueAllocationRecordRepository extends
 	public TargetValueAllocationRecord findOneByIndexAndForObjective(Integer index, Objective objective);
 
 	
-	public List<TargetValueAllocationRecord> findAllByForObjective_FiscalYearAndIndex(
-			Integer fiscalYear, int index);
+	public List<TargetValueAllocationRecord> findAllByForObjectiveAndIndex(
+			Objective forObjective, int index);
 
 
 	public TargetValueAllocationRecord findOneByTargetAndForObjectiveAndIndex(
