@@ -220,14 +220,14 @@ public class ObjectiveRestController {
 	}
 	
 	@RequestMapping(value="/Objective/{id}", method=RequestMethod.PUT)
-	public @ResponseBody Objective updateObjective(@PathVariable Long id,
+	public @ResponseBody String updateObjective(@PathVariable Long id,
 			@RequestBody JsonNode node) {
 		
 		// now we'll have to save this
 		Objective objectiveFromJpa = entityService.saveObjective(node);
 		
 		
-		return objectiveFromJpa;
+		return "success";
 		
 	}
 	

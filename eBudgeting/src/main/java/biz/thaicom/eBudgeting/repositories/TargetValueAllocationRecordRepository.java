@@ -27,4 +27,11 @@ public interface TargetValueAllocationRecordRepository extends
 	public TargetValueAllocationRecord findOneByIndexAndForObjectiveAndTarget(
 			int i, Objective o, ObjectiveTarget target);
 
+
+	@Query(""
+			+ "SELECT tvar "
+			+ "FROM TargetValueAllocationRecord tvar "
+			+ "WHERE tvar.target = ?1")
+	public List<TargetValueAllocationRecord> findAllByTarget(ObjectiveTarget t);
+
 }

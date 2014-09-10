@@ -1194,6 +1194,7 @@ alter table BGT_BUDGETSIGNOFFLOG
         
 -- version 18
 -- Modified Date: September 10, 2014
+update app_info set db_version = 18;
 alter table PLN_TARGETVALUE 
 add (requestedValueNext1Year number(19,0),
 	requestedValueNext2Year number(19,0),

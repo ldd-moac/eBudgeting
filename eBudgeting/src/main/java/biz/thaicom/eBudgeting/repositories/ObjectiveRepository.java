@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 
 import biz.thaicom.eBudgeting.models.pln.Objective;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveName;
+import biz.thaicom.eBudgeting.models.pln.ObjectiveTarget;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveType;
 
 public interface ObjectiveRepository extends PagingAndSortingRepository<Objective, Long>, JpaSpecificationExecutor<Objective>{
@@ -261,5 +262,12 @@ public interface ObjectiveRepository extends PagingAndSortingRepository<Objectiv
 			"	LEFT JOIN FETCH objective.children " +
 			"	LEFT JOIN FETCH objective.parent ")
 	public Iterable<Objective> findAllFetchChildrenParent();
+	
+	@Query("" +
+			"SELECT distinct objective " +
+			"FROM Objective objective "
+			+ "	INNER JOIN objective.targets t " +
+			"WHERE t = ?1 ")
+	public List<Objective> findAllByTarget(ObjectiveTarget t);
 
 }

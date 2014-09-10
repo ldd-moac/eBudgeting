@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import biz.thaicom.eBudgeting.models.pln.ObjectiveTarget;
 import biz.thaicom.eBudgeting.models.pln.TargetValue;
 
 public interface TargetValueRepository extends JpaSpecificationExecutor<TargetValue>,
@@ -67,6 +68,12 @@ public interface TargetValueRepository extends JpaSpecificationExecutor<TargetVa
 			"	INNER JOIN targetValue.owner owner " +
 			"WHERE owner.id =?1 and objective.id in (?3) and target.id = ?2 ")
 	public List<TargetValue> findAllByOnwerIdAndObjectiveIdIn(Long ownerId, Long targetId, List<Long> parentIds);
+
+	@Query(""
+			+ "SELECT targetValue "
+			+ "FROM TargetValue targetValue "
+			+ "WHERE targetValue.target = ?1 ")
+	public List<TargetValue> findAllByTarget(ObjectiveTarget t);
 
 
 	

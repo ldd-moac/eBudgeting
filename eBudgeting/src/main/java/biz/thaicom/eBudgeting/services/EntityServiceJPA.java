@@ -3509,6 +3509,9 @@ public class EntityServiceJPA implements EntityService {
 					newTv.setForObjective(parent);
 					newTv.setOwner(workAt);
 					newTv.setRequestedValue(requestedValue);
+					newTv.setRequestedValueNext1Year(requestedValueNext1Year);
+					newTv.setRequestedValueNext2Year(requestedValueNext2Year);
+					newTv.setRequestedValueNext3Year(requestedValueNext3Year);
 					
 					logger.debug("---------adding new tv with target.id: {}, requestedValue : {}",  matchingTarget.getId(), requestedValue);
 					targetValueRepository.save(newTv);
@@ -3954,6 +3957,16 @@ public class EntityServiceJPA implements EntityService {
 		
 		objectiveNameRepository.save(o);
 		
+		// now we'll update all objective
+		List<Objective> objectives = objectiveRepository.findAllByObjectiveName(o);
+		for(Objective obj : objectives) {
+			if(obj.getTargets() == null) {
+				obj.setTargets(new ArrayList<ObjectiveTarget>());
+			}
+			
+			obj.getTargets().add(t);
+		}
+		
 		
 		return t;
 	}
@@ -3965,8 +3978,23 @@ public class EntityServiceJPA implements EntityService {
 		
 		o.getTargets().remove(t);
 		
-		t.setUnit(null);
+		
 				
+		
+		
+		// now we'll have to delete every reference of this target!
+		List<TargetValue> values = targetValueRepository.findAllByTarget(t);
+		targetValueRepository.delete(values);
+		
+		List<TargetValueAllocationRecord> allocValues = targetValueAllocationRecordRepository.findAllByTarget(t);
+		targetValueAllocationRecordRepository.delete(allocValues);
+		
+		List<Objective> objectives = objectiveRepository.findAllByTarget(t);
+		for(Objective objective : objectives){
+			objective.getTargets().remove(t);
+		}
+		
+		t.setUnit(null);
 		objectiveTargetRepository.delete(t);
 		return "success";
 	}

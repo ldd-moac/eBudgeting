@@ -440,8 +440,9 @@ $(document).ready(function() {
 							lastPage++;
 						}
 						mainTblView.renderTargetPage(lastPage);						
+					} else {
+						mainTblView.render();
 					}
-					
 					this.$el.modal('hide');
 					
 				},this)
