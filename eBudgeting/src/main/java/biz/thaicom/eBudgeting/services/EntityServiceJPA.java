@@ -3925,13 +3925,24 @@ public class EntityServiceJPA implements EntityService {
 		o.getTargets().remove(t);
 		o.getObjectiveName().getTargets().remove(t);
 		
+
+
+		// now we'll have to delete every reference of this target!
+		List<TargetValue> values = targetValueRepository.findAllByTarget(t);
+		targetValueRepository.delete(values);
+		
+		List<TargetValueAllocationRecord> allocValues = targetValueAllocationRecordRepository.findAllByTarget(t);
+		targetValueAllocationRecordRepository.delete(allocValues);
+		
+		List<Objective> objectives = objectiveRepository.findAllByTarget(t);
+		for(Objective objective : objectives){
+			objective.getTargets().remove(t);
+		}
+		
 		t.setUnit(null);
-		
-		
 		objectiveTargetRepository.delete(t);
-				
-		
 		return "success";
+		
 	}
 	
 	@Override
