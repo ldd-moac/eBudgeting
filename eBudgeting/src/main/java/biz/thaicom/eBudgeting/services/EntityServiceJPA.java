@@ -1375,6 +1375,31 @@ public class EntityServiceJPA implements EntityService {
 					objectiveAllocationRecordRepository.save(newOar);
 				}
 				
+				// now we'll deal with TargetValue!
+				List<TargetValueAllocationRecord> tvars = 
+						targetValueAllocationRecordRepository.findAllByForObjective_FiscalYearAndIndex(fiscalYear, round-1);
+				targetValueAllocationRecordRepository.delete(tvars);
+				
+				tvars = targetValueAllocationRecordRepository.findAllByForObjective_FiscalYearAndIndex(fiscalYear, round-2);
+				logger.debug("getting ... " + tvars.size() + " records");
+				
+				List<TargetValueAllocationRecord> tvarsNew = 
+						new ArrayList<TargetValueAllocationRecord>();
+				
+				for(TargetValueAllocationRecord tvar : tvars) {
+					TargetValueAllocationRecord tvarNew = new TargetValueAllocationRecord();
+					
+					tvarNew.setForObjective(tvar.getForObjective());
+					tvarNew.setTarget(tvar.getTarget());
+					tvarNew.setIndex(round-1);
+					tvarNew.setAmountAllocated(tvar.getAmountAllocated());
+					
+					targetValueAllocationRecordRepository.save(tvarNew);
+					
+					tvarsNew.add(tvar);
+				}
+				logger.debug("saving ... " + tvarsNew.size() + " records");
+				targetValueAllocationRecordRepository.save(tvarsNew); 
 				
 			} else {
 
@@ -1785,6 +1810,10 @@ public class EntityServiceJPA implements EntityService {
 				returnList.add(o); 
 			} 
 			
+			for(ObjectiveTarget t :o.getTargets()) {
+				t.getUnit().getName();
+			}
+			
 			if(o.getProposals().size() > 0 ) {
 			
 				if(o.getChildren().size() >0) {
@@ -1941,6 +1970,7 @@ public class EntityServiceJPA implements EntityService {
 		
 		for(ObjectiveTarget target : targets) {
 			target.getForObjectives().size();
+			target.getUnit().getName();
 			
 			for(Objective o : target.getForObjectives()) {
 				//logger.debug("Adding objective target to list");
@@ -3572,16 +3602,18 @@ public class EntityServiceJPA implements EntityService {
 		
 		tvar.setAmountAllocated(requestedValue);
 		adjustedRequestedValue -= requestedValue;
+		logger.debug("about to save tvar... with " + tvar.getAmountAllocated());
 		targetValueAllocationRecordRepository.save(tvar);
 		
 		
 		for(Objective parent : objectiveRepository.findAllObjectiveByIds(obj.getParentIds())) {
 			TargetValueAllocationRecord parentTvar = targetValueAllocationRecordRepository.findOneByIndexAndForObjectiveAndTarget(tvar.getIndex(), parent, tvar.getTarget());
 			
+			if(parentTvar != null) {
+				parentTvar.adjustAmountAllocated(adjustedRequestedValue);
 			
-			parentTvar.adjustAmountAllocated(adjustedRequestedValue);
-			
-			targetValueAllocationRecordRepository.save(parentTvar);			
+				targetValueAllocationRecordRepository.save(parentTvar);
+			}
 			
 		}
 		
@@ -5216,6 +5248,13 @@ public class EntityServiceJPA implements EntityService {
 			logs = budgetSignOffLogRepository.findAllByFiscalYearRound(fiscalYear, round);
 		}
 		return logs;
+	}
+
+	@Override
+	public TargetValueAllocationRecord findTargetValueAllocationRecordById(
+			Long id) {
+		
+		return targetValueAllocationRecordRepository.findOne(id);
 	}
 	
 	

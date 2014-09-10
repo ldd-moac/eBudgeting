@@ -44,8 +44,8 @@
 			</div>
 			<div class="modal-body"></div>
 			<div class="modal-footer">
-				<a href="#" class="btn" id="cancelBtn">Close</a> <a href="#"
-					class="btn btn-primary" id="saveBtn">Save changes</a>
+				<a href="#" class="btn" id="cancelBtn">กลับหน้าหลัก</a> <a href="#"
+					class="btn btn-primary" id="saveBtn">บันทึกข้อมูล</a>
 			</div>
 		</div>
 	
@@ -620,7 +620,7 @@ Handlebars.registerHelper('next', function(val, next) {
 });
 
 
-$(document).ready(function() {
+$(document).rฆeady(function() {
 	Ext.QuickTips.init();
 
 	Ext.define('data.Model.Objective', {
@@ -636,6 +636,8 @@ $(document).ready(function() {
             }
 		},{
 			name: 'proposals', mapping: 'proposals'
+		},{
+			name: 'targetValueAllocationRecords', mapping: 'targetValueAllocationRecords'
 		},{
 			name: 'allocationRecordsR1', mapping: 'allocationRecordsR1'
 		},{
@@ -706,6 +708,20 @@ $(document).ready(function() {
         		});
         		return sum;
         	}
+        }, {
+        	name: 'targetValueAllocationRecordsR2',
+        	convert: function(v, rec) {
+        		var targetValues = new Array();
+        		
+        		_.forEach(rec.data.targetValueAllocationRecords, function(record) {
+        			if(record.index == 1) {        				
+        				targetValues.push(record)
+        			}	
+        		});
+
+        		return targetValues;
+        	}
+        
         }]
     });
 	

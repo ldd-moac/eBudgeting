@@ -44,8 +44,8 @@
 			</div>
 			<div class="modal-body"></div>
 			<div class="modal-footer">
-				<a href="#" class="btn" id="cancelBtn">Close</a> <a href="#"
-					class="btn btn-primary" id="saveBtn">Save changes</a>
+				<a href="#" class="btn" id="cancelBtn">กลับหน้าหลัก</a> <a href="#"
+					class="btn btn-primary" id="saveBtn">บันทึกข้อมูล</a>
 			</div>
 		</div>
 	
@@ -692,6 +692,20 @@ $(document).ready(function() {
         			}	
         		});
         		return sum;
+        	}
+        
+        }, {
+        	name: 'targetValueAllocationRecordsR1',
+        	convert: function(v, rec) {
+        		var targetValues = new Array();
+        		
+        		_.forEach(rec.data.targetValueAllocationRecords, function(record) {
+        			if(record.index == 0) {        				
+        				targetValues.push(record)
+        			}	
+        		});
+
+        		return targetValues;
         	}
         
         }]

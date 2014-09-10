@@ -34,4 +34,11 @@ public interface TargetValueAllocationRecordRepository extends
 			+ "WHERE tvar.target = ?1")
 	public List<TargetValueAllocationRecord> findAllByTarget(ObjectiveTarget t);
 
+	@Query(""
+			+ "SELECT tvar "
+			+ "FROM TargetValueAllocationRecord tvar "
+			+ "WHERE tvar.forObjective.fiscalYear = ?1 AND tvar.index = ?2 ")
+		public List<TargetValueAllocationRecord> findAllByForObjective_FiscalYearAndIndex(
+			Integer fiscalYear, int i);
+
 }

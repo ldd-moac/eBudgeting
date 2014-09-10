@@ -146,6 +146,13 @@ private static final Logger logger = LoggerFactory.getLogger(ObjectiveTargetRest
 	}
 	
 	
+	@RequestMapping(value="/TargetValueAllocationRecord/{id}", method=RequestMethod.GET)
+	public @ResponseBody TargetValueAllocationRecord getTargetValueAllocationRecord(
+			@PathVariable Long id,
+			@Activeuser ThaicomUserDetail currentUser) throws Exception {
+		return entityService.findTargetValueAllocationRecordById(id);
+	}
+	
 	@RequestMapping(value="/TargetValueAllocationRecord/{id}", method=RequestMethod.PUT)
 	public @ResponseBody TargetValueAllocationRecord updateTargetValueAllocationRecord(
 			@PathVariable Long id,

@@ -616,7 +616,7 @@ TargetValueAllocationRecord = Backbone.RelationalModel.extend({
 		key: 'target',
 		relatedModel : 'ObjectiveTarget'
 	}],
-	urlRoot: appUrl('/TargetValueAllocationRecord')
+	urlRoot: appUrl('/TargetValueAllocationRecord/')
 });
 
 

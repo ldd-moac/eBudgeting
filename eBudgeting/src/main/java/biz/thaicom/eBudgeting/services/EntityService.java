@@ -357,6 +357,9 @@ public interface EntityService {
 	// BudgetSignOffLog
 	public List<BudgetSignOffLog> findAllBudgetSignOffLog(Integer fiscalYear,
 			Integer round, ThaicomUserDetail currentUser);
+	
+	public TargetValueAllocationRecord findTargetValueAllocationRecordById(
+			Long id);
 
 
 	

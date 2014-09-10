@@ -401,12 +401,14 @@ var TargetValueModalView=Backbone.View.extend({
 		"click #saveBtn" : "saveTargetValue",
 		"click #cancelBtn" : "cancelTargetValue",
 	},
-	
+	setParentView: function(view) {
+		this.parentView = view;
+	},
 	targetValueModalTpl : Handlebars.compile($("#targetValueModalTemplate").html()),
 	render: function() {
 		
 		
-		this.$el.find('.modal-header span').html(this.objectiveTarget.get('name'));
+		this.$el.find('.modal-header span').html(this.objective.get('name'));
 		
 		var html = this.targetValueModalTpl(this.targetValue.toJSON());
 		this.$el.find('.modal-body').html(html);
@@ -422,6 +424,7 @@ var TargetValueModalView=Backbone.View.extend({
 	},
 	cancelTargetValue: function() {
 		this.$el.modal('hide');
+		this.parentView.reloadTable();
 	},
 	saveTargetValue: function() {
 		// we'll try to save
@@ -430,9 +433,10 @@ var TargetValueModalView=Backbone.View.extend({
 		this.targetValue.save({
 			 amountAllocated: input
 		}, {
-			success: function(){
-				window.location.reload();
-			}
+			success: _.bind(function(){
+				this.$el.modal('hide');
+				this.parentView.reloadTable();
+			},this)
 		});
 		
 		
@@ -442,13 +446,13 @@ var TargetValueModalView=Backbone.View.extend({
 	renderWith: function(objective, targetId, valueId) {
 		this.objective = objective;
 		this.objectiveTarget=ObjectiveTarget.findOrCreate(targetId);
-		this.targetValue=TargetValueAllocationRecord.findOrCreate(valueId);
-		if(this.targetValue == null) {
-			this.targetValue = new TargetValue();
-			this.targetValue.set('forObjective', objective);
-			this.targetValue.set('target', this.objectiveTarget);
-		}
-		this.render();
+		this.targetValue=TargetValueAllocationRecord.findOrCreate({id:valueId});
+		this.targetValue.fetch({
+			success: _.bind(function() {
+				this.render();
+			},this)
+		});
+		
 	}
 
 });
@@ -612,13 +616,16 @@ var MainCtrView = Backbone.View.extend({
 	},
 	
 	targetValueModal: function(e) {
-		var currentObjectiveId = $(e.target).parents('tr').attr('data-id');
-		var currentObjective = Objective.findOrCreate(currentObjectiveId);
-		
+		var currentObjectiveId = $(e.target).attr('objective-id');
 		var targetId = $(e.target).attr('target-id');
-		var valueId = $(e.target).attr('data-id');
-		
-		this.targetValueModalView.renderWith(currentObjective, targetId, valueId);
+		var valueId = $(e.target).attr('value-id');
+		this.targetValueModalView.setParentView(this);
+		var currentObjective = Objective.findOrCreate({id:currentObjectiveId});
+		currentObjective.fetch({
+			success: _.bind(function() {
+				this.targetValueModalView.renderWith(currentObjective, targetId, valueId);
+			},this)
+		});
 	},
 	
 	detailModal: function(e) {
@@ -714,7 +721,20 @@ var MainCtrView = Backbone.View.extend({
 	        	text: 'เป้าหมาย',
 	        	width: 80,
 	        	sortable: false,
-	        	align: 'center'
+	        	dataIndex: 'targetValueAllocationRecordsR2',
+	        	align: 'center',
+	        	renderer: function(value, metaData, record, rowIdx, colIdx, store) {
+	        		var html="";
+	        		for(var i=0; i<value.length; i++ ) {
+	        			if(i>0) {
+	        				html += "<br/>";
+	        			}
+	        			var unit = TargetUnit.findOrCreate(value[i].target.unit);
+	        			console.log(value[i]);
+	        			html += "<a href='#' class='targetValueModal' objective-id='"+value[i].forObjective+"' value-id='"+value[i].id+"' target-id='"+value[i].target.id+"'>"+addCommas(value[i].amountAllocated)+" " + unit.get('name') + "</a>"; 
+	        		}
+	        		return html;
+	        	}
 	        }, {
 	        	text: 'ขอตั้งปี ' + fiscalYear,
 	        	width: 120,
