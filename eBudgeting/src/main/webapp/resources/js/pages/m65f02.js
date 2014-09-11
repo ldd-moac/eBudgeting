@@ -666,149 +666,143 @@ var MainCtrView = Backbone.View.extend({
 	reloadTable: function() {
 		this.treeStore.reload();
 	},
-	renderMainTbl: function() {
+renderMainTbl: function() {
 		
-		//this.collection = new ObjectiveCollection();
+		this.collection = new ObjectiveCollection();
 		//this.rootCollection = new ObjectiveCollection();
 		
-		//this.collection.url = appUrl("/ObjectiveWithBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants");
+		this.collection.url = appUrl("/ObjectiveWithBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants");
 		
-		//this.$el.find('#mainTbl').html(this.loadingTemplate());
-		this.$el.find('#mainTbl').empty();
-		
-		
-		this.treeStore = Ext.create('Ext.data.TreeStore', {
-	        model: 'data.Model.Objective',
-	        proxy: {
-	            type: 'ajax',
-	            //the store will get the content from the .json file
-	            url: appUrl("/ObjectiveWithBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants")
-	        },
-	        folderSort: false
-	    });
-		
-		if(this.tree !=null) {
-			this.tree.destroy();
-		}
-		
-		this.tree = Ext.create('Ext.tree.Panel', {
-			id: 'treeGrid',
-	        title: 'การของบประมาณ',
-	        width: 820,
-	        height: 300,
-	        renderTo: Ext.getElementById('mainTbl'),
-	        collapsible: false,
-	        rootVisible: false,
-	        store: this.treeStore,
-	        columnLines: true, 
-	        rowLines: true,
-	        multiSelect: true,
-	        frame: true,
-	        columns: [{
-	             //this is so we know which column will show the tree
-	        	xtype: 'treecolumn',
-	            text: 'กิจกรรมรอง',
-	            sortable: true,
-	            dataIndex: 'codeAndName',
-	        	width: 300,
-	            locked: true,
-	            renderer: function(value, metaData, record, rowIdx, colIdx, store) {
-	                metaData.tdAttr = 'data-qtip="' + value + '"';
-	                if(record.data.children == null || record.data.children.length == 0) {
-	                	return "<a href='#' data-objectiveId=" + record.data.id +  " class='detail'>"+ value + "</a>";	
-	                }
-	                return value;
-	            }
-	        }, {
-	        	text: 'เป้าหมาย',
-	        	width: 80,
-	        	sortable: false,
-	        	dataIndex: 'targetValueAllocationRecordsR3',
-	        	align: 'center',
-	        	renderer: function(value, metaData, record, rowIdx, colIdx, store) {
-	        		var html="";
-	        		for(var i=0; i<value.length; i++ ) {
-	        			if(i>0) {
-	        				html += "<br/>";
-	        			}
-	        			console.log(value[i]);
-	        			
-	        			html += "<a href='#' class='targetValueModal' objective-id='"+value[i].forObjective+"' value-id='"+value[i].id+"' target-id='"+value[i].target.id+"'>"+addCommas(value[i].amountAllocated)+" " + value[i].target.unit.name + "</a>"; 
-	        		}
-	        		return html;
-	        	}
-	        }, {
-	        	text: 'ขอตั้งปี ' + fiscalYear,
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumProposals',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
-	        }, {
-	        	text: 'ปรับลดครั้งที่ 1',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumAllocationR1',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'ปรับลดครั้งที่ 2',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumAllocationR2',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'ปรับลดครั้งที่ 3',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumAllocationR3',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+1),
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumProposalsNext1year',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
-	        }, {
-	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+2),
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumProposalsNext2year',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
-	        }, {
-	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+3),
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumProposalsNext3year',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
-	        }]
-		});	
+		this.collection.fetch({
+			success: _.bind(function() {
+				//this.$el.find('#mainTbl').html(this.loadingTemplate());
+				var json = {};
+				json.objectives = this.collection.toJSON();
+				
+				this.$el.find('#mainTbl').empty();
+				
+				this.treeStore = Ext.create('Ext.data.TreeStore', {
+			        model: 'data.Model.Objective',
+			        storeId: 'treeObjectiveStore',
+			        proxy: {
+			            type: 'memory',
+			            data: json.objectives,
+			            reader: {
+			            	type: 'json'
+			            }
+			            //the store will get the content from the .json file
+			            //url: appUrl("/ObjectiveWithBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants")
+			        },
+			        folderSort: false
+			    });
+				
+				if(this.tree !=null) {
+					this.tree.destroy();
+				}
+				
+				this.tree = Ext.create('Ext.tree.Panel', {
+					id: 'treeGrid',
+			        title: 'การของบประมาณ',
+			        width: 820,
+			        height: 300,
+			        renderTo: Ext.getElementById('mainTbl'),
+			        collapsible: false,
+			        rootVisible: false,
+			        store: this.treeStore,
+			        columnLines: true, 
+			        rowLines: true,
+			        multiSelect: true,
+			        frame: true,
+			        columns: [{
+			             //this is so we know which column will show the tree
+			        	xtype: 'treecolumn',
+			            text: 'กิจกรรมรอง',
+			            sortable: true,
+			            dataIndex: 'codeAndName',
+			        	width: 300,
+			            locked: true,
+			            renderer: function(value, metaData, record, rowIdx, colIdx, store) {
+			            	
+			                metaData.tdAttr = 'data-qtip="' + value + '"';
+			                if(record.data.children == null || record.data.children.length == 0) {
+			                	return "<a href='#' data-objectiveId=" + record.data.id +  " class='detail'>"+ value + "</a>";	
+			                }
+			                
+			                return value;
+			            }
+			        }, {
+			        	text: 'เป้าหมาย',
+			        	width: 80,
+			        	sortable: false,
+			        	dataIndex: 'targetValueAllocationRecordsR3',
+			        	align: 'center',
+			        	renderer: function(value, metaData, record, rowIdx, colIdx, store) {
+			        		var html="";
+			        		for(var i=0; i<value.length; i++ ) {
+			        			if(i>0) {
+			        				html += "<br/>";
+			        			}
+			        			var unit = TargetUnit.findOrCreate(value[i].target.unit);
+			        			console.log(value[i]);
+			        			html += "<a href='#' class='targetValueModal' objective-id='"+value[i].forObjective+"' value-id='"+value[i].id+"' target-id='"+value[i].target.id+"'>"+addCommas(value[i].amountAllocated)+" " + unit.get('name') + "</a>"; 
+			        		}
+			        		return html;
+			        	}
+			        }, {
+			        	text: 'ขอตั้งปี ' + fiscalYear,
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumProposals',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        	
+			        }, {
+			        	text: 'ปรับลดครั้งที่ 1',
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumAllocationR1',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        		
+			        }, {
+			        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+1),
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumProposalsNext1year',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        	
+			        }, {
+			        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+2),
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumProposalsNext2year',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        	
+			        }, {
+			        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+3),
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumProposalsNext3year',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        	
+			        }]
+				});	
+				
+				
+			}, this)
+		});
 	}
 });
-	
