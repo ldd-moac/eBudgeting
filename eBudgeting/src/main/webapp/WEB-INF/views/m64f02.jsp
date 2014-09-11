@@ -620,7 +620,7 @@ Handlebars.registerHelper('next', function(val, next) {
 });
 
 
-$(document).rฆeady(function() {
+$(document).ready(function() {
 	Ext.QuickTips.init();
 
 	Ext.define('data.Model.Objective', {
