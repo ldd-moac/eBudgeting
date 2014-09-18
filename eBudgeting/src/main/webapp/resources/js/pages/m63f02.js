@@ -41,7 +41,7 @@ var DetailModalView = Backbone.View.extend({
 	},
 	cancelBtn : function(e) {
 		this.$el.modal('hide');
-		this.parentView.reloadTable();
+		//this.parentView.renderMainTbl();
 		
 	},
 	backToProposal : function(e) {
@@ -85,14 +85,14 @@ var DetailModalView = Backbone.View.extend({
 	},
 	detailAllocation: function(e) {
 		var allocationRecord = AllocationRecord.findOrCreate($(e.target).attr('data-allocationId'));
-		allocationRecord.fetch({
-			success: _.bind(function(model, response, options) {
+//		allocationRecord.fetch({
+//			success: _.bind(function(model, response, options) {
 				this.$el.find('.modal-footer').html(this.detailAllocationRecordFooterTemplate());
-				e1=model;
-				var json = model.toJSON();
+				//e1=model;
+				var json = allocationRecord.toJSON();
 				var html;
-				if(model.get('allocationRecordStrategies') != null && 
-						model.get('allocationRecordStrategies').length > 0) {
+				if(allocationRecord.get('allocationRecordStrategies') != null && 
+						allocationRecord.get('allocationRecordStrategies').length > 0) {
 					html = this.detailAllocationRecordTemplate(json);
 				} else {
 					html = this.detailAllocationRecordBasicTemplate(json);
@@ -101,8 +101,8 @@ var DetailModalView = Backbone.View.extend({
 				
 				
 				this.$el.find('.modal-body').html(html);
-			},this)
-		});
+//			},this)
+//		});
 	},
 	detailBasicAllocation : function(e) {
 		var allocRec = AllocationRecord.findOrCreate($(e.target).attr('data-allocationId'));
@@ -137,14 +137,33 @@ var DetailModalView = Backbone.View.extend({
 		var allocRec = AllocationRecord.findOrCreate(this.$el.find('#allocRecId').attr('data-id'));
 		var totalInputTxt = this.$el.find('#totalInputTxt').val();
 		
-		// now see to its change!
-		allocRec.set('amountAllocated', parseInt(totalInputTxt));
+		
 		
 		// and we can save
-		allocRec.save(null, {
-			success:function(model, response, options) {
+		allocRec.save({amountAllocated: parseInt(totalInputTxt)
+			} , {
+			success: _.bind(function(model, response, options) {
+				// now see to its change!
+				allocRec.set('amountAllocated', parseInt(totalInputTxt));
+				
 				alert('บันทึกเรียบร้อยแล้ว');
-			}
+				
+				var store=Ext.getStore('treeObjectiveStore');
+				var node = store.getNodeById(this.currentObjective.get('id'));
+				
+				var sum =0;
+				
+				for(var i=0; i<node.data.allocationRecordsR1.length; i++) {
+					if(allocRec.get('id') == node.data.allocationRecordsR1[i].id) {
+						node.data.allocationRecordsR1[i].amountAllocated=allocRec.get('amountAllocated');
+					}
+					sum+=node.data.allocationRecordsR1[i].amountAllocated;
+				}
+				
+				node.data.sumAllocationR1=sum;
+				node.commit();
+				
+			},this)
 		});
 		
 		
@@ -213,17 +232,48 @@ var DetailModalView = Backbone.View.extend({
 			allocRecStrgy.set('totalCalculatedAmount', calculatedAmount);
 		
 		}
-		// now we update allocRec
-		var record = allocRecStrgy.get('allocationRecord');
-		record.set('amountAllocated', record.get('amountAllocated') - adjustedAmount);
-		
+			
 		// then save!
 		allocRecStrgy.save(null, {
-			success:function(model, response, options) {
-				alert('บันทึกเรียบร้อยแล้ว');
-			}
+			success:_.bind(function(model, response, options) {
+				// now we update allocRec
+				var record = allocRecStrgy.get('allocationRecord');
+				record.set('amountAllocated', record.get('amountAllocated') - adjustedAmount);
+				alert('บันทึกเรียบร้อยแล้ว1');
+				
+				var store=Ext.getStore('treeObjectiveStore');
+				var node = store.getNodeById(this.currentObjective.get('id'));
+				
+				var sum =0;
+				
+				for(var i=0; i<node.data.allocationRecordsR1.length; i++) {
+					if(record.get('id') == node.data.allocationRecordsR1[i].id) {
+						node.data.allocationRecordsR1[i].amountAllocated=record.get('amountAllocated');
+					}
+					sum+=node.data.allocationRecordsR1[i].amountAllocated;
+				}
+				
+				alert('sum=' + sum);
+				
+				node.data.sumAllocationR1=sum;
+				node.commit();
+				
+				// now update parent!
+				this.updateNode(node.parentNode, adjustedAmount);
+				
+			},this)
 		});
 		
+		
+	},
+	
+	updateNode: function(node, adjustedAmount) {
+		if(node == null) return;
+		
+		node.data.sumAllocationR1 = node.data.sumAllocationR1 - adjustedAmount;
+		node.commit();
+		
+		this.updateNode(node.parentNode, adjustedAmount);
 		
 	},
 	
@@ -422,7 +472,7 @@ var TargetValueModalView=Backbone.View.extend({
 	},
 	cancelTargetValue: function() {
 		this.$el.modal('hide');
-		this.parentView.reloadTable();
+		//this.parentView.reloadTable();
 	},
 	saveTargetValue: function() {
 		// we'll try to save
@@ -443,6 +493,8 @@ var TargetValueModalView=Backbone.View.extend({
 				for(var i=0; i<tvars.length; i++) {
 					if(tvars[i].id==this.targetValue.get('id')) {
 						tvars[i].amountAllocated = input;
+						
+						continue;
 					}
 				}
 				
@@ -633,23 +685,14 @@ var MainCtrView = Backbone.View.extend({
 		var valueId = $(e.target).attr('value-id');
 		this.targetValueModalView.setParentView(this);
 		var currentObjective = Objective.findOrCreate({id:currentObjectiveId});
-//		currentObjective.fetch({
-//			success: _.bind(function() {
-				this.targetValueModalView.renderWith(currentObjective, targetId, valueId);
-//			},this)
-//		});
-		
-
-		
+		this.targetValueModalView.renderWith(currentObjective, targetId, valueId);
 		
 	},
 	
 	detailModal: function(e) {
 		
 		var currentObjectiveId = $(e.target).attr('data-objectiveId');
-		
-		//var budgetProposalCollection = new BudgetProposalCollection();
-		this.currentObjective = Objective.findOrCreate( this.treeStore.getById(currentObjectiveId).raw);
+		this.currentObjective = Objective.findOrCreate({id: currentObjectiveId});
 		this.detailModalView.setParentView(this);
 		this.detailModalView.renderWithObjective(this.currentObjective);
 		
@@ -684,7 +727,9 @@ var MainCtrView = Backbone.View.extend({
 		
 		this.collection = new ObjectiveCollection();
 		//this.rootCollection = new ObjectiveCollection();
-		
+		if(this.tree != null) {
+			 this.tree.destroy();
+		}
 		this.collection.url = appUrl("/ObjectiveWithBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants");
 		this.json = {};
 		
