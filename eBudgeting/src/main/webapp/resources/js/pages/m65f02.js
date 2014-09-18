@@ -41,7 +41,6 @@ var DetailModalView = Backbone.View.extend({
 	},
 	cancelBtn : function(e) {
 		this.$el.modal('hide');
-		this.parentView.reloadTable();
 		
 	},
 	backToProposal : function(e) {
@@ -145,10 +144,30 @@ var DetailModalView = Backbone.View.extend({
 		allocRec.set('amountAllocated', parseInt(totalInputTxt));
 		
 		// and we can save
-		allocRec.save(null, {
-			success:function(model, response, options) {
+		allocRec.save({amountAllocated: parseInt(totalInputTxt)
+			} , {
+			success: _.bind(function(model, response, options) {
+				// now see to its change!
+				allocRec.set('amountAllocated', parseInt(totalInputTxt));
+				
 				alert('บันทึกเรียบร้อยแล้ว');
-			}
+				
+				var store=Ext.getStore('treeObjectiveStore');
+				var node = store.getNodeById(this.currentObjective.get('id'));
+				
+				var sum =0;
+				
+				for(var i=0; i<node.data.allocationRecordsR3.length; i++) {
+					if(allocRec.get('id') == node.data.allocationRecordsR3[i].id) {
+						node.data.allocationRecordsR3[i].amountAllocated=allocRec.get('amountAllocated');
+					}
+					sum+=node.data.allocationRecordsR3[i].amountAllocated;
+				}
+				
+				node.data.sumAllocationR3=sum;
+				node.commit();
+				
+			},this)
 		});
 		
 		
@@ -223,11 +242,42 @@ var DetailModalView = Backbone.View.extend({
 		
 		// then save!
 		allocRecStrgy.save(null, {
-			success:function(model, response, options) {
+			success:_.bind(function(model, response, options) {
+				// now we update allocRec
+				var record = allocRecStrgy.get('allocationRecord');
+				record.set('amountAllocated', record.get('amountAllocated') - adjustedAmount);
 				alert('บันทึกเรียบร้อยแล้ว');
-			}
+				
+				var store=Ext.getStore('treeObjectiveStore');
+				var node = store.getNodeById(this.currentObjective.get('id'));
+				
+				var sum =0;
+				
+				for(var i=0; i<node.data.allocationRecordsR3.length; i++) {
+					if(record.get('id') == node.data.allocationRecordsR1[i].id) {
+						node.data.allocationRecordsR3[i].amountAllocated=record.get('amountAllocated');
+					}
+					sum+=node.data.allocationRecordsR3[i].amountAllocated;
+				}
+				
+				node.data.sumAllocationR3=sum;
+				node.commit();
+				
+				// now update parent!
+				this.updateNode(node.parentNode, adjustedAmount);
+				
+			},this)
 		});
 		
+		
+	},
+	updateNode: function(node, adjustedAmount) {
+		if(node == null) return;
+		
+		node.data.sumAllocationR1 = node.data.sumAllocationR1 - adjustedAmount;
+		node.commit();
+		
+		this.updateNode(node.parentNode, adjustedAmount);
 		
 	},
 	
@@ -426,7 +476,6 @@ var TargetValueModalView=Backbone.View.extend({
 	},
 	cancelTargetValue: function() {
 		this.$el.modal('hide');
-		this.parentView.reloadTable();
 	},
 	saveTargetValue: function() {
 		// we'll try to save
@@ -436,12 +485,27 @@ var TargetValueModalView=Backbone.View.extend({
 			 amountAllocated: input
 		}, {
 			success: _.bind(function(){
+				this.targetValue.set('amountAllocated', input);
+				
+				// now update 
+				var store=Ext.getStore('treeObjectiveStore');
+				var node = store.getNodeById(this.objective.get('id'));
+				
+				var tvars = node.data.targetValueAllocationRecordsR3;
+				
+				for(var i=0; i<tvars.length; i++) {
+					if(tvars[i].id==this.targetValue.get('id')) {
+						tvars[i].amountAllocated = input;
+						
+						continue;
+					}
+				}
+				
+				node.commit();
+				
 				this.$el.modal('hide');
-				this.parentView.reloadTable();
 			},this)
 		});
-		
-		
 		
 	},
 	

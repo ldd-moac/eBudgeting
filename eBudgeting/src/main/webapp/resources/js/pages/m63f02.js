@@ -239,7 +239,7 @@ var DetailModalView = Backbone.View.extend({
 				// now we update allocRec
 				var record = allocRecStrgy.get('allocationRecord');
 				record.set('amountAllocated', record.get('amountAllocated') - adjustedAmount);
-				alert('บันทึกเรียบร้อยแล้ว1');
+				alert('บันทึกเรียบร้อยแล้ว');
 				
 				var store=Ext.getStore('treeObjectiveStore');
 				var node = store.getNodeById(this.currentObjective.get('id'));
@@ -252,8 +252,6 @@ var DetailModalView = Backbone.View.extend({
 					}
 					sum+=node.data.allocationRecordsR1[i].amountAllocated;
 				}
-				
-				alert('sum=' + sum);
 				
 				node.data.sumAllocationR1=sum;
 				node.commit();
