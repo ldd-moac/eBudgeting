@@ -40,6 +40,13 @@ public class TargetValueAllocationRecord implements Serializable {
 	@Basic
 	private Long amountAllocated;
 	
+	@Basic
+	private Long amountAllocatedNext1Year;
+	@Basic
+	private Long amountAllocatedNext2Year;
+	@Basic
+	private Long amountAllocatedNext3Year;
+	
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="OBJECTIVETARGET_ID")
 	private ObjectiveTarget target;
@@ -92,6 +99,52 @@ public class TargetValueAllocationRecord implements Serializable {
 		this.amountAllocated -= adjustedRequestedValue;
 		
 	}
+	
+	public void adjustAmountAllocated(Long adjustedRequestedValue, 
+			Long adjustedRequestedValueNext1Year,
+			Long adjustedRequestedValueNext2Year,
+			Long adjustedRequestedValueNext3Year) {
+		this.amountAllocated -= adjustedRequestedValue;
+		this.amountAllocatedNext1Year -= adjustedRequestedValueNext1Year;
+		this.amountAllocatedNext2Year -= adjustedRequestedValueNext2Year;
+		this.amountAllocatedNext3Year -= adjustedRequestedValueNext3Year;
+	}
+	
+	public void adjustAmountAllocatedOfNextYear(Long adjustedRequestedValue, Integer year) {
+		if(year == 1) {
+			this.amountAllocatedNext1Year -= adjustedRequestedValue;
+		} else if (year == 2) {
+			this.amountAllocatedNext2Year -= adjustedRequestedValue;
+		} else if (year == 3) {
+			this.amountAllocatedNext3Year -= adjustedRequestedValue;
+		}
+		
+	}
+
+	public Long getAmountAllocatedNext1Year() {
+		return amountAllocatedNext1Year;
+	}
+
+	public void setAmountAllocatedNext1Year(Long amountAllocatedNext1Year) {
+		this.amountAllocatedNext1Year = amountAllocatedNext1Year;
+	}
+
+	public Long getAmountAllocatedNext2Year() {
+		return amountAllocatedNext2Year;
+	}
+
+	public void setAmountAllocatedNext2Year(Long amountAllocatedNext2Year) {
+		this.amountAllocatedNext2Year = amountAllocatedNext2Year;
+	}
+
+	public Long getAmountAllocatedNext3Year() {
+		return amountAllocatedNext3Year;
+	}
+
+	public void setAmountAllocatedNext3Year(Long amountAllocatedNext3Year) {
+		this.amountAllocatedNext3Year = amountAllocatedNext3Year;
+	}
+	
 	
 	
 }
