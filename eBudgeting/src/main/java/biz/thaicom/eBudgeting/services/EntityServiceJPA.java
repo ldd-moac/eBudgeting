@@ -1326,6 +1326,9 @@ public class EntityServiceJPA implements EntityService {
 				for(AllocationRecord r : previousArList) {
 					AllocationRecord newR = new AllocationRecord();
 					newR.setAmountAllocated(r.getAmountAllocated());
+					newR.setAmountAllocatedNext1Year(r.getAmountAllocatedNext1Year());
+					newR.setAmountAllocatedNext2Year(r.getAmountAllocatedNext2Year());
+					newR.setAmountAllocatedNext3Year(r.getAmountAllocatedNext3Year());
 					newR.setBudgetType(r.getBudgetType());
 					newR.setIndex(round-1);
 					newR.setForObjective(r.getForObjective());
@@ -1393,6 +1396,10 @@ public class EntityServiceJPA implements EntityService {
 					tvarNew.setTarget(tvar.getTarget());
 					tvarNew.setIndex(round-1);
 					tvarNew.setAmountAllocated(tvar.getAmountAllocated());
+					tvarNew.setAmountAllocatedNext1Year(tvar.getAmountAllocatedNext1Year());
+					tvarNew.setAmountAllocatedNext2Year(tvar.getAmountAllocatedNext2Year());
+					tvarNew.setAmountAllocatedNext3Year(tvar.getAmountAllocatedNext3Year());
+					
 					
 					targetValueAllocationRecordRepository.save(tvarNew);
 					
@@ -1402,7 +1409,7 @@ public class EntityServiceJPA implements EntityService {
 				targetValueAllocationRecordRepository.save(tvarsNew); 
 				
 			} else {
-
+			// this is Round 1
 			// here we have to remove objAllocationRecord and its associated 
 			List<ObjectiveAllocationRecord> objArList = objectiveAllocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, round-1);
 			logger.debug("deleting... " + objArList.size()+ " records...") ;
@@ -1468,6 +1475,9 @@ public class EntityServiceJPA implements EntityService {
 					} else {
 						
 						ar.setAmountAllocated(ar.getAmountAllocated() + p.getAmountRequest());
+						ar.setAmountAllocatedNext1Year(ar.getAmountAllocatedNext1Year() + p.getAmountRequestNext1Year());
+						ar.setAmountAllocatedNext2Year(ar.getAmountAllocatedNext2Year() + p.getAmountRequestNext2Year());
+						ar.setAmountAllocatedNext3Year(ar.getAmountAllocatedNext3Year() + p.getAmountRequestNext3Year());
 						
 					}
 					allocationRecordRepository.save(ar);
@@ -1548,6 +1558,9 @@ public class EntityServiceJPA implements EntityService {
 					tvar.setTarget(target);
 					tvar.setIndex(round-1);
 					tvar.setAmountAllocated(0L);
+					tvar.setAmountAllocatedNext1Year(0L);
+					tvar.setAmountAllocatedNext2Year(0L);
+					tvar.setAmountAllocatedNext3Year(0L);
 					
 					tvarMap.put(target.getId(), tvar);
 					
@@ -1559,6 +1572,12 @@ public class EntityServiceJPA implements EntityService {
 					TargetValueAllocationRecord tvar = tvarMap.get(tv.getTarget().getId());
 						
 					tvar.setAmountAllocated(tvar.getAmountAllocated() + tv.getRequestedValue());
+					tvar.setAmountAllocatedNext1Year(
+							tvar.getAmountAllocatedNext1Year() + tv.getRequestedValueNext1Year());
+					tvar.setAmountAllocatedNext2Year(
+							tvar.getAmountAllocatedNext2Year() + tv.getRequestedValueNext2Year());
+					tvar.setAmountAllocatedNext3Year(
+							tvar.getAmountAllocatedNext3Year() + tv.getRequestedValueNext3Year());
 				}
 				targetValueAllocationRecordRepository.save(tvars);
 			}
@@ -3042,8 +3061,14 @@ public class EntityServiceJPA implements EntityService {
 		Integer index = ars.getAllocationRecord().getIndex();
 		if(ars != null) {
 			Long amountUpdate = data.get("totalCalculatedAmount").asLong();
+			Long amountAllocatedNext1Year = data.get("allocationRecord").get("amountAllocatedNext1Year").asLong();
+			Long amountAllocatedNext2Year = data.get("allocationRecord").get("amountAllocatedNext2Year").asLong();
+			Long amountAllocatedNext3Year = data.get("allocationRecord").get("amountAllocatedNext3Year").asLong();
+			
+			
 			
 			ars.setTotalCalculatedAmount(amountUpdate);
+			
 			
 			for(JsonNode rcNode : data.get("requestColumns")) {
 				RequestColumn rc = requestColumnRepositories.findOne(rcNode.get("id").asLong());
@@ -3056,6 +3081,14 @@ public class EntityServiceJPA implements EntityService {
 			// then we update the allocation!
 			AllocationRecord record = ars.getAllocationRecord();
 			record.setAmountAllocated(allocationRecordStrategyRepository.findSumTotalCalculatedAmount(record));
+			Long adjustAllocatedNext1Year = record.getAmountAllocatedNext1Year() - amountAllocatedNext1Year;
+			Long adjustAllocatedNext2Year = record.getAmountAllocatedNext2Year() - amountAllocatedNext2Year;
+			Long adjustAllocatedNext3Year = record.getAmountAllocatedNext3Year() - amountAllocatedNext3Year;
+			
+			record.setAmountAllocatedNext1Year(amountAllocatedNext1Year);
+			record.setAmountAllocatedNext2Year(amountAllocatedNext2Year);
+			record.setAmountAllocatedNext3Year(amountAllocatedNext3Year);
+			
 			
 			
 			//record.adjustAmountAllocated(adjustedAmount);
@@ -3068,6 +3101,8 @@ public class EntityServiceJPA implements EntityService {
 				AllocationRecord temp = allocationRecordRepository.findOneByBudgetTypeAndObjectiveAndIndex(record.getBudgetType(), parent, index);
 				
 				temp.setAmountAllocated(allocationRecordRepository.findSumAmountAllocationOfBudgetTypeAndParent(record.getBudgetType(), parent, index));
+				temp.adjustAmountAllocated(0L,
+						adjustAllocatedNext1Year, adjustAllocatedNext2Year, adjustAllocatedNext3Year);
 				
 				allocationRecordRepository.save(temp);
 				
@@ -3590,18 +3625,37 @@ public class EntityServiceJPA implements EntityService {
 		Long objectiveTargetId = node.get("target").get("id").asLong();
 		ObjectiveTarget target = objectiveTargetRepository.findOne(objectiveTargetId);
 		
-		Long adjustedRequestedValue = 0L;
-		Long requestedValue = node.get("amountAllocated").asLong();
+		Long adjustedAllocatedValue = 0L;
+		Long adjustedAllocatedValueNext1Year = 0L;
+		Long adjustedAllocatedValueNext2Year = 0L;
+		Long adjustedAllocatedValueNext3Year = 0L;
+		Long amountAllocated = node.get("amountAllocated").asLong();
+		Long amountAllocatedNext1Year = node.get("amountAllocatedNext1Year").asLong();
+		Long amountAllocatedNext2Year = node.get("amountAllocatedNext2Year").asLong();
+		Long amountAllocatedNext3Year = node.get("amountAllocatedNext3Year").asLong();
 		
 		TargetValueAllocationRecord tvar;
 		tvar = targetValueAllocationRecordRepository.findOne(tvarId);
 		
-		adjustedRequestedValue = tvar.getAmountAllocated();
+		adjustedAllocatedValue = tvar.getAmountAllocated();
+		adjustedAllocatedValueNext1Year = tvar.getAmountAllocatedNext1Year();
+		adjustedAllocatedValueNext2Year = tvar.getAmountAllocatedNext2Year();
+		adjustedAllocatedValueNext3Year = tvar.getAmountAllocatedNext3Year();
 			
 	
 		
-		tvar.setAmountAllocated(requestedValue);
-		adjustedRequestedValue -= requestedValue;
+		tvar.setAmountAllocated(amountAllocated);
+		tvar.setAmountAllocatedNext1Year(amountAllocatedNext1Year);
+		tvar.setAmountAllocatedNext2Year(amountAllocatedNext2Year);
+		tvar.setAmountAllocatedNext3Year(amountAllocatedNext3Year);
+		
+		
+		adjustedAllocatedValue -= amountAllocated;
+		adjustedAllocatedValueNext1Year -= amountAllocatedNext1Year;
+		adjustedAllocatedValueNext2Year -= amountAllocatedNext2Year;
+		adjustedAllocatedValueNext3Year -= amountAllocatedNext3Year;
+		
+		
 		logger.debug("about to save tvar... with " + tvar.getAmountAllocated());
 		targetValueAllocationRecordRepository.save(tvar);
 		
@@ -3610,7 +3664,12 @@ public class EntityServiceJPA implements EntityService {
 			TargetValueAllocationRecord parentTvar = targetValueAllocationRecordRepository.findOneByIndexAndForObjectiveAndTarget(tvar.getIndex(), parent, tvar.getTarget());
 			
 			if(parentTvar != null) {
-				parentTvar.adjustAmountAllocated(adjustedRequestedValue);
+				parentTvar.adjustAmountAllocated(
+						adjustedAllocatedValue,
+						adjustedAllocatedValueNext1Year,
+						adjustedAllocatedValueNext2Year,
+						adjustedAllocatedValueNext3Year
+						);
 			
 				targetValueAllocationRecordRepository.save(parentTvar);
 			}

@@ -33,8 +33,6 @@ import biz.thaicom.eBudgeting.models.bgt.BudgetSignOffLog;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
-import biz.thaicom.eBudgeting.models.hrx.Organization;
-import biz.thaicom.eBudgeting.repositories.BudgetSignOffLogRepository;
 import biz.thaicom.eBudgeting.services.EntityService;
 import biz.thaicom.security.models.Activeuser;
 import biz.thaicom.security.models.ThaicomUserDetail;

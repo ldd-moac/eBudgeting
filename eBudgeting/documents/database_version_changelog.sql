@@ -1199,4 +1199,16 @@ alter table PLN_TARGETVALUE
 add (requestedValueNext1Year number(19,0),
 	requestedValueNext2Year number(19,0),
 	requestedValueNext3Year number(19,0));
-        
+
+-- version 19
+-- Modified Date: September 20, 2014
+update app_info set db_version = 20;
+alter table BGT_ALLOCATIONRECORD
+add (amountAllocatedNext1Year number(19,0),
+	amountAllocatedNext2Year number(19,0),
+	amountAllocatedNext3Year number(19,0));
+	
+alter table PLN_TARGETVALUEALLOCRECORD
+add (amountAllocatedNext1Year number(19,0),
+	amountAllocatedNext2Year number(19,0),
+	amountAllocatedNext3Year number(19,0));

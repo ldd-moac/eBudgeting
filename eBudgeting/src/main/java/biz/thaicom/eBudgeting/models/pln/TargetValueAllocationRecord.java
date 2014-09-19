@@ -72,6 +72,7 @@ public class TargetValueAllocationRecord implements Serializable {
 	}
 
 	public Long getAmountAllocated() {
+		if(amountAllocated == null) return 0L;
 		return amountAllocated;
 	}
 
@@ -104,6 +105,11 @@ public class TargetValueAllocationRecord implements Serializable {
 			Long adjustedRequestedValueNext1Year,
 			Long adjustedRequestedValueNext2Year,
 			Long adjustedRequestedValueNext3Year) {
+		if(this.amountAllocated == null)  amountAllocated = 0L;
+		if(this.amountAllocatedNext1Year == null)  amountAllocatedNext1Year = 0L;
+		if(this.amountAllocatedNext2Year == null)  amountAllocatedNext2Year = 0L;
+		if(this.amountAllocatedNext3Year == null)  amountAllocatedNext3Year = 0L;
+		
 		this.amountAllocated -= adjustedRequestedValue;
 		this.amountAllocatedNext1Year -= adjustedRequestedValueNext1Year;
 		this.amountAllocatedNext2Year -= adjustedRequestedValueNext2Year;
@@ -111,6 +117,10 @@ public class TargetValueAllocationRecord implements Serializable {
 	}
 	
 	public void adjustAmountAllocatedOfNextYear(Long adjustedRequestedValue, Integer year) {
+		if(this.amountAllocatedNext1Year == null)  amountAllocatedNext1Year = 0L;
+		if(this.amountAllocatedNext2Year == null)  amountAllocatedNext2Year = 0L;
+		if(this.amountAllocatedNext3Year == null)  amountAllocatedNext3Year = 0L;
+		
 		if(year == 1) {
 			this.amountAllocatedNext1Year -= adjustedRequestedValue;
 		} else if (year == 2) {
@@ -122,6 +132,7 @@ public class TargetValueAllocationRecord implements Serializable {
 	}
 
 	public Long getAmountAllocatedNext1Year() {
+		if(amountAllocatedNext1Year == null) return 0L;
 		return amountAllocatedNext1Year;
 	}
 
@@ -130,6 +141,7 @@ public class TargetValueAllocationRecord implements Serializable {
 	}
 
 	public Long getAmountAllocatedNext2Year() {
+		if(amountAllocatedNext2Year == null) return 0L;
 		return amountAllocatedNext2Year;
 	}
 
@@ -138,6 +150,7 @@ public class TargetValueAllocationRecord implements Serializable {
 	}
 
 	public Long getAmountAllocatedNext3Year() {
+		if(amountAllocatedNext3Year == null) return 0L;
 		return amountAllocatedNext3Year;
 	}
 
