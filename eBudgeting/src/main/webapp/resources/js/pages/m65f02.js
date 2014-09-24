@@ -78,18 +78,30 @@ var DetailModalView = Backbone.View.extend({
 		_.forEach(json.sumBudgetTypeProposals, _.bind(function(proposal) {
 			var budgetType = BudgetType.findOrCreate({id:proposal.budgetType.id});
 			// search the allocationR1 
-			var allocationRecord = this.currentObjective.get('allocationRecordsR3').findWhere({budgetType:budgetType});
+			var allocationRecord = this.currentObjective.get('allocationRecordsR'+round).findWhere({budgetType:budgetType});
 			if(allocationRecord  != null) {
 				var r1 = this.currentObjective.get('allocationRecordsR1').findWhere({budgetType:budgetType});
 				var r2 = this.currentObjective.get('allocationRecordsR2').findWhere({budgetType:budgetType});
-				proposal.amountAllocatedR1 = r1.get('amountAllocated');
-				proposal.amountAllocatedR2 = r2.get('amountAllocated');
-				proposal.amountAllocated = allocationRecord.get('amountAllocated');
+				var r3 = this.currentObjective.get('allocationRecordsR3').findWhere({budgetType:budgetType});
+				proposal.rounds = new Array(round);
+				json.rounds = new Array(round);
+				for(var i=0; i<round; i++) {
+					var roundNum=i+1;
+					var r = this.currentObjective.get('allocationRecordsR'+roundNum).findWhere({budgetType:budgetType});
+					proposal.rounds[i]={};
+					proposal.rounds[i].amountAllocated = r.get('amountAllocated');
+					proposal.rounds[i].round =1;
+					json.rounds[i] = {};
+					json.rounds[i].roundNum = i+1;
+				}
+				
+								
 				proposal.allocationId = allocationRecord.get('id');
 			}
 			
 		},this));
 		
+		console.log(json);
 		html = this.detailViewTableTemplate(json);
 		this.$el.find('#detailModalDiv').html(html);
 		
@@ -102,6 +114,7 @@ var DetailModalView = Backbone.View.extend({
 				this.$el.find('.modal-footer').html(this.detailAllocationRecordFooterTemplate());
 				e1=model;
 				var json = model.toJSON();
+				json.roundNum = round;
 				var html;
 				if(model.get('allocationRecordStrategies') != null && 
 						model.get('allocationRecordStrategies').length > 0) {
@@ -179,17 +192,17 @@ var DetailModalView = Backbone.View.extend({
 				
 				var sum =0;
 				
-				for(var i=0; i<node.data.allocationRecordsR3.length; i++) {
-					if(allocRec.get('id') == node.data.allocationRecordsR3[i].id) {
-						node.data.allocationRecordsR3[i].amountAllocated=allocRec.get('amountAllocated');
-						node.data.allocationRecordsR3[i].amountAllocatedNext1Year=allocRec.get('amountAllocatedNext1Year');
-						node.data.allocationRecordsR3[i].amountAllocatedNext2Year=allocRec.get('amountAllocatedNext2Year');
-						node.data.allocationRecordsR3[i].amountAllocatedNext3Year=allocRec.get('amountAllocatedNext3Year');
+				for(var i=0; i<node.data.allocationRecordsRound.length; i++) {
+					if(allocRec.get('id') == node.data.allocationRecordsRound[i].id) {
+						node.data.allocationRecordsRound[i].amountAllocated=allocRec.get('amountAllocated');
+						node.data.allocationRecordsRound[i].amountAllocatedNext1Year=allocRec.get('amountAllocatedNext1Year');
+						node.data.allocationRecordsRound[i].amountAllocatedNext2Year=allocRec.get('amountAllocatedNext2Year');
+						node.data.allocationRecordsRound[i].amountAllocatedNext3Year=allocRec.get('amountAllocatedNext3Year');
 					}
-					sum+=node.data.allocationRecordsR3[i].amountAllocated;
+					sum+=node.data.allocationRecordsRound[i].amountAllocated;
 				}
 				
-				node.data.sumAllocationR3=sum;
+				node.data.sumAllocationRound=sum;
 				node.commit();
 				
 			},this)
@@ -286,17 +299,17 @@ var DetailModalView = Backbone.View.extend({
 				
 				var sum =0;
 				
-				for(var i=0; i<node.data.allocationRecordsR3.length; i++) {
+				for(var i=0; i<node.data.allocationRecordsRound.length; i++) {
 					if(record.get('id') == node.data.allocationRecordsR1[i].id) {
-						node.data.allocationRecordsR3[i].amountAllocated=record.get('amountAllocated');
-						node.data.allocationRecordsR3[i].amountAllocatedNext1Year=allocRec.get('amountAllocatedNext1Year');
-						node.data.allocationRecordsR3[i].amountAllocatedNext2Year=allocRec.get('amountAllocatedNext2Year');
-						node.data.allocationRecordsR3[i].amountAllocatedNext3Year=allocRec.get('amountAllocatedNext3Year');
+						node.data.allocationRecordsRound[i].amountAllocated=record.get('amountAllocated');
+						node.data.allocationRecordsRound[i].amountAllocatedNext1Year=allocRec.get('amountAllocatedNext1Year');
+						node.data.allocationRecordsRound[i].amountAllocatedNext2Year=allocRec.get('amountAllocatedNext2Year');
+						node.data.allocationRecordsRound[i].amountAllocatedNext3Year=allocRec.get('amountAllocatedNext3Year');
 					}
-					sum+=node.data.allocationRecordsR3[i].amountAllocated;
+					sum+=node.data.allocationRecordsRound[i].amountAllocated;
 				}
 				
-				node.data.sumAllocationR3=sum;
+				node.data.sumAllocationRound=sum;
 				node.commit();
 				
 				// now update parent!
@@ -547,7 +560,7 @@ var TargetValueModalView=Backbone.View.extend({
 				var store=Ext.getStore('treeObjectiveStore');
 				var node = store.getNodeById(this.objective.get('id'));
 				
-				var tvars = node.data.targetValueAllocationRecordsR3;
+				var tvars = node.data.targetValueAllocationRecordsRound;
 				
 				for(var i=0; i<tvars.length; i++) {
 					if(tvars[i].id==this.targetValue.get('id')) {
@@ -858,7 +871,7 @@ renderMainTbl: function() {
 			        	text: 'เป้าหมาย',
 			        	width: 80,
 			        	sortable: false,
-			        	dataIndex: 'targetValueAllocationRecordsR3',
+			        	dataIndex: 'targetValueAllocationRecordsRound',
 			        	align: 'center',
 			        	renderer: function(value, metaData, record, rowIdx, colIdx, store) {
 			        		var html="";
@@ -882,10 +895,10 @@ renderMainTbl: function() {
 			        	}
 			        	
 			        }, {
-			        	text: 'ปรับลดครั้งที่ 1',
+			        	text: 'ปรับลดครั้งที่ '+ round,
 			        	width: 120,
 			        	sortable : false,
-			        	dataIndex: 'sumAllocationR1',
+			        	dataIndex: 'sumAllocationRound',
 			        	align: 'right',
 			        	renderer: function(value) {
 			        		return addCommas(value);

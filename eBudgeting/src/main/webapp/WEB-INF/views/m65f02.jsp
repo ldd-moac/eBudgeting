@@ -3,7 +3,7 @@
 
 <div class="hero-unit white">
 <div id="headLine">
-	<h4>การปรับลดงบประมาณครั้งที่3 ระดับรายการ</h4> 
+	<h4>การปรับลดงบประมาณครั้งที่ ${round} ระดับรายการ</h4> 
 </div>
 
 <div class="row">
@@ -124,7 +124,7 @@
 	<thead>
 		<tr>
 			<td>รายการงบประมาณ</td>
-			<td>ปรับลดครั้งที่3</td>
+			<td>ปรับลดครั้งที่ {{roundNum}} </td>
 		</tr>
 	</thead>
 	<tbody>
@@ -219,19 +219,19 @@
 		<tr>
 			<td>รายการงบประมาณ</td>
 			<td>ขอตั้ง</td>
-			<td>ปรับลดครั้งที่1</td>
-			<td>ปรับลดครั้งที่2</td>
-			<td>ปรับลดครั้งที่3</td>
-					</tr>
+			{{#each rounds}}
+			<td>ปรับลดครั้งที่ {{roundNum}}</td>
+			{{/each}}}
+		</tr>
 	</thead>
 	<tbody>
 		{{#each sumBudgetTypeProposals}}
 		<tr>
 			<td><a href="#" data-allocationId={{allocationId}} class="detailAllocation">{{budgetType.name}}</a></td>
 			<td>{{formatNumber amountRequest}}</td>
-			<td>{{formatNumber amountAllocatedR1}}</td>			
-			<td>{{formatNumber amountAllocatedR2}}</td>			
+			{{#each rounds}}
 			<td>{{formatNumber amountAllocated}}</td>
+			{{/each}}			
 		</tr>
 		{{/each}}
 	</tbody>
@@ -512,6 +512,7 @@
 <script type="text/javascript">
 var objectiveId = "${objective.id}";
 var fiscalYear = parseInt("${fiscalYear}");
+var round = parseInt("${round}");
 
 var pageUrl = "/page/m65f02/";
 var mainTblView  = null;
@@ -764,6 +765,64 @@ $(document).ready(function() {
         		});
         		return sum;
         	}
+        }, {
+        	name: 'sumAllocationRound',
+        	convert: function(v, rec) {
+        		var sum=0;
+        		var records;
+        		if(round == 1) {
+        			records = rec.data.allocationRecordsR1;
+        		} else if (round == 2 ) {
+        			records = rec.data.allocationRecordsR2;
+        		} else if (round == 3 ) {
+        			records = rec.data.allocationRecordsR3;
+        		}
+        		_.forEach(records, function(record) {
+        			if(record.index == (round-1)) {        				
+        				sum += record.amountAllocated;
+        			}	
+        		});
+        		return sum;
+        	}
+        }, {
+        	name: 'targetValueAllocationRecordsRound',
+        	convert: function(v, rec) {
+        		var targetValues = new Array();
+        		
+        		_.forEach(rec.data.targetValueAllocationRecords, function(record) {
+        			if(record.index == (round-1)) {        				
+        				targetValues.push(record)
+        			}	
+        		});
+        		return targetValues;
+        	}
+        
+        }, {
+        	name: 'targetValueAllocationRecordsR1',
+        	convert: function(v, rec) {
+        		var targetValues = new Array();
+        		
+        		_.forEach(rec.data.targetValueAllocationRecords, function(record) {
+        			if(record.index == 0) {        				
+        				targetValues.push(record)
+        			}	
+        		});
+        		return targetValues;
+        	}
+        
+        }, {
+        	name: 'targetValueAllocationRecordsR2',
+        	convert: function(v, rec) {
+        		var targetValues = new Array();
+        		
+        		_.forEach(rec.data.targetValueAllocationRecords, function(record) {
+        			if(record.index == 1) {        				
+        				targetValues.push(record)
+        			}	
+        		});
+        		return targetValues;
+        	}
+        
         }, {
         	name: 'targetValueAllocationRecordsR3',
         	convert: function(v, rec) {

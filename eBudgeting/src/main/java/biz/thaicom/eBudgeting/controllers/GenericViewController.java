@@ -913,12 +913,22 @@ public class GenericViewController {
 
 	// --------------------------------------------------------------m63f02:
 	// การปรับลดงบประมาณระดับรายการรอบที่ 1
+	@RequestMapping("/page/m63f02_orig/")
+	public String render_m63f02_orig(Model model, HttpSession session) {
+		model.addAttribute("rootPage", true);
+		model.addAttribute("round", 1);
+		setFiscalYearFromSession(model, session);
+		
+		return "m63f02";
+	}
+	
 	@RequestMapping("/page/m63f02/")
 	public String render_m63f02(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
+		model.addAttribute("round", 1);
 		setFiscalYearFromSession(model, session);
-
-		return "m63f02";		
+		
+		return "m65f02";
 	}
 	
 	// --------------------------------------------------------------m63f04:
@@ -978,7 +988,17 @@ public class GenericViewController {
 	@RequestMapping("/page/m64f02/")
 	public String render_m64f02(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
+		model.addAttribute("round", 2);
 		setFiscalYearFromSession(model, session);
+		
+		return "m65f02";
+	}
+	@RequestMapping("/page/m64f02_orig/")
+	public String render_m64f02_orig(Model model, HttpSession session) {
+		model.addAttribute("rootPage", true);
+		model.addAttribute("round", 2);
+		setFiscalYearFromSession(model, session);
+		
 		return "m64f02";
 	}
 
@@ -1037,6 +1057,7 @@ public class GenericViewController {
 	@RequestMapping("/page/m65f04/")
 	public String render_m65f04(Model model, HttpServletRequest request, HttpSession session) {
 		model.addAttribute("rootPage", true);
+		model.addAttribute("round", 3);
 		Integer fiscalYear = setFiscalYearFromSession(model, session);
 		model.addAttribute("rootObjective", entityService.findOneRootObjectiveByFiscalyear(fiscalYear));
 		return "m65f04";
@@ -1046,6 +1067,7 @@ public class GenericViewController {
 	@RequestMapping("/page/m65f02/")
 	public String render_m65f02(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
+		model.addAttribute("round", 3);
 		setFiscalYearFromSession(model, session);
 		return "m65f02";
 	}
