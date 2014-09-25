@@ -3,6 +3,7 @@ package biz.thaicom.eBudgeting.models.bgt;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,7 +38,15 @@ public class AllocationRecordStrategy implements Serializable {
 	@JoinColumn(name="ALLOCATIONRECORD_ID")
 	private AllocationRecord allocationRecord;
 	
+	@Basic
 	private Long totalCalculatedAmount;
+	
+	@Basic
+	private Long amountAllocatedNext1Year;
+	@Basic
+	private Long amountAllocatedNext2Year;
+	@Basic
+	private Long amountAllocatedNext3Year;
 	
 	@OneToMany
 	@JoinTable(name="BGT_ALLOCREC_PROPOSALSTRGY")
@@ -103,6 +112,32 @@ public class AllocationRecordStrategy implements Serializable {
 		}
 		
 	}
+
+	public Long getAmountAllocatedNext1Year() {
+		return amountAllocatedNext1Year;
+	}
+
+	public void setAmountAllocatedNext1Year(Long amountAllocatedNext1Year) {
+		this.amountAllocatedNext1Year = amountAllocatedNext1Year;
+	}
+
+	public Long getAmountAllocatedNext2Year() {
+		return amountAllocatedNext2Year;
+	}
+
+	public void setAmountAllocatedNext2Year(Long amountAllocatedNext2Year) {
+		this.amountAllocatedNext2Year = amountAllocatedNext2Year;
+	}
+
+	public Long getAmountAllocatedNext3Year() {
+		return amountAllocatedNext3Year;
+	}
+
+	public void setAmountAllocatedNext3Year(Long amountAllocatedNext3Year) {
+		this.amountAllocatedNext3Year = amountAllocatedNext3Year;
+	}
+	
+	
 	
 	
 	

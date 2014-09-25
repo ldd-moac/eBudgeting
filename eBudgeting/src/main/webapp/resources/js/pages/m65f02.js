@@ -167,6 +167,9 @@ var DetailModalView = Backbone.View.extend({
 		var amountAllocatedNext3Year = parseInt(this.$el.find('#amountAllocatedNext3Year').val());
 		var totalInputTxt = this.$el.find('#totalInputTxt').val();
 		
+		var adjustedAmount = parseInt(totalInputTxt) - allocRec.get('amountAllocated');
+		
+		console.log("updateAllocRed: ");
 		// now see to its change!
 		allocRec.set('amountAllocated', parseInt(totalInputTxt));
 		
@@ -198,8 +201,11 @@ var DetailModalView = Backbone.View.extend({
 					sum+=node.data["allocationRecordsR"+round][i].amountAllocated;
 				}
 				
-				node.data["sumAllocationR"+round]=sum;
+				node.data["sumAllocationRound"]=sum;
 				node.commit();
+				
+				// now update parent!
+				this.updateNode(node.parentNode, adjustedAmount);
 				
 			},this)
 		});
@@ -267,17 +273,24 @@ var DetailModalView = Backbone.View.extend({
 				}
 			}
 			adjustedAmount = allocRecStrgy.get('totalCalculatedAmount') - calculatedAmount;
+			var adjustedAmountNext1Year = 
 			allocRecStrgy.set('totalCalculatedAmount', calculatedAmount);
 		
 		}
 		// now we update allocRec
-		var amountAllocatedNext1Year = parseInt(this.$el.find('#amountAllocatedNext1Year').val());
-		var amountAllocatedNext2Year = parseInt(this.$el.find('#amountAllocatedNext2Year').val());
-		var amountAllocatedNext3Year = parseInt(this.$el.find('#amountAllocatedNext3Year').val());
+		
+		var amountAllocatedNext1Year = parseInt(this.$el.find('#amountAllocatedNext1Year').val()) || 0;
+		var amountAllocatedNext2Year = parseInt(this.$el.find('#amountAllocatedNext2Year').val()) || 0;
+		var amountAllocatedNext3Year = parseInt(this.$el.find('#amountAllocatedNext3Year').val()) || 0;
 		var record = allocRecStrgy.get('allocationRecord');
-		record.set('amountAllocatedNext1Year', amountAllocatedNext1Year);
-		record.set('amountAllocatedNext2Year', amountAllocatedNext2Year);
-		record.set('amountAllocatedNext3Year', amountAllocatedNext3Year);
+		
+		var adjustedAmountNext1Year = allocRecStrgy.get('amountAllocatedNext1Year')-amountAllocatedNext1Year;
+		var adjustedAmountNext2Year = allocRecStrgy.get('amountAllocatedNext2Year')-amountAllocatedNext2Year;
+		var adjustedAmountNext3Year = allocRecStrgy.get('amountAllocatedNext3Year')-amountAllocatedNext3Year;
+		
+		allocRecStrgy.set('amountAllocatedNext1Year', amountAllocatedNext1Year);
+		allocRecStrgy.set('amountAllocatedNext2Year', amountAllocatedNext2Year);
+		allocRecStrgy.set('amountAllocatedNext3Year', amountAllocatedNext3Year);
 		
 		// then save!
 		allocRecStrgy.save(null, {
@@ -285,38 +298,51 @@ var DetailModalView = Backbone.View.extend({
 				// now we update allocRec
 				var record = allocRecStrgy.get('allocationRecord');
 				record.set('amountAllocated', record.get('amountAllocated') - adjustedAmount);
-				record.set('amountAllocatedNext1Year', amountAllocatedNext1Year);
-				record.set('amountAllocatedNext2Year', amountAllocatedNext2Year);
-				record.set('amountAllocatedNext3Year', amountAllocatedNext3Year);
+				record.set('amountAllocatedNext1Year', record.get('amountAllocatedNext1Year') - adjustedAmountNext1Year);
+				record.set('amountAllocatedNext2Year', record.get('amountAllocatedNext2Year') - adjustedAmountNext2Year);
+				record.set('amountAllocatedNext3Year', record.get('amountAllocatedNext3Year') - adjustedAmountNext3Year);
 				alert('บันทึกเรียบร้อยแล้ว');
 				
 				var store=Ext.getStore('treeObjectiveStore');
 				var node = store.getNodeById(this.currentObjective.get('id'));
 				
 				var sum =0;
+				var sumNext1Year =0;
+				var sumNext2Year =0;
+				var sumNext3Year =0;
+				
 				
 				for(var i=0; i<node.data["allocationRecordsR"+round].length; i++) {
-					if(record.get('id') == node.data.data["allocationRecordsR"+round][i].id) {
-						node.data.data["allocationRecordsR"+round][i].amountAllocated=record.get('amountAllocated');
+					if(record.get('id') == node.data["allocationRecordsR"+round][i].id) {
+						node.data["allocationRecordsR"+round][i].amountAllocated=record.get('amountAllocated');
 					}
-					sum+=node.data.data["allocationRecordsR"+round][i].amountAllocated;
+					sum+=node.data["allocationRecordsR"+round][i].amountAllocated;
+					sumNext1Year=+node.data["allocationRecordsR"+round][i].amountAllocatedNext1Year;
+					sumNext2Year=+node.data["allocationRecordsR"+round][i].amountAllocatedNext2Year;
+					sumNext3Year=+node.data["allocationRecordsR"+round][i].amountAllocatedNext3Year;
 				}
 				
-				node.data["sumAllocationR"+round]=sum;
+				node.data["sumAllocationRound"]=sum;
+				node.data["sumAllocationRoundNext1Year"]=sumNext1Year;
+				node.data["sumAllocationRoundNext2Year"]=sumNext2Year;
+				node.data["sumAllocationRoundNext3Year"]=sumNext3Year;
 				node.commit();
 				
 				// now update parent!
-				this.updateNode(node.parentNode, adjustedAmount);
+				this.updateNode(node.parentNode, adjustedAmount, adjustedAmountNext1Year, adjustedAmountNext2Year, adjustedAmountNext3Year);
 				
 			},this)
 		});
 		
 		
 	},
-	updateNode: function(node, adjustedAmount) {
+	updateNode: function(node, adjustedAmount, adjustedAmountNext1Year, adjustedAmountNext2Year, adjustedAmountNext3Year) {
 		if(node == null) return;
 		
-		node.data["sumAllocationR"+round] = node.data["sumAllocationR"+round] - adjustedAmount;
+		node.data["sumAllocationRound"] = node.data["sumAllocationRound"] - adjustedAmount;
+		node.data["sumAllocationRoundNext1Year"] = node.data["sumAllocationRoundNext1Year"] - adjustedAmountNext1Year;
+		node.data["sumAllocationRoundNext2Year"] = node.data["sumAllocationRoundNext2Year"] - adjustedAmountNext2Year;
+		node.data["sumAllocationRoundNext3Year"] = node.data["sumAllocationRoundNext3Year"] - adjustedAmountNext3Year;
 		node.commit();
 		
 		this.updateNode(node.parentNode, adjustedAmount);
@@ -354,6 +380,10 @@ var DetailModalView = Backbone.View.extend({
 			json.budgetType = {};
 			json.budgetType.name = allocRecStrgy.get('allocationRecord').get('budgetType').get('name');
 			json.amountAllocated = allocRecStrgy.get('totalCalculatedAmount');
+			
+			json.next1Year = fiscalYear+1;
+			json.next2Year = fiscalYear+2;
+			json.next3Year = fiscalYear+3;
 			html = this.detailAllocationBasicTemplate(json);
 		}
 		
@@ -900,30 +930,30 @@ renderMainTbl: function() {
 			        	}
 			        		
 			        }, {
-			        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+1),
+			        	text: 'ปรับลดปี ' + (parseInt(fiscalYear)+1),
 			        	width: 120,
 			        	sortable : false,
-			        	dataIndex: 'sumProposalsNext1year',
+			        	dataIndex: 'sumAllocationRoundNext1Year',
 			        	align: 'right',
 			        	renderer: function(value) {
 			        		return addCommas(value);
 			        	}
 			        	
 			        }, {
-			        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+2),
+			        	text: 'ปรับลดปี ' + (parseInt(fiscalYear)+2),
 			        	width: 120,
 			        	sortable : false,
-			        	dataIndex: 'sumProposalsNext2year',
+			        	dataIndex: 'sumAllocationRoundNext2Year',
 			        	align: 'right',
 			        	renderer: function(value) {
 			        		return addCommas(value);
 			        	}
 			        	
 			        }, {
-			        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+3),
+			        	text: 'ปรับลดปี ' + (parseInt(fiscalYear)+3),
 			        	width: 120,
 			        	sortable : false,
-			        	dataIndex: 'sumProposalsNext3year',
+			        	dataIndex: 'sumAllocationRoundNext3Year',
 			        	align: 'right',
 			        	renderer: function(value) {
 			        		return addCommas(value);

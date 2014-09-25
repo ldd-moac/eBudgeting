@@ -1202,13 +1202,22 @@ add (requestedValueNext1Year number(19,0),
 
 -- version 19
 -- Modified Date: September 20, 2014
-update app_info set db_version = 20;
+update app_info set db_version = 19;
 alter table BGT_ALLOCATIONRECORD
 add (amountAllocatedNext1Year number(19,0),
 	amountAllocatedNext2Year number(19,0),
 	amountAllocatedNext3Year number(19,0));
 	
 alter table PLN_TARGETVALUEALLOCRECORD
+add (amountAllocatedNext1Year number(19,0),
+	amountAllocatedNext2Year number(19,0),
+	amountAllocatedNext3Year number(19,0));
+	
+	
+-- version 19
+-- Modified Date: September 20, 2014
+update app_info set db_version = 20;
+alter table BGT_ALLOCRECORDSTRATEGY
 add (amountAllocatedNext1Year number(19,0),
 	amountAllocatedNext2Year number(19,0),
 	amountAllocatedNext3Year number(19,0));

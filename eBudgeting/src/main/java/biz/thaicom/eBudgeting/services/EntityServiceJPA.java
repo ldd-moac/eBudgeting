@@ -1342,6 +1342,9 @@ public class EntityServiceJPA implements EntityService {
 							newArs.setAllocationRecord(newR);
 							newArs.setStrategy(ars.getStrategy());
 							newArs.setTotalCalculatedAmount(ars.getTotalCalculatedAmount());
+							newArs.setAmountAllocatedNext1Year(ars.getAmountAllocatedNext1Year());
+							newArs.setAmountAllocatedNext2Year(ars.getAmountAllocatedNext2Year());
+							newArs.setAmountAllocatedNext3Year(ars.getAmountAllocatedNext3Year());
 							
 							newR.getAllocationRecordStrategies().add(newArs);
 							
@@ -1505,6 +1508,10 @@ public class EntityServiceJPA implements EntityService {
 							
 							
 							ars.setTotalCalculatedAmount(ps.getTotalCalculatedAmount());
+							ars.setAmountAllocatedNext1Year(ps.getAmountRequestNext1Year());
+							ars.setAmountAllocatedNext2Year(ps.getAmountRequestNext2Year());
+							ars.setAmountAllocatedNext3Year(ps.getAmountRequestNext3Year());
+							
 							
 							if(ps.getFormulaStrategy() == null) {
 								allocStrgyBudgetTypeMap.put(ar.getBudgetType(), ars);
@@ -3061,13 +3068,19 @@ public class EntityServiceJPA implements EntityService {
 		Integer index = ars.getAllocationRecord().getIndex();
 		if(ars != null) {
 			Long amountUpdate = data.get("totalCalculatedAmount").asLong();
-			Long amountAllocatedNext1Year = data.get("allocationRecord").get("amountAllocatedNext1Year").asLong();
-			Long amountAllocatedNext2Year = data.get("allocationRecord").get("amountAllocatedNext2Year").asLong();
-			Long amountAllocatedNext3Year = data.get("allocationRecord").get("amountAllocatedNext3Year").asLong();
+			Long amountAllocatedNext1Year = data.get("amountAllocatedNext1Year").asLong();
+			Long amountAllocatedNext2Year = data.get("amountAllocatedNext2Year").asLong();
+			Long amountAllocatedNext3Year = data.get("amountAllocatedNext3Year").asLong();
 			
 			
+			Long adjustAllocatedNext1Year = ars.getAmountAllocatedNext1Year() - amountAllocatedNext1Year;
+			Long adjustAllocatedNext2Year = ars.getAmountAllocatedNext2Year() - amountAllocatedNext2Year;
+			Long adjustAllocatedNext3Year = ars.getAmountAllocatedNext3Year() - amountAllocatedNext3Year;
 			
 			ars.setTotalCalculatedAmount(amountUpdate);
+			ars.setAmountAllocatedNext1Year(amountAllocatedNext1Year);
+			ars.setAmountAllocatedNext2Year(amountAllocatedNext2Year);
+			ars.setAmountAllocatedNext3Year(amountAllocatedNext3Year);
 			
 			
 			for(JsonNode rcNode : data.get("requestColumns")) {
@@ -3081,15 +3094,9 @@ public class EntityServiceJPA implements EntityService {
 			// then we update the allocation!
 			AllocationRecord record = ars.getAllocationRecord();
 			record.setAmountAllocated(allocationRecordStrategyRepository.findSumTotalCalculatedAmount(record));
-			Long adjustAllocatedNext1Year = record.getAmountAllocatedNext1Year() - amountAllocatedNext1Year;
-			Long adjustAllocatedNext2Year = record.getAmountAllocatedNext2Year() - amountAllocatedNext2Year;
-			Long adjustAllocatedNext3Year = record.getAmountAllocatedNext3Year() - amountAllocatedNext3Year;
-			
-			record.setAmountAllocatedNext1Year(amountAllocatedNext1Year);
-			record.setAmountAllocatedNext2Year(amountAllocatedNext2Year);
-			record.setAmountAllocatedNext3Year(amountAllocatedNext3Year);
 			
 			
+			record.adjustAmountAllocated(0L, adjustAllocatedNext1Year, adjustAllocatedNext2Year, adjustAllocatedNext3Year);
 			
 			//record.adjustAmountAllocated(adjustedAmount);
 			allocationRecordRepository.save(record);

@@ -784,6 +784,65 @@ $(document).ready(function() {
         		});
         		return sum;
         	}
+        },  {
+        	name: 'sumAllocationRoundNext1Year',
+        	convert: function(v, rec) {
+        		var sum=0;
+        		var records;
+        		if(round == 1) {
+        			records = rec.data.allocationRecordsR1;
+        		} else if (round == 2 ) {
+        			records = rec.data.allocationRecordsR2;
+        		} else if (round == 3 ) {
+        			records = rec.data.allocationRecordsR3;
+        		}
+        		_.forEach(records, function(record) {
+        			if(record.index == (round-1)) {
+  
+        				sum += record.amountAllocatedNext1Year;
+        			}	
+        		});
+
+        		return sum;
+        	}
+        },  {
+        	name: 'sumAllocationRoundNext2Year',
+        	convert: function(v, rec) {
+        		var sum=0;
+        		var records;
+        		if(round == 1) {
+        			records = rec.data.allocationRecordsR1;
+        		} else if (round == 2 ) {
+        			records = rec.data.allocationRecordsR2;
+        		} else if (round == 3 ) {
+        			records = rec.data.allocationRecordsR3;
+        		}
+        		_.forEach(records, function(record) {
+        			if(record.index == (round-1)) {        				
+        				sum += record.amountAllocatedNext2Year;
+        			}	
+        		});
+        		return sum;
+        	}
+        },  {
+        	name: 'sumAllocationRoundNext3Year',
+        	convert: function(v, rec) {
+        		var sum=0;
+        		var records;
+        		if(round == 1) {
+        			records = rec.data.allocationRecordsR1;
+        		} else if (round == 2 ) {
+        			records = rec.data.allocationRecordsR2;
+        		} else if (round == 3 ) {
+        			records = rec.data.allocationRecordsR3;
+        		}
+        		_.forEach(records, function(record) {
+        			if(record.index == (round-1)) {        				
+        				sum += record.amountAllocatedNext3Year;
+        			}	
+        		});
+        		return sum;
+        	}
         }, {
         	name: 'targetValueAllocationRecordsRound',
         	convert: function(v, rec) {
