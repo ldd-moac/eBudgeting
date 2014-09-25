@@ -18,6 +18,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import biz.thaicom.eBudgeting.models.pln.Objective;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -88,6 +89,7 @@ public class AllocationRecord implements Serializable{
 	}
 
 	public Long getAmountAllocated() {
+		if (amountAllocated == null) return 0L;
 		return amountAllocated;
 	}
 
@@ -118,6 +120,7 @@ public class AllocationRecord implements Serializable{
 	}
 
 	public Long getAmountAllocatedNext1Year() {
+		if(this.amountAllocatedNext1Year == null)  amountAllocatedNext1Year = 0L;
 		return amountAllocatedNext1Year;
 	}
 
@@ -126,6 +129,7 @@ public class AllocationRecord implements Serializable{
 	}
 
 	public Long getAmountAllocatedNext2Year() {
+		if(this.amountAllocatedNext2Year == null)  amountAllocatedNext2Year = 0L;
 		return amountAllocatedNext2Year;
 	}
 
@@ -134,11 +138,27 @@ public class AllocationRecord implements Serializable{
 	}
 
 	public Long getAmountAllocatedNext3Year() {
+		if(this.amountAllocatedNext3Year == null)  amountAllocatedNext3Year = 0L;
 		return amountAllocatedNext3Year;
 	}
 
 	public void setAmountAllocatedNext3Year(Long amountAllocatedNext3Year) {
 		this.amountAllocatedNext3Year = amountAllocatedNext3Year;
+	}
+	
+	public void adjustAmountAllocated(Long adjustedAllocatedValue, 
+			Long adjustedAllocatedValueNext1Year,
+			Long adjustedAllocatedValueNext2Year,
+			Long adjustedAllocatedValueNext3Year) {
+		if(this.amountAllocated == null)  amountAllocated = 0L;
+		if(this.amountAllocatedNext1Year == null)  amountAllocatedNext1Year = 0L;
+		if(this.amountAllocatedNext2Year == null)  amountAllocatedNext2Year = 0L;
+		if(this.amountAllocatedNext3Year == null)  amountAllocatedNext3Year = 0L;
+		
+		this.amountAllocated -= adjustedAllocatedValue;
+		this.amountAllocatedNext1Year -= adjustedAllocatedValueNext1Year;
+		this.amountAllocatedNext2Year -= adjustedAllocatedValueNext2Year;
+		this.amountAllocatedNext3Year -= adjustedAllocatedValueNext3Year;
 	}
 	
 }

@@ -37,7 +37,7 @@
 			</div>
 		</div>
 		
-		<div id="targetValueModal" class="modal hide fade">
+		<div id="targetValueModal" class="modal wideModal hide fade">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 				<span style="font-weight: bold;"></span>
@@ -346,6 +346,24 @@
 			</div>
 		</div>
 	</div>
+<div class="clearfix"></div>
+<div id="formulaBox">
+	<div>
+		<div style="margin-top:11px;"> <button class="btn copytoNextYear">คัดลอกงบประมาณ</button></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next1Year}}:</b></div>
+		<div><div class="input-append"><input style="width:120px;" type="text" id="amountAllocatedNext1Year" value="{{amountAllocatedNext1Year}}"/><span class="add-on">บาท</span></div></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next2Year}}:</b></div>
+		<div><div class="input-append"><input style="width:120px;" type="text" id="amountAllocatedNext2Year" value="{{amountAllocatedNext2Year}}"/><span class="add-on">บาท</span></div></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next3Year}}:</b></div>
+		<div><div class="input-append"><input style="width:120px;" type="text" id="amountAllocatedNext3Year" value="{{amountAllocatedNext3Year}}"/><span class="add-on">บาท</span></div></div>
+	</div>
+</div>
 </script>
 
 <script id="detailAllocationRecordStrategyFooterTemplate"  type="text/x-handler-template">
@@ -367,10 +385,33 @@
 </script>
 
 <script id="targetValueModalTemplate" type="text/x-handler-template">
-<form>
-	<label>ระบุเป้าหมาย</label>
-	<input type="text" value="{{amountAllocated}}"/> {{target.unit.name}}
-</form>
+<div id="formulaBox">
+	<div>
+		<div style="vertical-align:middle"> <strong>ระบุค่าเป้าหมาย:</strong></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div class="input-append"><input style="width:80px;" type="text" class="targetRV" id="targetValueAmountAllocated" data-unitId="{{target.Id}}" value="{{amountAllocated}}"/><span class="add-on">{{target.unit.name}}</span></div>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div id="formulaBox">
+	<div>
+		<div style="text-align:right; padding-top:10px;"> <button class="btn copyTargetToNextYear">คัดลอกเป้าหมาย</button></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next1Year}}:</b></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" class="targetRV" id="targetValueAmountAllocatedNext1Year" value="{{amountAllocatedNext1Year}}"/><span class="add-on">{{target.unit.name}}</span></div></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next2Year}}:</b></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" class="targetRV" id="targetValueAmountAllocatedNext2Year" value="{{amountAllocatedNext2Year}}"/><span class="add-on">{{target.unit.name}}</span></div></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next3Year}}:</b></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" class="targetRV" id="targetValueAmountAllocatedNext3Year" value="{{amountAllocatedNext3Year}}"/><span class="add-on">{{target.unit.name}}</span></div></div>
+	</div>
+</div>
+<div class="clearfix"></div>
 </script>
 
 <script id="inputModalTemplate"  type="text/x-handler-template">
@@ -468,9 +509,9 @@
 
 <script type="text/javascript">
 var objectiveId = "${objective.id}";
-var fiscalYear = "${fiscalYear}";
+var fiscalYear = parseInt("${fiscalYear}");
 
-var pageUrl = "/page/m63f02/";
+var pageUrl = "/page/m64f02/";
 var mainTblView  = null;
 var mainCtrView = null;
 var objectiveCollection = null;

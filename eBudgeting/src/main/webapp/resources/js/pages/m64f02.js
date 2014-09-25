@@ -33,11 +33,20 @@ var DetailModalView = Backbone.View.extend({
 		"click .updateAllocRec" : "updateAllocRec",
 		"click .updateAllocRecStrgy" : "updateAllocRecStrgy",
 		
-		"change .formulaColumnInput" : "formulaInputChange"
+		"change .formulaColumnInput" : "formulaInputChange",
+		
+		"click .copyToNextYear" : "copyToNextYear"
 			
 	},
 	setParentView: function(view) {
 		this.parentView = view;
+	},
+	copyToNextYear : function(e) {
+		var valueToCopy = $('#totalInputTxt').val();
+		valueToCopy = valueToCopy.replace(/,/g, '');
+		this.$el.find('#amountAllocatedNext1Year').val(valueToCopy);
+		this.$el.find('#amountAllocatedNext2Year').val(valueToCopy);
+		this.$el.find('#amountAllocatedNext3Year').val(valueToCopy);
 	},
 	cancelBtn : function(e) {
 		this.$el.modal('hide');
@@ -110,6 +119,9 @@ var DetailModalView = Backbone.View.extend({
 		this.$el.find('.modal-footer').html(this.detailAllocationBasicFooterTemplate());
 		
 		var json = allocRec.toJSON();
+		json.next1Year = fiscalYear+1;
+		json.next2Year = fiscalYear+2;
+		json.next3Year = fiscalYear+3;
 		
 		var html = this.detailAllocationBasicTemplate(json);
 		
@@ -136,17 +148,27 @@ var DetailModalView = Backbone.View.extend({
 		}
 		
 		var allocRec = AllocationRecord.findOrCreate(this.$el.find('#allocRecId').attr('data-id'));
+		var amountAllocatedNext1Year = parseInt(this.$el.find('#amountAllocatedNext1Year').val());
+		var amountAllocatedNext2Year = parseInt(this.$el.find('#amountAllocatedNext2Year').val());
+		var amountAllocatedNext3Year = parseInt(this.$el.find('#amountAllocatedNext3Year').val());
 		var totalInputTxt = this.$el.find('#totalInputTxt').val();
 		
 		// now see to its change!
 		allocRec.set('amountAllocated', parseInt(totalInputTxt));
 		
 		// and we can save
-		allocRec.save({amountAllocated: parseInt(totalInputTxt)
+		allocRec.save({amountAllocated: totalInputTxt,
+			amountAllocatedNext1Year: amountAllocatedNext1Year,
+			amountAllocatedNext2Year: amountAllocatedNext2Year,
+			amountAllocatedNext3Year: amountAllocatedNext3Year
 			} , {
 			success: _.bind(function(model, response, options) {
 				// now see to its change!
 				allocRec.set('amountAllocated', parseInt(totalInputTxt));
+				allocRec.set('amountAllocated', totalInputTxt);
+				allocRec.set('amountAllocatedNext1Year', amountAllocatedNext1Year);
+				allocRec.set('amountAllocatedNext2Year', amountAllocatedNext2Year);
+				allocRec.set('amountAllocatedNext3Year', amountAllocatedNext3Year);
 				
 				alert('บันทึกเรียบร้อยแล้ว');
 				
@@ -158,6 +180,9 @@ var DetailModalView = Backbone.View.extend({
 				for(var i=0; i<node.data.allocationRecordsR2.length; i++) {
 					if(allocRec.get('id') == node.data.allocationRecordsR2[i].id) {
 						node.data.allocationRecordsR2[i].amountAllocated=allocRec.get('amountAllocated');
+						node.data.allocationRecordsR2[i].amountAllocatedNext1Year=allocRec.get('amountAllocatedNext1Year');
+						node.data.allocationRecordsR2[i].amountAllocatedNext2Year=allocRec.get('amountAllocatedNext2Year');
+						node.data.allocationRecordsR2[i].amountAllocatedNext3Year=allocRec.get('amountAllocatedNext3Year');
 					}
 					sum+=node.data.allocationRecordsR2[i].amountAllocated;
 				}
@@ -234,13 +259,25 @@ var DetailModalView = Backbone.View.extend({
 			allocRecStrgy.set('totalCalculatedAmount', calculatedAmount);
 		
 		}
-				
+
+		var amountAllocatedNext1Year = parseInt(this.$el.find('#amountAllocatedNext1Year').val());
+		var amountAllocatedNext2Year = parseInt(this.$el.find('#amountAllocatedNext2Year').val());
+		var amountAllocatedNext3Year = parseInt(this.$el.find('#amountAllocatedNext3Year').val());
+		var record = allocRecStrgy.get('allocationRecord');
+		record.set('amountAllocatedNext1Year', amountAllocatedNext1Year);
+		record.set('amountAllocatedNext2Year', amountAllocatedNext2Year);
+		record.set('amountAllocatedNext3Year', amountAllocatedNext3Year);
+		
 		// then save!
 		allocRecStrgy.save(null, {
 			success:_.bind(function(model, response, options) {
 				// now we update allocRec
 				var record = allocRecStrgy.get('allocationRecord');
 				record.set('amountAllocated', record.get('amountAllocated') - adjustedAmount);
+				record.set('amountAllocatedNext1Year', amountAllocatedNext1Year);
+				record.set('amountAllocatedNext2Year', amountAllocatedNext2Year);
+				record.set('amountAllocatedNext3Year', amountAllocatedNext3Year);
+				
 				alert('บันทึกเรียบร้อยแล้ว');
 				
 				var store=Ext.getStore('treeObjectiveStore');
@@ -251,6 +288,9 @@ var DetailModalView = Backbone.View.extend({
 				for(var i=0; i<node.data.allocationRecordsR1.length; i++) {
 					if(record.get('id') == node.data.allocationRecordsR2[i].id) {
 						node.data.allocationRecordsR2[i].amountAllocated=record.get('amountAllocated');
+						node.data.allocationRecordsR2[i].amountAllocatedNext1Year=allocRec.get('amountAllocatedNext1Year');
+						node.data.allocationRecordsR2[i].amountAllocatedNext2Year=allocRec.get('amountAllocatedNext2Year');
+						node.data.allocationRecordsR2[i].amountAllocatedNext3Year=allocRec.get('amountAllocatedNext3Year');
 					}
 					sum+=node.data.allocationRecordsR2[i].amountAllocated;
 				}
@@ -306,6 +346,9 @@ var DetailModalView = Backbone.View.extend({
 			json.budgetType = {};
 			json.budgetType.name = allocRecStrgy.get('allocationRecord').get('budgetType').get('name');
 			json.amountAllocated = allocRecStrgy.get('totalCalculatedAmount');
+			json.next1Year = fiscalYear+1;
+			json.next2Year = fiscalYear+2;
+			json.next3Year = fiscalYear+3;
 			html = this.detailAllocationBasicTemplate(json);
 		}
 		
@@ -446,17 +489,29 @@ var TargetValueModalView=Backbone.View.extend({
 	events : {
 		"click #saveBtn" : "saveTargetValue",
 		"click #cancelBtn" : "cancelTargetValue",
+		"click .copyTargetToNextYear" : "copyTargetToNextYear",
 	},
 	setParentView: function(view) {
 		this.parentView = view;
+	},
+	copyTargetToNextYear : function(e) {
+		var valueToCopy = $('#targetValueAmountAllocated').val();
+		valueToCopy = valueToCopy.replace(/,/g, '');
+		this.$el.find('#targetValueAmountAllocatedNext1Year').val(valueToCopy);
+		this.$el.find('#targetValueAmountAllocatedNext2Year').val(valueToCopy);
+		this.$el.find('#targetValueAmountAllocatedNext3Year').val(valueToCopy);
 	},
 	targetValueModalTpl : Handlebars.compile($("#targetValueModalTemplate").html()),
 	render: function() {
 		
 		
 		this.$el.find('.modal-header span').html(this.objective.get('name'));
+		var json = this.targetValue.toJSON();
+		json.next1Year = fiscalYear+1;
+		json.next2Year = fiscalYear+2;
+		json.next3Year = fiscalYear+3;
 		
-		var html = this.targetValueModalTpl(this.targetValue.toJSON());
+		var html = this.targetValueModalTpl(json);
 		this.$el.find('.modal-body').html(html);
 
 		
@@ -473,13 +528,23 @@ var TargetValueModalView=Backbone.View.extend({
 	},
 	saveTargetValue: function() {
 		// we'll try to save
-		var input = parseInt(this.$el.find('input').val());
+		var amountAllocated = parseInt(this.$el.find('#targetValueAmountAllocated').val());
+		var amountAllocatedNext1Year = parseInt(this.$el.find('#targetValueAmountAllocatedNext1Year').val());
+		var amountAllocatedNext2Year = parseInt(this.$el.find('#targetValueAmountAllocatedNext2Year').val());
+		var amountAllocatedNext3Year = parseInt(this.$el.find('#targetValueAmountAllocatedNext3Year').val());
+		
 		
 		this.targetValue.save({
-			 amountAllocated: input
+			 amountAllocated: amountAllocated,
+			 amountAllocatedNext1Year : amountAllocatedNext1Year,
+			 amountAllocatedNext2Year : amountAllocatedNext2Year,
+			 amountAllocatedNext3Year : amountAllocatedNext3Year
 		}, {
 			success: _.bind(function(){
-				this.targetValue.set('amountAllocated', input);
+				this.targetValue.set('amountAllocated', amountAllocated);
+				this.targetValue.set('amountAllocatedNext1Year', amountAllocatedNext1Year);
+				this.targetValue.set('amountAllocatedNext2Year', amountAllocatedNext2Year);
+				this.targetValue.set('amountAllocatedNext3Year', amountAllocatedNext3Year);
 				
 				// now update 
 				var store=Ext.getStore('treeObjectiveStore');
@@ -489,8 +554,11 @@ var TargetValueModalView=Backbone.View.extend({
 				
 				for(var i=0; i<tvars.length; i++) {
 					if(tvars[i].id==this.targetValue.get('id')) {
-						tvars[i].amountAllocated = input;
+						tvars[i].amountAllocated = amountAllocated;
 						
+						tvars[i].amountAllocatedNext1Year = amountAllocatedNext1Year;
+						tvars[i].amountAllocatedNext2Year = amountAllocatedNext2Year;
+						tvars[i].amountAllocatedNext3Year = amountAllocatedNext3Year;
 						continue;
 					}
 				}
@@ -730,6 +798,8 @@ var MainCtrView = Backbone.View.extend({
 		this.treeStore.reload();
 	},
 	renderMainTbl: function() {
+		this.$el.find('#mainTbl').empty();
+		this.$el.find('#mainTbl').html(this.loadingTemplate());
 		
 		this.collection = new ObjectiveCollection();
 		//this.rootCollection = new ObjectiveCollection();
@@ -806,7 +876,6 @@ var MainCtrView = Backbone.View.extend({
 			        				html += "<br/>";
 			        			}
 			        			var unit = TargetUnit.findOrCreate(value[i].target.unit);
-			        			console.log(value[i]);
 			        			html += "<a href='#' class='targetValueModal' objective-id='"+value[i].forObjective+"' value-id='"+value[i].id+"' target-id='"+value[i].target.id+"'>"+addCommas(value[i].amountAllocated)+" " + unit.get('name') + "</a>"; 
 			        		}
 			        		return html;

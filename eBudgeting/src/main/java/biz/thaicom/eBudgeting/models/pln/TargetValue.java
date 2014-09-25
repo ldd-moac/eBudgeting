@@ -116,6 +116,7 @@ public class TargetValue implements Serializable{
 	
 
 	public Long getRequestedValueNext1Year() {
+		if(this.requestedValueNext1Year == null) return 0L;
 		return requestedValueNext1Year;
 	}
 
@@ -124,6 +125,7 @@ public class TargetValue implements Serializable{
 	}
 
 	public Long getRequestedValueNext2Year() {
+		if(this.requestedValueNext2Year == null) return 0L;
 		return requestedValueNext2Year;
 	}
 
@@ -132,6 +134,7 @@ public class TargetValue implements Serializable{
 	}
 
 	public Long getRequestedValueNext3Year() {
+		if(this.requestedValueNext3Year == null) return 0L;
 		return requestedValueNext3Year;
 	}
 

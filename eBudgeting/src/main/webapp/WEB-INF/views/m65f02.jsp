@@ -3,7 +3,7 @@
 
 <div class="hero-unit white">
 <div id="headLine">
-	<h4>การปรับลดงบประมาณครั้งที่3 ระดับรายการ</h4> 
+	<h4>การปรับลดงบประมาณครั้งที่ ${round} ระดับรายการ</h4> 
 </div>
 
 <div class="row">
@@ -37,7 +37,7 @@
 			</div>
 		</div>
 		
-		<div id="targetValueModal" class="modal hide fade">
+		<div id="targetValueModal" class="modal wideModal hide fade">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 				<span style="font-weight: bold;"></span>
@@ -124,7 +124,7 @@
 	<thead>
 		<tr>
 			<td>รายการงบประมาณ</td>
-			<td>ปรับลดครั้งที่3</td>
+			<td>ปรับลดครั้งที่ {{roundNum}} </td>
 		</tr>
 	</thead>
 	<tbody>
@@ -219,19 +219,19 @@
 		<tr>
 			<td>รายการงบประมาณ</td>
 			<td>ขอตั้ง</td>
-			<td>ปรับลดครั้งที่1</td>
-			<td>ปรับลดครั้งที่2</td>
-			<td>ปรับลดครั้งที่3</td>
-					</tr>
+			{{#each rounds}}
+			<td>ปรับลดครั้งที่ {{roundNum}}</td>
+			{{/each}}}
+		</tr>
 	</thead>
 	<tbody>
 		{{#each sumBudgetTypeProposals}}
 		<tr>
 			<td><a href="#" data-allocationId={{allocationId}} class="detailAllocation">{{budgetType.name}}</a></td>
 			<td>{{formatNumber amountRequest}}</td>
-			<td>{{formatNumber amountAllocatedR1}}</td>			
-			<td>{{formatNumber amountAllocatedR2}}</td>			
+			{{#each rounds}}
 			<td>{{formatNumber amountAllocated}}</td>
+			{{/each}}			
 		</tr>
 		{{/each}}
 	</tbody>
@@ -348,6 +348,24 @@
 			</div>
 		</div>
 	</div>
+<div class="clearfix"></div>
+<div id="formulaBox">
+	<div>
+		<div style="margin-top:11px;"> <button class="btn copytoNextYear">คัดลอกงบประมาณ</button></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next1Year}}:</b></div>
+		<div><div class="input-append"><input style="width:120px;" type="text" id="amountAllocatedNext1Year" value="{{amountAllocatedNext1Year}}"/><span class="add-on">บาท</span></div></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next2Year}}:</b></div>
+		<div><div class="input-append"><input style="width:120px;" type="text" id="amountAllocatedNext2Year" value="{{amountAllocatedNext2Year}}"/><span class="add-on">บาท</span></div></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next3Year}}:</b></div>
+		<div><div class="input-append"><input style="width:120px;" type="text" id="amountAllocatedNext3Year" value="{{amountAllocatedNext3Year}}"/><span class="add-on">บาท</span></div></div>
+	</div>
+</div>
 </script>
 
 <script id="detailAllocationRecordStrategyFooterTemplate"  type="text/x-handler-template">
@@ -369,10 +387,33 @@
 </script>
 
 <script id="targetValueModalTemplate" type="text/x-handler-template">
-<form>
-	<label>ระบุเป้าหมาย</label>
-	<input type="text" value="{{amountAllocated}}"/> {{target.unit.name}}
-</form>
+<div id="formulaBox">
+	<div>
+		<div style="vertical-align:middle"> <strong>ระบุค่าเป้าหมาย:</strong></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div class="input-append"><input style="width:80px;" type="text" class="targetRV" id="targetValueAmountAllocated" data-unitId="{{target.Id}}" value="{{amountAllocated}}"/><span class="add-on">{{target.unit.name}}</span></div>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div id="formulaBox">
+	<div>
+		<div style="text-align:right; padding-top:10px;"> <button class="btn copyTargetToNextYear">คัดลอกเป้าหมาย</button></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next1Year}}:</b></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" class="targetRV" id="targetValueAmountAllocatedNext1Year" value="{{amountAllocatedNext1Year}}"/><span class="add-on">{{target.unit.name}}</span></div></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next2Year}}:</b></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" class="targetRV" id="targetValueAmountAllocatedNext2Year" value="{{amountAllocatedNext2Year}}"/><span class="add-on">{{target.unit.name}}</span></div></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div><b>ปี {{next3Year}}:</b></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" class="targetRV" id="targetValueAmountAllocatedNext3Year" value="{{amountAllocatedNext3Year}}"/><span class="add-on">{{target.unit.name}}</span></div></div>
+	</div>
+</div>
+<div class="clearfix"></div>
 </script>
 
 <script id="inputModalTemplate"  type="text/x-handler-template">
@@ -470,7 +511,8 @@
 
 <script type="text/javascript">
 var objectiveId = "${objective.id}";
-var fiscalYear = "${fiscalYear}";
+var fiscalYear = parseInt("${fiscalYear}");
+var round = parseInt("${round}");
 
 var pageUrl = "/page/m65f02/";
 var mainTblView  = null;
@@ -723,6 +765,64 @@ $(document).ready(function() {
         		});
         		return sum;
         	}
+        }, {
+        	name: 'sumAllocationRound',
+        	convert: function(v, rec) {
+        		var sum=0;
+        		var records;
+        		if(round == 1) {
+        			records = rec.data.allocationRecordsR1;
+        		} else if (round == 2 ) {
+        			records = rec.data.allocationRecordsR2;
+        		} else if (round == 3 ) {
+        			records = rec.data.allocationRecordsR3;
+        		}
+        		_.forEach(records, function(record) {
+        			if(record.index == (round-1)) {        				
+        				sum += record.amountAllocated;
+        			}	
+        		});
+        		return sum;
+        	}
+        }, {
+        	name: 'targetValueAllocationRecordsRound',
+        	convert: function(v, rec) {
+        		var targetValues = new Array();
+        		
+        		_.forEach(rec.data.targetValueAllocationRecords, function(record) {
+        			if(record.index == (round-1)) {        				
+        				targetValues.push(record)
+        			}	
+        		});
+        		return targetValues;
+        	}
+        
+        }, {
+        	name: 'targetValueAllocationRecordsR1',
+        	convert: function(v, rec) {
+        		var targetValues = new Array();
+        		
+        		_.forEach(rec.data.targetValueAllocationRecords, function(record) {
+        			if(record.index == 0) {        				
+        				targetValues.push(record)
+        			}	
+        		});
+        		return targetValues;
+        	}
+        
+        }, {
+        	name: 'targetValueAllocationRecordsR2',
+        	convert: function(v, rec) {
+        		var targetValues = new Array();
+        		
+        		_.forEach(rec.data.targetValueAllocationRecords, function(record) {
+        			if(record.index == 1) {        				
+        				targetValues.push(record)
+        			}	
+        		});
+        		return targetValues;
+        	}
+        
         }, {
         	name: 'targetValueAllocationRecordsR3',
         	convert: function(v, rec) {
