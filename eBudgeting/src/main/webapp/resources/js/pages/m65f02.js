@@ -157,14 +157,14 @@ var DetailModalView = Backbone.View.extend({
 				
 				var sum =0;
 				
-				for(var i=0; i<node.data.allocationRecordsR3.length; i++) {
-					if(allocRec.get('id') == node.data.allocationRecordsR3[i].id) {
-						node.data.allocationRecordsR3[i].amountAllocated=allocRec.get('amountAllocated');
+				for(var i=0; i<node.data["allocationRecordsR"+round].length; i++) {
+					if(allocRec.get('id') == node.data["allocationRecordsR"+round][i].id) {
+						node.data.data["allocationRecordsR"+round][i].amountAllocated=allocRec.get('amountAllocated');
 					}
-					sum+=node.data.allocationRecordsR3[i].amountAllocated;
+					sum+=node.data["allocationRecordsR"+round][i].amountAllocated;
 				}
 				
-				node.data.sumAllocationR3=sum;
+				node.data["sumAllocationR"+round]=sum;
 				node.commit();
 				
 			},this)
@@ -253,14 +253,14 @@ var DetailModalView = Backbone.View.extend({
 				
 				var sum =0;
 				
-				for(var i=0; i<node.data.allocationRecordsR3.length; i++) {
-					if(record.get('id') == node.data.allocationRecordsR1[i].id) {
-						node.data.allocationRecordsR3[i].amountAllocated=record.get('amountAllocated');
+				for(var i=0; i<node.data["allocationRecordsR"+round].length; i++) {
+					if(record.get('id') == node.data.data["allocationRecordsR"+round][i].id) {
+						node.data.data["allocationRecordsR"+round][i].amountAllocated=record.get('amountAllocated');
 					}
-					sum+=node.data.allocationRecordsR3[i].amountAllocated;
+					sum+=node.data.data["allocationRecordsR"+round][i].amountAllocated;
 				}
 				
-				node.data.sumAllocationR3=sum;
+				node.data["sumAllocationR"+round]=sum;
 				node.commit();
 				
 				// now update parent!
@@ -274,7 +274,7 @@ var DetailModalView = Backbone.View.extend({
 	updateNode: function(node, adjustedAmount) {
 		if(node == null) return;
 		
-		node.data.sumAllocationR1 = node.data.sumAllocationR1 - adjustedAmount;
+		node.data["sumAllocationR"+round] = node.data["sumAllocationR"+round] - adjustedAmount;
 		node.commit();
 		
 		this.updateNode(node.parentNode, adjustedAmount);
