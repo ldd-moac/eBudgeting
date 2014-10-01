@@ -200,6 +200,9 @@ var DetailModalView = Backbone.View.extend({
 				for(var i=0; i<node.data["allocationRecordsR"+round].length; i++) {
 					if(record.get('id') == node.data["allocationRecordsR"+round][i].id) {
 						node.data["allocationRecordsR"+round][i].amountAllocated=record.get('amountAllocated');
+						node.data["allocationRecordsR"+round][i].amountAllocatedNext1Year = record.get('amountAllocatedNext1Year');
+						node.data["allocationRecordsR"+round][i].amountAllocatedNext2Year = record.get('amountAllocatedNext2Year');
+						node.data["allocationRecordsR"+round][i].amountAllocatedNext3Year = record.get('amountAllocatedNext3Year');
 					}
 					sum+=node.data["allocationRecordsR"+round][i].amountAllocated;
 					sumNext1Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext1Year;
@@ -325,11 +328,16 @@ var DetailModalView = Backbone.View.extend({
 				for(var i=0; i<node.data["allocationRecordsR"+round].length; i++) {
 					if(record.get('id') == node.data["allocationRecordsR"+round][i].id) {
 						node.data["allocationRecordsR"+round][i].amountAllocated=record.get('amountAllocated');
+						node.data["allocationRecordsR"+round][i].amountAllocatedNext1Year = record.get('amountAllocatedNext1Year');
+						node.data["allocationRecordsR"+round][i].amountAllocatedNext2Year = record.get('amountAllocatedNext2Year');
+						node.data["allocationRecordsR"+round][i].amountAllocatedNext3Year = record.get('amountAllocatedNext3Year');
 					}
 					sum+=node.data["allocationRecordsR"+round][i].amountAllocated;
 					sumNext1Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext1Year;
 					sumNext2Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext2Year;
 					sumNext3Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext3Year;
+					
+					console.log("sumNext1Year: " + sumNext1Year);
 					
 				}
 				
@@ -931,7 +939,7 @@ renderMainTbl: function() {
 			        	}
 			        	
 			        }, {
-			        	text: 'ปรับลดครั้งที่ '+ round,
+			        	text: 'เพิ่ม-ลดปี '+ fiscalYear,
 			        	width: 120,
 			        	sortable : false,
 			        	dataIndex: 'sumAllocationRound',
@@ -941,7 +949,7 @@ renderMainTbl: function() {
 			        	}
 			        		
 			        }, {
-			        	text: 'ปรับลดปี ' + (parseInt(fiscalYear)+1),
+			        	text: 'เพิ่ม-ลดปี ' + (parseInt(fiscalYear)+1),
 			        	width: 120,
 			        	sortable : false,
 			        	dataIndex: 'sumAllocationRoundNext1Year',
@@ -951,7 +959,7 @@ renderMainTbl: function() {
 			        	}
 			        	
 			        }, {
-			        	text: 'ปรับลดปี ' + (parseInt(fiscalYear)+2),
+			        	text: 'เพิ่ม-ลดปี ' + (parseInt(fiscalYear)+2),
 			        	width: 120,
 			        	sortable : false,
 			        	dataIndex: 'sumAllocationRoundNext2Year',
@@ -961,7 +969,7 @@ renderMainTbl: function() {
 			        	}
 			        	
 			        }, {
-			        	text: 'ปรับลดปี ' + (parseInt(fiscalYear)+3),
+			        	text: 'เพิ่ม-ลดปี ' + (parseInt(fiscalYear)+3),
 			        	width: 120,
 			        	sortable : false,
 			        	dataIndex: 'sumAllocationRoundNext3Year',

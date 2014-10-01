@@ -114,6 +114,7 @@ public class AllocationRecordStrategy implements Serializable {
 	}
 
 	public Long getAmountAllocatedNext1Year() {
+		if(amountAllocatedNext1Year == null) return 0L;
 		return amountAllocatedNext1Year;
 	}
 
@@ -122,6 +123,7 @@ public class AllocationRecordStrategy implements Serializable {
 	}
 
 	public Long getAmountAllocatedNext2Year() {
+		if(amountAllocatedNext2Year == null) return 0L;
 		return amountAllocatedNext2Year;
 	}
 
@@ -130,6 +132,7 @@ public class AllocationRecordStrategy implements Serializable {
 	}
 
 	public Long getAmountAllocatedNext3Year() {
+		if(amountAllocatedNext3Year == null) return 0L;
 		return amountAllocatedNext3Year;
 	}
 
