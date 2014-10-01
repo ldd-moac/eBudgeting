@@ -193,15 +193,25 @@ var DetailModalView = Backbone.View.extend({
 				var node = store.getNodeById(this.currentObjective.get('id'));
 				
 				var sum =0;
+				var sumNext1Year =0;
+				var sumNext2Year =0;
+				var sumNext3Year =0;
 				
 				for(var i=0; i<node.data["allocationRecordsR"+round].length; i++) {
-					if(allocRec.get('id') == node.data["allocationRecordsR"+round][i].id) {
-						node.data.data["allocationRecordsR"+round][i].amountAllocated=allocRec.get('amountAllocated');
+					if(record.get('id') == node.data["allocationRecordsR"+round][i].id) {
+						node.data["allocationRecordsR"+round][i].amountAllocated=record.get('amountAllocated');
 					}
 					sum+=node.data["allocationRecordsR"+round][i].amountAllocated;
+					sumNext1Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext1Year;
+					sumNext2Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext2Year;
+					sumNext3Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext3Year;
+					
 				}
 				
 				node.data["sumAllocationRound"]=sum;
+				node.data["sumAllocationRoundNext1Year"]=sumNext1Year;
+				node.data["sumAllocationRoundNext2Year"]=sumNext2Year;
+				node.data["sumAllocationRoundNext3Year"]=sumNext3Year;
 				node.commit();
 				
 				// now update parent!
@@ -317,9 +327,10 @@ var DetailModalView = Backbone.View.extend({
 						node.data["allocationRecordsR"+round][i].amountAllocated=record.get('amountAllocated');
 					}
 					sum+=node.data["allocationRecordsR"+round][i].amountAllocated;
-					sumNext1Year=+node.data["allocationRecordsR"+round][i].amountAllocatedNext1Year;
-					sumNext2Year=+node.data["allocationRecordsR"+round][i].amountAllocatedNext2Year;
-					sumNext3Year=+node.data["allocationRecordsR"+round][i].amountAllocatedNext3Year;
+					sumNext1Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext1Year;
+					sumNext2Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext2Year;
+					sumNext3Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext3Year;
+					
 				}
 				
 				node.data["sumAllocationRound"]=sum;
