@@ -351,19 +351,32 @@
 <div class="clearfix"></div>
 <div id="formulaBox">
 	<div>
+		<div style="vertical-align:middle"> <strong>ระบุค่าเป้าหมาย:</strong></div>
+	</div>
+	<div style="margin: 0px 8px;">
+		<div class="input-append"><input style="width:80px;" type="text" id="targetValue" data-unitId="{{targetUnit.id}}" value="{{targetValue}}"/><span class="add-on">{{targetUnit.name}}</span></div>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div id="formulaBox">
+	<div>
 		<div style="margin-top:11px;"> <button class="btn copytoNextYear">คัดลอกงบประมาณ</button></div>
+		<div style="text-align:right; padding-top:10px;"> <button class="btn copyTargetToNextYear">คัดลอกเป้าหมาย</button></div>
 	</div>
 	<div style="margin: 0px 8px;">
 		<div><b>ปี {{next1Year}}:</b></div>
 		<div><div class="input-append"><input style="width:120px;" type="text" id="amountAllocatedNext1Year" value="{{amountAllocatedNext1Year}}"/><span class="add-on">บาท</span></div></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" id="targetValueNext1Year" value="{{targetValueNext1Year}}"/><span class="add-on">{{targetUnit.name}}</span></div></div>
 	</div>
 	<div style="margin: 0px 8px;">
 		<div><b>ปี {{next2Year}}:</b></div>
 		<div><div class="input-append"><input style="width:120px;" type="text" id="amountAllocatedNext2Year" value="{{amountAllocatedNext2Year}}"/><span class="add-on">บาท</span></div></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" id="targetValueNext2Year" value="{{targetValueNext2Year}}"/><span class="add-on">{{targetUnit.name}}</span></div></div>
 	</div>
 	<div style="margin: 0px 8px;">
 		<div><b>ปี {{next3Year}}:</b></div>
 		<div><div class="input-append"><input style="width:120px;" type="text" id="amountAllocatedNext3Year" value="{{amountAllocatedNext3Year}}"/><span class="add-on">บาท</span></div></div>
+		<div><div class="input-append"><input style="width:100px;" type="text" id="targetValueNext3Year" value="{{targetValueNext3Year}}"/><span class="add-on">{{targetUnit.name}}</span></div></div>
 	</div>
 </div>
 </script>

@@ -35,7 +35,8 @@ var DetailModalView = Backbone.View.extend({
 		
 		"change .formulaColumnInput" : "formulaInputChange",
 		
-		"click .copytoNextYear" : "copyToNextYear"
+		"click .copytoNextYear" : "copyToNextYear",
+		"click .copyTargetToNextYear" : "copyTargetToNextYear"
 			
 	},
 	setParentView: function(view) {
@@ -47,6 +48,13 @@ var DetailModalView = Backbone.View.extend({
 		this.$el.find('#amountAllocatedNext1Year').val(valueToCopy);
 		this.$el.find('#amountAllocatedNext2Year').val(valueToCopy);
 		this.$el.find('#amountAllocatedNext3Year').val(valueToCopy);
+	},
+	copyTargetToNextYear : function(e) {
+		var valueToCopy = $('#targetValue').val();
+		valueToCopy = valueToCopy.replace(/,/g, '');
+		this.$el.find('#targetValueNext1Year').val(valueToCopy);
+		this.$el.find('#targetValueNext2Year').val(valueToCopy);
+		this.$el.find('#targetValueNext3Year').val(valueToCopy);
 	},
 	cancelBtn : function(e) {
 		this.$el.modal('hide');
@@ -295,6 +303,12 @@ var DetailModalView = Backbone.View.extend({
 		var amountAllocatedNext1Year = parseInt(this.$el.find('#amountAllocatedNext1Year').val()) || 0;
 		var amountAllocatedNext2Year = parseInt(this.$el.find('#amountAllocatedNext2Year').val()) || 0;
 		var amountAllocatedNext3Year = parseInt(this.$el.find('#amountAllocatedNext3Year').val()) || 0;
+		
+		var targetValue = parseInt(this.$el.find('#targetValue').val()) || 0;
+		var targetValueNext1Year = parseInt(this.$el.find('#targetValueNext1Year').val()) || 0;
+		var targetValueNext2Year = parseInt(this.$el.find('#targetValueNext2Year').val()) || 0;
+		var targetValueNext3Year = parseInt(this.$el.find('#targetValueNext3Year').val()) || 0;
+		
 		var record = allocRecStrgy.get('allocationRecord');
 		
 		var adjustedAmountNext1Year = allocRecStrgy.get('amountAllocatedNext1Year')-amountAllocatedNext1Year;
@@ -304,6 +318,12 @@ var DetailModalView = Backbone.View.extend({
 		allocRecStrgy.set('amountAllocatedNext1Year', amountAllocatedNext1Year);
 		allocRecStrgy.set('amountAllocatedNext2Year', amountAllocatedNext2Year);
 		allocRecStrgy.set('amountAllocatedNext3Year', amountAllocatedNext3Year);
+		
+		allocRecStrgy.set('targetValue',targetValue);
+		allocRecStrgy.set('targetValueNext1Year',targetValueNext1Year);
+		allocRecStrgy.set('targetValueNext2Year',targetValueNext2Year);
+		allocRecStrgy.set('targetValueNext3Year',targetValueNext3Year);
+		
 		
 		// then save!
 		allocRecStrgy.save(null, {
@@ -336,8 +356,6 @@ var DetailModalView = Backbone.View.extend({
 					sumNext1Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext1Year;
 					sumNext2Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext2Year;
 					sumNext3Year += node.data["allocationRecordsR"+round][i].amountAllocatedNext3Year;
-					
-					console.log("sumNext1Year: " + sumNext1Year);
 					
 				}
 				

@@ -16,6 +16,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import biz.thaicom.eBudgeting.models.pln.TargetUnit;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -47,6 +49,20 @@ public class AllocationRecordStrategy implements Serializable {
 	private Long amountAllocatedNext2Year;
 	@Basic
 	private Long amountAllocatedNext3Year;
+	
+	
+	@Basic
+	private Long targetValue;
+	@Basic
+	private Long targetValueNext1Year;
+	@Basic
+	private Long targetValueNext2Year;
+	@Basic
+	private Long targetValueNext3Year;
+	@ManyToOne
+	@JoinColumn(name="PLN_UNIT_ID")
+	private TargetUnit targetUnit;
+	
 	
 	@OneToMany
 	@JoinTable(name="BGT_ALLOCREC_PROPOSALSTRGY")
@@ -139,9 +155,49 @@ public class AllocationRecordStrategy implements Serializable {
 	public void setAmountAllocatedNext3Year(Long amountAllocatedNext3Year) {
 		this.amountAllocatedNext3Year = amountAllocatedNext3Year;
 	}
-	
-	
-	
-	
+
+	public Long getTargetValue() {
+		if(targetValue == null) return 0L;
+		return targetValue;
+	}
+
+	public void setTargetValue(Long targetValue) {
+		this.targetValue = targetValue;
+	}
+
+	public Long getTargetValueNext1Year() {
+		if(targetValueNext1Year == null) return 0L;
+		return targetValueNext1Year;
+	}
+
+	public void setTargetValueNext1Year(Long targetValueNext1Year) {
+		this.targetValueNext1Year = targetValueNext1Year;
+	}
+
+	public Long getTargetValueNext2Year() {
+		if(targetValueNext2Year == null) return 0L;
+		return targetValueNext2Year;
+	}
+
+	public void setTargetValueNext2Year(Long targetValueNext2Year) {
+		this.targetValueNext2Year = targetValueNext2Year;
+	}
+
+	public Long getTargetValueNext3Year() {
+		if(targetValueNext3Year == null) return 0L;
+		return targetValueNext3Year;
+	}
+
+	public void setTargetValueNext3Year(Long targetValueNext3Year) {
+		this.targetValueNext3Year = targetValueNext3Year;
+	}
+
+	public TargetUnit getTargetUnit() {
+		return targetUnit;
+	}
+
+	public void setTargetUnit(TargetUnit targetUnit) {
+		this.targetUnit = targetUnit;
+	}
 	
 }

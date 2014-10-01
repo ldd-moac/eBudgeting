@@ -1221,3 +1221,17 @@ alter table BGT_ALLOCRECORDSTRATEGY
 add (amountAllocatedNext1Year number(19,0),
 	amountAllocatedNext2Year number(19,0),
 	amountAllocatedNext3Year number(19,0));
+	
+-- version 21
+-- Modified Date: October 1, 2014
+update app_info set db_version = 21;
+alter table BGT_ALLOCRECORDSTRATEGY
+add (targetValue number(19,0),
+	targetValueNext1Year number(19,0),
+	targetValueNext2Year number(19,0),
+	targetValueNext3Year number(19,0),
+	PLN_UNIT_ID number(19,0));
+alter table BGT_ALLOCRECORDSTRATEGY
+		add constraint FK834293E8DE82F831 
+        foreign key (PLN_UNIT_ID) 
+        references PLN_TARGETUNIT;

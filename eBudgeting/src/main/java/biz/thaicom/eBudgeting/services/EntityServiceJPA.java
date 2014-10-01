@@ -1329,6 +1329,7 @@ public class EntityServiceJPA implements EntityService {
 					newR.setAmountAllocatedNext1Year(r.getAmountAllocatedNext1Year());
 					newR.setAmountAllocatedNext2Year(r.getAmountAllocatedNext2Year());
 					newR.setAmountAllocatedNext3Year(r.getAmountAllocatedNext3Year());
+					
 					newR.setBudgetType(r.getBudgetType());
 					newR.setIndex(round-1);
 					newR.setForObjective(r.getForObjective());
@@ -1340,11 +1341,17 @@ public class EntityServiceJPA implements EntityService {
 						for(AllocationRecordStrategy ars : r.getAllocationRecordStrategies()) {
 							AllocationRecordStrategy newArs = new AllocationRecordStrategy();
 							newArs.setAllocationRecord(newR);
+							newArs.setTargetUnit(ars.getTargetUnit());
 							newArs.setStrategy(ars.getStrategy());
 							newArs.setTotalCalculatedAmount(ars.getTotalCalculatedAmount());
 							newArs.setAmountAllocatedNext1Year(ars.getAmountAllocatedNext1Year());
 							newArs.setAmountAllocatedNext2Year(ars.getAmountAllocatedNext2Year());
 							newArs.setAmountAllocatedNext3Year(ars.getAmountAllocatedNext3Year());
+							newArs.setTargetValue(ars.getTargetValue());
+							newArs.setTargetValueNext1Year(ars.getTargetValueNext1Year());
+							newArs.setTargetValueNext2Year(ars.getTargetValueNext2Year());
+							newArs.setTargetValueNext3Year(ars.getTargetValueNext3Year());
+							
 							
 							newR.getAllocationRecordStrategies().add(newArs);
 							
@@ -1506,11 +1513,16 @@ public class EntityServiceJPA implements EntityService {
 							
 							ars.getProposalStrategies().add(ps);
 							
+							ars.setTargetUnit(ps.getTargetUnit());
 							
 							ars.setTotalCalculatedAmount(ps.getTotalCalculatedAmount());
 							ars.setAmountAllocatedNext1Year(ps.getAmountRequestNext1Year());
 							ars.setAmountAllocatedNext2Year(ps.getAmountRequestNext2Year());
 							ars.setAmountAllocatedNext3Year(ps.getAmountRequestNext3Year());
+							ars.setTargetValue(ps.getTargetValue());
+							ars.setTargetValueNext1Year(ps.getTargetValueNext1Year());
+							ars.setTargetValueNext2Year(ps.getTargetValueNext2Year());
+							ars.setTargetValueNext3Year(ps.getTargetValueNext3Year());
 							
 							
 							if(ps.getFormulaStrategy() == null) {
@@ -1522,6 +1534,14 @@ public class EntityServiceJPA implements EntityService {
 						} else {
 							
 								ars.setTotalCalculatedAmount(ars.getTotalCalculatedAmount() + ps.getTotalCalculatedAmount());
+								ars.setAmountAllocatedNext1Year(ars.getAmountAllocatedNext1Year() + ps.getAmountRequestNext1Year());
+								ars.setAmountAllocatedNext1Year(ars.getAmountAllocatedNext2Year() + ps.getAmountRequestNext2Year());
+								ars.setAmountAllocatedNext1Year(ars.getAmountAllocatedNext3Year() + ps.getAmountRequestNext3Year());
+								
+								ars.setTargetValue(ars.getTargetValue() + ps.getTargetValue());
+								ars.setTargetValueNext1Year(ars.getTargetValueNext1Year() + ps.getTargetValueNext1Year());
+								ars.setTargetValueNext2Year(ars.getTargetValueNext2Year() + ps.getTargetValueNext2Year());
+								ars.setTargetValueNext3Year(ars.getTargetValueNext3Year() + ps.getTargetValueNext3Year());
 							
 							ars.getProposalStrategies().add(ps);
 						}
@@ -3072,6 +3092,10 @@ public class EntityServiceJPA implements EntityService {
 			Long amountAllocatedNext2Year = data.get("amountAllocatedNext2Year").asLong();
 			Long amountAllocatedNext3Year = data.get("amountAllocatedNext3Year").asLong();
 			
+			Long targetValue = data.get("targetValue").asLong();
+			Long targetValueNext1Year = data.get("targetValueNext1Year").asLong();
+			Long targetValueNext2Year = data.get("targetValueNext2Year").asLong();
+			Long targetValueNext3Year = data.get("targetValueNext3Year").asLong();
 			
 			Long adjustAllocatedNext1Year = ars.getAmountAllocatedNext1Year() - amountAllocatedNext1Year;
 			Long adjustAllocatedNext2Year = ars.getAmountAllocatedNext2Year() - amountAllocatedNext2Year;
@@ -3082,6 +3106,10 @@ public class EntityServiceJPA implements EntityService {
 			ars.setAmountAllocatedNext2Year(amountAllocatedNext2Year);
 			ars.setAmountAllocatedNext3Year(amountAllocatedNext3Year);
 			
+			ars.setTargetValue(targetValue);
+			ars.setTargetValueNext1Year(targetValueNext1Year);
+			ars.setTargetValueNext2Year(targetValueNext2Year);
+			ars.setTargetValueNext3Year(targetValueNext3Year);
 			
 			for(JsonNode rcNode : data.get("requestColumns")) {
 				RequestColumn rc = requestColumnRepositories.findOne(rcNode.get("id").asLong());
@@ -5172,11 +5200,16 @@ public class EntityServiceJPA implements EntityService {
 		ar.getAllocationRecordStrategies().size();
 		for(AllocationRecordStrategy ars : ar.getAllocationRecordStrategies()) {
 			ars.getRequestColumns().size();
+			if(ars.getTargetUnit() != null) {
+				ars.getTargetUnit().getId();
+			}
 			if(ars.getStrategy()!= null && ars.getStrategy().getAllocationStandardPriceMap()!=null) {
 				ars.getStrategy().getAllocationStandardPriceMap().size();
 				for(FormulaColumn fc: ars.getStrategy().getFormulaColumns()) {
 					fc.getAllocatedFormulaColumnValueMap().size();
 				}
+				ars.getStrategy().getUnit().getId();
+				
 			}
 			
 		}
