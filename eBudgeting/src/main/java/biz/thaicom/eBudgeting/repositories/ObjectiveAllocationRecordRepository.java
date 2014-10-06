@@ -39,10 +39,11 @@ public interface ObjectiveAllocationRecordRepository extends
 			Integer fiscalYear, Integer index);
 
 	@Query(""
-			+ "SELECT sum(record.amountAllocated) "
+			+ "SELECT sum(record.amountAllocated), sum(record.amountAllocatedNext1Year),"
+			+ "		sum(record.amountAllocatedNext2Year), sum(record.amountAllocatedNext3Year) "
 			+ "FROM ObjectiveAllocationRecord record "
 			+ "WHERE record.forObjective = ?1 and record.index = ?2 ")
-	Long findSumAllocationForObjectiveAndIndex(Objective obj, int i);
+	List<Object[]> findSumAllocationForObjectiveAndIndex(Objective obj, int i);
 
 	@Query("" +
 			"SELECT record " +

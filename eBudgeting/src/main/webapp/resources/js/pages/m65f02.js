@@ -177,7 +177,7 @@ var DetailModalView = Backbone.View.extend({
 		
 		var adjustedAmount = parseInt(totalInputTxt) - allocRec.get('amountAllocated');
 		
-		console.log("updateAllocRed: ");
+		
 		// now see to its change!
 		allocRec.set('amountAllocated', parseInt(totalInputTxt));
 		
@@ -190,7 +190,6 @@ var DetailModalView = Backbone.View.extend({
 			success: _.bind(function(model, response, options) {
 				// now see to its change!
 				allocRec.set('amountAllocated', parseInt(totalInputTxt));
-				allocRec.set('amountAllocated', totalInputTxt);
 				allocRec.set('amountAllocatedNext1Year', amountAllocatedNext1Year);
 				allocRec.set('amountAllocatedNext2Year', amountAllocatedNext2Year);
 				allocRec.set('amountAllocatedNext3Year', amountAllocatedNext3Year);

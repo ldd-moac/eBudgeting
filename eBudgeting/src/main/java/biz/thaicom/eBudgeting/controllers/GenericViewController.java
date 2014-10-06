@@ -903,24 +903,34 @@ public class GenericViewController {
 	
 	// --------------------------------------------------------------m63f01:
 	// การปรับลดงบประมาณระดับกิจกรรมรอบที่ 1
-	@RequestMapping("/page/m63f01/")
-	public String render_m63f01(Model model, HttpSession session) {
+	@RequestMapping("/page/m63f01_orig/")
+	public String render_m63f01Orig(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
+		model.addAttribute("round", 1);
 		setFiscalYearFromSession(model, session);
 
 		return "m63f01";
 	}
 
-	// --------------------------------------------------------------m63f02:
-	// การปรับลดงบประมาณระดับรายการรอบที่ 1
-	@RequestMapping("/page/m63f02_orig/")
-	public String render_m63f02_orig(Model model, HttpSession session) {
+	@RequestMapping("/page/m63f01/")
+	public String render_m63f01(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
 		model.addAttribute("round", 1);
 		setFiscalYearFromSession(model, session);
-		
-		return "m63f02";
+
+		return "m65f01";
 	}
+	
+	// --------------------------------------------------------------m63f02:
+	// การปรับลดงบประมาณระดับรายการรอบที่ 1
+//	@RequestMapping("/page/m63f02_orig/")
+//	public String render_m63f02_orig(Model model, HttpSession session) {
+//		model.addAttribute("rootPage", true);
+//		model.addAttribute("round", 1);
+//		setFiscalYearFromSession(model, session);
+//		
+//		return "m63f02";
+//	}
 	
 	@RequestMapping("/page/m63f02/")
 	public String render_m63f02(Model model, HttpSession session) {
@@ -977,9 +987,10 @@ public class GenericViewController {
 	@RequestMapping("/page/m64f01/")
 	public String render_m64f01(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
+		model.addAttribute("round", 2);
 		setFiscalYearFromSession(model, session);
 
-		return "m64f01";
+		return "m65f01";
 	}
 
 
@@ -993,14 +1004,15 @@ public class GenericViewController {
 		
 		return "m65f02";
 	}
-	@RequestMapping("/page/m64f02_orig/")
-	public String render_m64f02_orig(Model model, HttpSession session) {
-		model.addAttribute("rootPage", true);
-		model.addAttribute("round", 2);
-		setFiscalYearFromSession(model, session);
-		
-		return "m64f02";
-	}
+
+	//	@RequestMapping("/page/m64f02_orig/")
+//	public String render_m64f02_orig(Model model, HttpSession session) {
+//		model.addAttribute("rootPage", true);
+//		model.addAttribute("round", 2);
+//		setFiscalYearFromSession(model, session);
+//		
+//		return "m64f02";
+//	}
 
 	// --------------------------------------------------------------m64f04:
 	//  การประมวลผลก่อนการปรับลดรอบที่ 2
@@ -1047,6 +1059,7 @@ public class GenericViewController {
 	@RequestMapping("/page/m65f01/")
 	public String render_m65f01(Model model, HttpSession session) {
 		model.addAttribute("rootPage", true);
+		model.addAttribute("round", 3);
 		setFiscalYearFromSession(model, session);
 
 		return "m65f01";

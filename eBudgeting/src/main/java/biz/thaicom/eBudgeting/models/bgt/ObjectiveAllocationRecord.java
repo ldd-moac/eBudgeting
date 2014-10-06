@@ -18,6 +18,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import biz.thaicom.eBudgeting.models.pln.Objective;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -42,6 +43,13 @@ public class ObjectiveAllocationRecord implements Serializable{
 	
 	@Basic
 	private Long amountAllocated;
+	
+	@Basic
+	private Long amountAllocatedNext1Year;
+	@Basic
+	private Long amountAllocatedNext2Year;
+	@Basic
+	private Long amountAllocatedNext3Year;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="BUDGETTYPE_BGT_ID")
@@ -91,10 +99,38 @@ public class ObjectiveAllocationRecord implements Serializable{
 		this.budgetType = budgetType;
 	}
 
-	public void adjustAmountAllocated(Long adjustedAmount) {
+	public void adjustAmountAllocated(Long adjustedAmount, Long adjustedAmountNext1Year, Long adjustedAmountNext2Year, Long adjustedAmountNext3Year) {
 		this.amountAllocated = this.amountAllocated - adjustedAmount;
+		this.amountAllocatedNext1Year = this.getAmountAllocatedNext1Year() - adjustedAmountNext1Year;
+		this.amountAllocatedNext2Year = this.getAmountAllocatedNext2Year() - adjustedAmountNext2Year;
+		this.amountAllocatedNext3Year = this.getAmountAllocatedNext3Year() - adjustedAmountNext3Year;
 		
 	}
-	
+	public Long getAmountAllocatedNext1Year() {
+		if(this.amountAllocatedNext1Year == null)  amountAllocatedNext1Year = 0L;
+		return amountAllocatedNext1Year;
+	}
+
+	public void setAmountAllocatedNext1Year(Long amountAllocatedNext1Year) {
+		this.amountAllocatedNext1Year = amountAllocatedNext1Year;
+	}
+
+	public Long getAmountAllocatedNext2Year() {
+		if(this.amountAllocatedNext2Year == null)  amountAllocatedNext2Year = 0L;
+		return amountAllocatedNext2Year;
+	}
+
+	public void setAmountAllocatedNext2Year(Long amountAllocatedNext2Year) {
+		this.amountAllocatedNext2Year = amountAllocatedNext2Year;
+	}
+
+	public Long getAmountAllocatedNext3Year() {
+		if(this.amountAllocatedNext3Year == null)  amountAllocatedNext3Year = 0L;
+		return amountAllocatedNext3Year;
+	}
+
+	public void setAmountAllocatedNext3Year(Long amountAllocatedNext3Year) {
+		this.amountAllocatedNext3Year = amountAllocatedNext3Year;
+	}
 
 }

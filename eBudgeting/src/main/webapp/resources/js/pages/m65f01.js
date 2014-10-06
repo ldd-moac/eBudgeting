@@ -33,15 +33,23 @@ var DetailModalView = Backbone.View.extend({
 		"click .updateAllocRec" : "updateAllocRec",
 		"click .updateAllocRecStrgy" : "updateAllocRecStrgy",
 		
-		"change .formulaColumnInput" : "formulaInputChange"
+		"change .formulaColumnInput" : "formulaInputChange",
+		"click .copytoNextYear" : "copyToNextYear"
 			
 	},
 	setParentView: function(view) {
 		this.parentView = view;
 	},
+	copyToNextYear : function(e) {
+		var valueToCopy = $('#totalInputTxt').val();
+		valueToCopy = valueToCopy.replace(/,/g, '');
+		this.$el.find('#amountAllocatedNext1Year').val(valueToCopy);
+		this.$el.find('#amountAllocatedNext2Year').val(valueToCopy);
+		this.$el.find('#amountAllocatedNext3Year').val(valueToCopy);
+	},
 	cancelBtn : function(e) {
 		this.$el.modal('hide');
-		this.parentView.reloadTable();
+		//this.parentView.reloadTable();
 		
 	},
 	backToProposal : function(e) {
@@ -70,16 +78,28 @@ var DetailModalView = Backbone.View.extend({
 		_.forEach(json.sumBudgetTypeObjectiveProposals, _.bind(function(proposal) {
 			var budgetType = BudgetType.findOrCreate({id:proposal.budgetType.id});
 			// search the allocationR2 
-			var objectiveAllocationRecord = this.currentObjective.get('objectiveAllocationRecordsR2').findWhere({budgetType:budgetType});
+			var objectiveAllocationRecord = this.currentObjective.get('objectiveAllocationRecordsR'+round).findWhere({budgetType:budgetType});
 			if(objectiveAllocationRecord  != null) {
 				
 				var r1 = this.currentObjective.get('objectiveAllocationRecordsR1').findWhere({budgetType:budgetType});
 				var r2 = this.currentObjective.get('objectiveAllocationRecordsR2').findWhere({budgetType:budgetType});
+				var r3 = this.currentObjective.get('objectiveAllocationRecordsR3').findWhere({budgetType:budgetType});
+				proposal.rounds = new Array(round);
+				json.rounds = new Array(round);
 				
-				proposal.amountAllocated = objectiveAllocationRecord.get('amountAllocated');
-				proposal.amountAllocatedR1 = r1.get('amountAllocated');
-				proposal.amountAllocatedR2 = r2.get('amountAllocated');
-				proposal.allocationId = objectiveAllocationRecord.get('id');
+				for(var i=0; i<round; i++) {
+					var roundNum=i+1;
+					var r = this.currentObjective.get('objectiveAllocationRecordsR'+roundNum).findWhere({budgetType:budgetType});
+					proposal.rounds[i]={};
+					proposal.rounds[i].amountAllocated = r.get('amountAllocated');
+					proposal.rounds[i].round =1;
+					json.rounds[i] = {};
+					json.rounds[i].roundNum = i+1;
+				}
+				
+				
+					proposal.allocationId = objectiveAllocationRecord.get('id');
+				
 			}
 			
 		},this));
@@ -108,6 +128,9 @@ var DetailModalView = Backbone.View.extend({
 		this.$el.find('.modal-footer').html(this.detailAllocationBasicFooterTemplate());
 		
 		var json = allocRec.toJSON();
+		json.next1Year = fiscalYear+1;
+		json.next2Year = fiscalYear+2;
+		json.next3Year = fiscalYear+3;
 		
 		var html = this.detailAllocationBasicTemplate(json);
 		
@@ -134,18 +157,85 @@ var DetailModalView = Backbone.View.extend({
 		}
 		
 		var allocRec = ObjectiveAllocationRecord.findOrCreate(this.$el.find('#allocRecId').attr('data-id'));
-		var totalInputTxt = this.$el.find('#totalInputTxt').val();
+		
+		var amountAllocatedNext1Year = parseInt(this.$el.find('#amountAllocatedNext1Year').val());
+		var amountAllocatedNext2Year = parseInt(this.$el.find('#amountAllocatedNext2Year').val());
+		var amountAllocatedNext3Year = parseInt(this.$el.find('#amountAllocatedNext3Year').val());
+		var totalInputTxt = parseInt(this.$el.find('#totalInputTxt').val());
+		
+		var adjustedAmount = allocRec.get('amountAllocated') - totalInputTxt;
+		var adjustedAmountNext1Year = allocRec.get('amountAllocatedNext1Year')-amountAllocatedNext1Year;
+		var adjustedAmountNext2Year = allocRec.get('amountAllocatedNext2Year')-amountAllocatedNext2Year;
+		var adjustedAmountNext3Year = allocRec.get('amountAllocatedNext3Year')-amountAllocatedNext3Year;
 		
 		// now see to its change!
 		allocRec.set('amountAllocated', parseInt(totalInputTxt));
 		
 		// and we can save
-		allocRec.save(null, {
-			success:function(model, response, options) {
+		allocRec.save({amountAllocated: totalInputTxt,
+			amountAllocatedNext1Year: amountAllocatedNext1Year,
+			amountAllocatedNext2Year: amountAllocatedNext2Year,
+			amountAllocatedNext3Year: amountAllocatedNext3Year
+			}, {
+			success:_.bind(function(model, response, options) {
+				
+				
+				
+				
+				allocRec.set('amountAllocated', parseInt(totalInputTxt));
+				allocRec.set('amountAllocatedNext1Year', amountAllocatedNext1Year);
+				allocRec.set('amountAllocatedNext2Year', amountAllocatedNext2Year);
+				allocRec.set('amountAllocatedNext3Year', amountAllocatedNext3Year);
+				
 				alert('บันทึกเรียบร้อยแล้ว');
-			}
+				
+				var store=Ext.getStore('treeObjectiveStore');
+				var node = store.getNodeById(this.currentObjective.get('id'));
+				
+				var sum =0;
+				var sumNext1Year =0;
+				var sumNext2Year =0;
+				var sumNext3Year =0;
+				
+				for(var i=0; i<node.data["objectiveAllocationRecordsR"+round].length; i++) {
+					if(allocRec.get('id') == node.data["objectiveAllocationRecordsR"+round][i].id) {
+						node.data["objectiveAllocationRecordsR"+round][i].amountAllocated = allocRec.get('amountAllocated');
+						node.data["objectiveAllocationRecordsR"+round][i].amountAllocatedNext1Year = allocRec.get('amountAllocatedNext1Year');
+						node.data["objectiveAllocationRecordsR"+round][i].amountAllocatedNext2Year = allocRec.get('amountAllocatedNext2Year');
+						node.data["objectiveAllocationRecordsR"+round][i].amountAllocatedNext3Year = allocRec.get('amountAllocatedNext3Year');
+					}
+					sum+=node.data["objectiveAllocationRecordsR"+round][i].amountAllocated;
+					sumNext1Year += node.data["objectiveAllocationRecordsR"+round][i].amountAllocatedNext1Year;
+					sumNext2Year += node.data["objectiveAllocationRecordsR"+round][i].amountAllocatedNext2Year;
+					sumNext3Year += node.data["objectiveAllocationRecordsR"+round][i].amountAllocatedNext3Year;
+					
+				}
+				
+				node.data["sumObjectiveAllocationRound"]=sum;
+				node.data["sumObjectiveAllocationRoundNext1Year"]=sumNext1Year;
+				node.data["sumObjectiveAllocationRoundNext2Year"]=sumNext2Year;
+				node.data["sumObjectiveAllocationRoundNext3Year"]=sumNext3Year;
+				node.commit();
+				
+				// now update parent!
+				this.updateNode(node.parentNode, adjustedAmount, adjustedAmountNext1Year, adjustedAmountNext2Year, adjustedAmountNext3Year);
+				
+			},this)
 		});
 		
+		
+	},
+	
+	updateNode: function(node, adjustedAmount, adjustedAmountNext1Year, adjustedAmountNext2Year, adjustedAmountNext3Year) {
+		if(node == null) return;
+		
+		node.data["sumObjectiveAllocationRound"] = node.data["sumObjectiveAllocationRound"] - adjustedAmount;
+		node.data["sumObjectiveAllocationRoundNext1Year"] = node.data["sumObjectiveAllocationRoundNext1Year"] - adjustedAmountNext1Year;
+		node.data["sumObjectiveAllocationRoundNext2Year"] = node.data["sumObjectiveAllocationRoundNext2Year"] - adjustedAmountNext2Year;
+		node.data["sumObjectiveAllocationRoundNext3Year"] = node.data["sumObjectiveAllocationRoundNext3Year"] - adjustedAmountNext3Year;
+		node.commit();
+		
+		this.updateNode(node.parentNode, adjustedAmount);
 		
 	},
 	
@@ -397,15 +487,30 @@ var TargetValueModalView=Backbone.View.extend({
 	events : {
 		"click #saveBtn" : "saveTargetValue",
 		"click #cancelBtn" : "cancelTargetValue",
+		"click .copyTargetToNextYear" : "copyTargetToNextYear",
 	},
-	
+	setParentView: function(view) {
+		this.parentView = view;
+	},
+	copyTargetToNextYear : function(e) {
+		var valueToCopy = $('#targetValueAmountAllocated').val();
+		valueToCopy = valueToCopy.replace(/,/g, '');
+		this.$el.find('#targetValueAmountAllocatedNext1Year').val(valueToCopy);
+		this.$el.find('#targetValueAmountAllocatedNext2Year').val(valueToCopy);
+		this.$el.find('#targetValueAmountAllocatedNext3Year').val(valueToCopy);
+	},
 	targetValueModalTpl : Handlebars.compile($("#targetValueModalTemplate").html()),
 	render: function() {
 		
 		
-		this.$el.find('.modal-header span').html(this.objectiveTarget.get('name'));
+		this.$el.find('.modal-header span').html(this.objective.get('name'));
 		
-		var html = this.targetValueModalTpl(this.targetValue.toJSON());
+		var json = this.targetValue.toJSON();
+		json.next1Year = fiscalYear+1;
+		json.next2Year = fiscalYear+2;
+		json.next3Year = fiscalYear+3;
+		
+		var html = this.targetValueModalTpl(json);
 		this.$el.find('.modal-body').html(html);
 
 		
@@ -422,14 +527,44 @@ var TargetValueModalView=Backbone.View.extend({
 	},
 	saveTargetValue: function() {
 		// we'll try to save
-		var input = parseInt(this.$el.find('input').val());
+		var amountAllocated = parseInt(this.$el.find('#targetValueAmountAllocated').val());
+		var amountAllocatedNext1Year = parseInt(this.$el.find('#targetValueAmountAllocatedNext1Year').val());
+		var amountAllocatedNext2Year = parseInt(this.$el.find('#targetValueAmountAllocatedNext2Year').val());
+		var amountAllocatedNext3Year = parseInt(this.$el.find('#targetValueAmountAllocatedNext3Year').val());
+		
 		
 		this.targetValue.save({
-			 amountAllocated: input
+			 amountAllocated: amountAllocated,
+			 amountAllocatedNext1Year : amountAllocatedNext1Year,
+			 amountAllocatedNext2Year : amountAllocatedNext2Year,
+			 amountAllocatedNext3Year : amountAllocatedNext3Year
 		}, {
-			success: function(){
-				window.location.reload();
-			}
+			success: _.bind(function(){
+				this.targetValue.set('amountAllocated', amountAllocated);
+				this.targetValue.set('amountAllocatedNext1Year', amountAllocatedNext1Year);
+				this.targetValue.set('amountAllocatedNext2Year', amountAllocatedNext2Year);
+				this.targetValue.set('amountAllocatedNext3Year', amountAllocatedNext3Year);
+				
+				// now update 
+				var store=Ext.getStore('treeObjectiveStore');
+				var node = store.getNodeById(this.objective.get('id'));
+				
+				var tvars = node.data.targetValueAllocationRecordsRound;
+				
+				for(var i=0; i<tvars.length; i++) {
+					if(tvars[i].id==this.targetValue.get('id')) {
+						tvars[i].amountAllocated = amountAllocated;
+						tvars[i].amountAllocatedNext1Year = amountAllocatedNext1Year;
+						tvars[i].amountAllocatedNext2Year = amountAllocatedNext2Year;
+						tvars[i].amountAllocatedNext3Year = amountAllocatedNext3Year;
+						continue;
+					}
+				}
+				
+				node.commit();
+				
+				this.$el.modal('hide');
+			},this)
 		});
 		
 		
@@ -439,13 +574,12 @@ var TargetValueModalView=Backbone.View.extend({
 	renderWith: function(objective, targetId, valueId) {
 		this.objective = objective;
 		this.objectiveTarget=ObjectiveTarget.findOrCreate(targetId);
-		this.targetValue=TargetValueAllocationRecord.findOrCreate(valueId);
-		if(this.targetValue == null) {
-			this.targetValue = new TargetValue();
-			this.targetValue.set('forObjective', objective);
-			this.targetValue.set('target', this.objectiveTarget);
-		}
-		this.render();
+		this.targetValue=TargetValueAllocationRecord.findOrCreate({id:valueId});
+		this.targetValue.fetch({
+			success: _.bind(function() {
+				this.render();
+			},this)
+		});
 	}
 
 });
@@ -609,13 +743,16 @@ var MainCtrView = Backbone.View.extend({
 	},
 	
 	targetValueModal: function(e) {
-		var currentObjectiveId = $(e.target).parents('tr').attr('data-id');
-		var currentObjective = Objective.findOrCreate(currentObjectiveId);
-		
+		var currentObjectiveId = $(e.target).attr('objective-id');
 		var targetId = $(e.target).attr('target-id');
-		var valueId = $(e.target).attr('data-id');
-		
-		this.targetValueModalView.renderWith(currentObjective, targetId, valueId);
+		var valueId = $(e.target).attr('value-id');
+		this.targetValueModalView.setParentView(this);
+		var currentObjective = Objective.findOrCreate({id:currentObjectiveId});
+		currentObjective.fetch({
+			success: _.bind(function() {
+				this.targetValueModalView.renderWith(currentObjective, targetId, valueId);
+			},this)
+		});
 	},
 	
 	detailModal: function(e) {
@@ -652,137 +789,142 @@ var MainCtrView = Backbone.View.extend({
 		this.renderMainTbl();
 	},
 	reloadTable: function() {
-		this.treeStore.reload();
+		// this.treeStore.reload();
 	},
 	renderMainTbl: function() {
 		
-		//this.collection = new ObjectiveCollection();
+		this.collection = new ObjectiveCollection();
 		//this.rootCollection = new ObjectiveCollection();
 		
-		//this.collection.url = appUrl("/ObjectiveWithBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants");
+		this.collection.url = appUrl("/ObjectiveWithObjectiveBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants");
+		this.$el.find('#mainTbl').html(this.loadingTemplate());
 		
-		//this.$el.find('#mainTbl').html(this.loadingTemplate());
-		this.$el.find('#mainTbl').empty();
-		
-		this.treeStore = Ext.create('Ext.data.TreeStore', {
-	        model: 'data.Model.Objective',
-	        proxy: {
-	            type: 'ajax',
-	            //the store will get the content from the .json file
-	            url: appUrl("/ObjectiveWithObjectiveBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants")
-	        },
-	        folderSort: false
-	    });
-		
-		if(this.tree !=null) {
-			this.tree.destroy();
-		}
-		
-		this.tree = Ext.create('Ext.tree.Panel', {
-			id: 'treeGrid',
-	        title: 'การของบประมาณ',
-	        width: 820,
-	        height: 300,
-	        renderTo: Ext.getElementById('mainTbl'),
-	        collapsible: false,
-	        rootVisible: false,
-	        store: this.treeStore,
-	        columnLines: true, 
-	        rowLines: true,
-	        multiSelect: true,
-	        frame: true,
-	        columns: [{
-	             //this is so we know which column will show the tree
-	        	xtype: 'treecolumn',
-	            text: 'กิจกรรมรอง',
-	            sortable: true,
-	            dataIndex: 'codeAndName',
-	        	width: 300,
-	            locked: true,
-	            renderer: function(value, metaData, record, rowIdx, colIdx, store) {
-	                metaData.tdAttr = 'data-qtip="' + value + '"';
-	                if(record.data.children == null || record.data.children.length == 0) {
-	                	return "<a href='#' data-objectiveId=" + record.data.id +  " class='detail'>"+ value + "</a>";	
-	                }
-	                return value;
-	            }
-	        }, {
-	        	text: 'เป้าหมาย',
-	        	width: 80,
-	        	sortable: false,
-	        	align: 'center'
-	        }, {
-	        	text: 'ปรับลดครั้งที่ 3',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumObjectiveAllocationR3',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'ปรับลดครั้งที่ 2',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumObjectiveAllocationR2',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'ปรับลดครั้งที่ 1',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumObjectiveAllocationR1',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'ขอตั้งปี ' + fiscalYear,
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumObjectiveProposals',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
-	        }, {
-	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+1),
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumObjectiveProposalsNext1year',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
-	        }, {
-	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+2),
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumObjectiveProposalsNext2year',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
-	        }, {
-	        	text: 'ขอตั้งปี ' + (parseInt(fiscalYear)+3),
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumObjectiveProposalsNext3year',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        	
-	        }]
-		});	
+		this.collection.fetch({
+			success: _.bind(function() {
+				var json = {};
+				json.objectives = this.collection.toJSON();
+				
+				this.$el.find('#mainTbl').empty();
+				
+				this.treeStore = Ext.create('Ext.data.TreeStore', {
+			        model: 'data.Model.Objective',
+			        storeId: 'treeObjectiveStore',
+			        proxy: {
+			            type: 'memory',
+			            data: json.objectives,
+			            reader: {
+			            	type: 'json'
+			            }
+			            //the store will get the content from the .json file
+			            //url: appUrl("/ObjectiveWithObjectiveBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants")
+			        },
+			        folderSort: false
+			    });
+				
+				if(this.tree !=null) {
+					this.tree.destroy();
+				}
+				
+				this.tree = Ext.create('Ext.tree.Panel', {
+					id: 'treeGrid',
+			        title: 'การของบประมาณ',
+			        width: 820,
+			        height: 300,
+			        renderTo: Ext.getElementById('mainTbl'),
+			        collapsible: false,
+			        rootVisible: false,
+			        store: this.treeStore,
+			        columnLines: true, 
+			        rowLines: true,
+			        multiSelect: true,
+			        frame: true,
+			        columns: [{
+			             //this is so we know which column will show the tree
+			        	xtype: 'treecolumn',
+			            text: 'กิจกรรมรอง',
+			            sortable: true,
+			            dataIndex: 'codeAndName',
+			        	width: 300,
+			            locked: true,
+			            renderer: function(value, metaData, record, rowIdx, colIdx, store) {
+			                metaData.tdAttr = 'data-qtip="' + value + '"';
+			                if(record.data.children == null || record.data.children.length == 0) {
+			                	return "<a href='#' data-objectiveId=" + record.data.id +  " class='detail'>"+ value + "</a>";	
+			                }
+			                return value;
+			            }
+			        }, {
+			        	text: 'เป้าหมาย',
+			        	width: 80,
+			        	sortable: false,
+			        	dataIndex: 'targetValueAllocationRecordsRound',
+			        	align: 'center',
+			        	renderer: function(value, metaData, record, rowIdx, colIdx, store) {
+			        		var html="";
+			        		for(var i=0; i<value.length; i++ ) {
+			        			if(i>0) {
+			        				html += "<br/>";
+			        			}
+			        			var unit = TargetUnit.findOrCreate(value[i].target.unit);
+			        			html += "<a href='#' class='targetValueModal' objective-id='"+value[i].forObjective+"' value-id='"+value[i].id+"' target-id='"+value[i].target.id+"'>"+addCommas(value[i].amountAllocated)+" " + unit.get('name') + "</a>"; 
+			        		}
+			        		return html;
+			        	}
+			        }, {
+			        	text: 'ขอตั้งปี ' + fiscalYear,
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumObjectiveProposals',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        	
+			        },  {
+			        	text: 'เพิ่ม-ลดปี '+ fiscalYear,
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumObjectiveAllocationRound',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        		
+			        }, {
+			        	text: 'เพิ่ม-ลดปี ' + (parseInt(fiscalYear)+1),
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumObjectiveAllocationRoundNext1Year',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        	
+			        }, {
+			        	text: 'เพิ่ม-ลดปี ' + (parseInt(fiscalYear)+2),
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumObjectiveAllocationRoundNext2Year',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        	
+			        }, {
+			        	text: 'เพิ่ม-ลดปี ' + (parseInt(fiscalYear)+3),
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumObjectiveAllocationRoundNext3Year',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        }]
+				});			
+				
+			}, this)
+		});
+			
 	}
 });
 	

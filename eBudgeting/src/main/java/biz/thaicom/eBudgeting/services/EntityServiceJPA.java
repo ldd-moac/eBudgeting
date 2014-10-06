@@ -350,27 +350,67 @@ public class EntityServiceJPA implements EntityService {
 			// assume no children!
 			obj.setChildren(null);
 			
-			Long sumAllocation = allocationRecordRepository.findSumAllocationForObjectiveAndIndex(obj, roundNum-1);
+			List<Object[]> sumAllocation = allocationRecordRepository.findSumAllocationForObjectiveAndIndex(obj, roundNum-1);
 			obj.setAllocationRecordsR1(new ArrayList<AllocationRecord>());
 			AllocationRecord ar = new AllocationRecord();
 			ar.setForObjective(obj);
 			ar.setIndex(roundNum-1);
-			if(sumAllocation == null) {
+			if(sumAllocation == null || sumAllocation.size() == 0) {
 				ar.setAmountAllocated(0L);
+				ar.setAmountAllocatedNext1Year(0L);
+				ar.setAmountAllocatedNext2Year(0L);
+				ar.setAmountAllocatedNext3Year(0L);
 			} else {
-				ar.setAmountAllocated(sumAllocation);
+				Object[] sum = sumAllocation.get(0);
+				ar.setAmountAllocated((Long) sum[0]);
+				if(sum[1] == null) {
+					ar.setAmountAllocatedNext1Year(0L);
+				} else {
+					 ar.setAmountAllocatedNext1Year((Long) sum[1]);
+				}
+				if(sum[2] == null) {
+					ar.setAmountAllocatedNext2Year(0L);
+				} else {
+					 ar.setAmountAllocatedNext2Year((Long) sum[2]);
+				}
+				if(sum[3] == null) {
+					ar.setAmountAllocatedNext3Year(0L);
+				} else {
+					 ar.setAmountAllocatedNext3Year((Long) sum[3]);
+				}
 			}
 			
 			
-			Long sumObjAllocation = objectiveAllocationRecordRepository.findSumAllocationForObjectiveAndIndex(obj, roundNum-1);
+			List<Object[]>  sumObjAllocation = objectiveAllocationRecordRepository.findSumAllocationForObjectiveAndIndex(obj, roundNum-1);
 			obj.setObjectiveAllocationRecordsR1(new ArrayList<ObjectiveAllocationRecord>());
 			ObjectiveAllocationRecord oar = new ObjectiveAllocationRecord();
 			oar.setForObjective(obj);
 			oar.setIndex(roundNum-1);
-			if(sumObjAllocation == null) {
+			if(sumObjAllocation == null || sumObjAllocation.size() == 0) {
 				oar.setAmountAllocated(0L);
+				oar.setAmountAllocatedNext1Year(0L);
+				oar.setAmountAllocatedNext2Year(0L);
+				oar.setAmountAllocatedNext3Year(0L);
 			} else {
-				oar.setAmountAllocated(sumObjAllocation);
+				Object[] sum = sumObjAllocation.get(0);
+				
+				logger.debug("sum: " + sum[0] + sum[1] + sum[2] + sum[3]);
+				
+				if(sum[0] != null){
+					oar.setAmountAllocated((Long) sum[0]);
+				}
+				
+				if(sum[1] != null) {
+					oar.setAmountAllocatedNext1Year((Long) sum[1]);
+				}
+				
+				if(sum[2] != null) {
+					oar.setAmountAllocatedNext2Year((Long) sum[2]);
+				}
+				
+				if(sum[3] != null) {
+					oar.setAmountAllocatedNext3Year((Long) sum[3]);
+				}
 			}
 			
 			if(roundNum == 1) {
@@ -1381,6 +1421,9 @@ public class EntityServiceJPA implements EntityService {
 				for(ObjectiveAllocationRecord oar : previousObjArList) {
 					ObjectiveAllocationRecord newOar = new ObjectiveAllocationRecord();
 					newOar.setAmountAllocated(oar.getAmountAllocated());
+					newOar.setAmountAllocatedNext1Year(oar.getAmountAllocatedNext1Year());
+					newOar.setAmountAllocatedNext2Year(oar.getAmountAllocatedNext2Year());
+					newOar.setAmountAllocatedNext3Year(oar.getAmountAllocatedNext3Year());
 					newOar.setBudgetType(oar.getBudgetType());
 					newOar.setForObjective(oar.getForObjective());
 					newOar.setIndex(round-1);
@@ -1452,12 +1495,18 @@ public class EntityServiceJPA implements EntityService {
 						
 						
 						r.setAmountAllocated(p.getAmountRequest());
+						r.setAmountAllocatedNext1Year(p.getAmountRequestNext1Year());
+						r.setAmountAllocatedNext2Year(p.getAmountRequestNext2Year());
+						r.setAmountAllocatedNext3Year(p.getAmountRequestNext3Year());
 						
 						
 						objBudgetTypeMap.put(p.getBudgetType().getId(), r);
 					} else {
 						
 						r.setAmountAllocated(r.getAmountAllocated() + p.getAmountRequest());
+						r.setAmountAllocatedNext1Year(r.getAmountAllocatedNext1Year() + p.getAmountRequestNext1Year());
+						r.setAmountAllocatedNext2Year(r.getAmountAllocatedNext2Year() + p.getAmountRequestNext2Year());
+						r.setAmountAllocatedNext3Year(r.getAmountAllocatedNext3Year() + p.getAmountRequestNext3Year());
 						
 					}
 					objectiveAllocationRecordRepository.save(r);
@@ -1919,6 +1968,9 @@ public class EntityServiceJPA implements EntityService {
 			if(o.getObjectiveAllocationRecords()==null) {
 				o.setObjectiveAllocationRecords(new ArrayList<ObjectiveAllocationRecord>());
 			}
+			
+			logger.debug("record: " + record.getId() + " " + record.getAmountAllocated() + " " + record.getAmountAllocatedNext1Year() 
+					+ " ");
 			
 			if(record.getIndex() == 0) {
 				o.getObjectiveAllocationRecordsR1().add(record);
@@ -5229,14 +5281,31 @@ public class EntityServiceJPA implements EntityService {
 		
 		// now update the value
 		Long amountUpdate = data.get("amountAllocated").asLong();
+		Long amountUpdateNext1Year = data.get("amountAllocatedNext1Year").asLong();
+		Long amountUpdateNext2Year = data.get("amountAllocatedNext2Year").asLong();
+		Long amountUpdateNext3Year = data.get("amountAllocatedNext3Year").asLong();
+		
 		Long oldAmount = record.getAmountAllocated();
+		Long oldAmountNext1Year = record.getAmountAllocatedNext1Year();
+		Long oldAmountNext2Year = record.getAmountAllocatedNext2Year();
+		Long oldAmountNext3Year = record.getAmountAllocatedNext3Year();
+		
+		
 		Long adjustedAmount = oldAmount - amountUpdate;
+		Long adjustedAmountNext1Year = oldAmountNext1Year - amountUpdateNext1Year;
+		Long adjustedAmountNext2Year = oldAmountNext2Year - amountUpdateNext2Year;
+		Long adjustedAmountNext3Year = oldAmountNext3Year - amountUpdateNext3Year;
+		
+		
 		
 		Integer index = record.getIndex();
 		BudgetType budgetType = record.getBudgetType();
 		Objective objective = record.getForObjective();
 		
 		record.setAmountAllocated(amountUpdate);
+		record.setAmountAllocatedNext1Year(amountUpdateNext1Year);
+		record.setAmountAllocatedNext2Year(amountUpdateNext2Year);
+		record.setAmountAllocatedNext3Year(amountUpdateNext3Year);
 		objectiveAllocationRecordRepository.save(record);
 		
 		
@@ -5246,7 +5315,7 @@ public class EntityServiceJPA implements EntityService {
 			logger.debug("parent.id: {}", parent.getId());
 			ObjectiveAllocationRecord temp = objectiveAllocationRecordRepository.findOneByBudgetTypeAndObjectiveAndIndex(budgetType, parent, index);
 			
-			temp.adjustAmountAllocated(adjustedAmount);
+			temp.adjustAmountAllocated(adjustedAmount, adjustedAmountNext1Year, adjustedAmountNext2Year, adjustedAmountNext3Year);
 			
 			objectiveAllocationRecordRepository.save(temp);
 			

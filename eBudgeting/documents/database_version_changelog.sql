@@ -1235,3 +1235,11 @@ alter table BGT_ALLOCRECORDSTRATEGY
 		add constraint FK834293E8DE82F831 
         foreign key (PLN_UNIT_ID) 
         references PLN_TARGETUNIT;
+        
+-- version 22
+-- Modified Date: October 7, 2014   
+update app_info set db_version = 22;     
+alter table BGT_OBJALLOCATIONRECORD
+add (amountAllocatedNext1Year number(19,0),
+	amountAllocatedNext2Year number(19,0),
+	amountAllocatedNext3Year number(19,0));
