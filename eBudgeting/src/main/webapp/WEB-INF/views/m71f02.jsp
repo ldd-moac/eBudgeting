@@ -197,9 +197,9 @@
 		</tr>
 	</thead>
 	<tbody>
-		{{#each sumBudgetTypeProposals}}
+		{{#each this}}
 		<tr>
-			<td fixed="true" style="position:absolute; left:10px;width:250px;"><a href="#" data-budgetTypeId={{budgetType.id}} class="detailAllocation">{{budgetType.name}}</a></td>
+			<td fixed="true" style="position:absolute; left:10px;width:250px;"><a href="#" data-budgetTypeId={{budgetType.id}} class="detailAllocation">{{@key}}</a></td>
 			<td fixed="true" style="position:absolute; left:277px;width:100px;">{{formatNumber amountAllocated}}</td>
 			<td fixed="true" style="position:absolute; left:394px;width:100px;">{{formatNumber amountReserved}}</td>
 			<td fixed="true" style="position:absolute; left:511px;width:82px;">{{formatNumber amountToBeAllocated}}</td>
@@ -208,6 +208,18 @@
 			<td  style="width:400px;">{{formatNumber amountAllocatedR1}}</td>
 			<td  style="width:400px;">{{formatNumber amountRequest}}</td>
 		</tr>
+		{{#each proposals}}
+		<tr>
+			<td fixed="true" style="position:absolute; left:10px;width:250px;"> - {{budgetType.name}}</td>
+			<td fixed="true" style="position:absolute; left:277px;width:100px;">{{formatNumber amountAllocated}}</td>
+			<td fixed="true" style="position:absolute; left:394px;width:100px;">{{formatNumber amountReserved}}</td>
+			<td fixed="true" style="position:absolute; left:511px;width:82px;">{{formatNumber amountToBeAllocated}}</td>
+			<td  style="width:400px;">{{formatNumber amountAllocatedR3}}</td>
+			<td  style="width:400px;">{{formatNumber amountAllocatedR2}}</td>
+			<td  style="width:400px;">{{formatNumber amountAllocatedR1}}</td>
+			<td  style="width:400px;">{{formatNumber amountRequest}}</td>
+		</tr>
+		{{/each}}
 		{{/each}}
 	</tbody>
 </table>
@@ -894,66 +906,7 @@ $(document).ready(function() {
     
 	mainCtrView = new MainCtrView();
 	mainCtrView.render();
-	
-	
-	/* 
-	if(objectiveId != null && objectiveId.length >0 ) {
-		objectiveCollection = new ObjectiveCollection();
-		rootCollection = new ObjectiveCollection();
-		
-		objectiveCollection.url = appUrl("/ObjectiveWithBudgetProposalAndAllocation/"+ fiscalYear + "/" + objectiveId +"/flatDescendants");
-		
-		
-		mainTblView = new MainTblView({collection: rootCollection});
-		
-		//load curent objective 
-		parentObjective = new Objective({id: objectiveId});
-		parentObjective.url=appUrl("/Objective/"+objectiveId);
-		parentObjective.fetch({
-			success: function() {
 
-				objectiveCollection.fetch({
-					success: function() {
-						// we will now sorted out this mess!
-						var i;
-						for(i=0;i<objectiveCollection.length;i++){
-							var o = objectiveCollection.at(i);
-							if(o.get('parent') != null) {
-								var parentId = o.get('parent').get('id');
-								if(parentId == objectiveId) {
-									rootCollection.add(o);
-								}
-								
-								var parentObj = objectiveCollection.get(parentId);
-								if(parentObj != null) {
-									parentObj.get('children').add(o);	
-								}
-								
-
-								var records = o.get('allocationRecords');
-								
-								o.set('allocationRecordsR1', records.where({index: 0}));
-								o.set('allocationRecordsR2', records.where({index: 1}));
-								o.set('allocationRecordsR3', records.where({index: 2}));
-								
-								var tvRecords = o.get('targetValueAllocationRecords');
-								o.set('targetValueAllocationRecordsR1', tvRecords.where({index: 0}));
-								o.set('targetValueAllocationRecordsR2', tvRecords.where({index: 1}));
-								o.set('targetValueAllocationRecordsR3', tvRecords.where({index: 2}));
-								
-								
-							}
-						}
-						
-						rootCollection.trigger('reset');
-						
-					}
-				});
-			}
-		});
-	} 
-	
-	*/
 	
 });
 </script>

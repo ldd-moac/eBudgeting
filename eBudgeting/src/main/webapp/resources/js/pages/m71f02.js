@@ -85,10 +85,30 @@ var DetailModalView = Backbone.View.extend({
 		this.$el.modal({show: true, backdrop: 'static', keyboard: false});
 		// now render table
 		
+		var sumTopBudgetType = {};
+		var allocRec = {};
+		
 		//prepare the allocation
 		_.forEach(json.sumBudgetTypeProposals, _.bind(function(proposal) {
 			var budgetType = BudgetType.findOrCreate({id:proposal.budgetType.id});
-			// search the allocationR1 
+			// search the allocationR1
+						
+			if(sumTopBudgetType[budgetType.get('topParentName')] == null) {
+				sumTopBudgetType[budgetType.get('topParentName')] = {};
+				allocRec = sumTopBudgetType[budgetType.get('topParentName')];
+				allocRec.amountAllocatedR1 = 0;
+				allocRec.amountAllocatedR2 = 0;
+				allocRec.amountAllocatedR3 = 0;
+				allocRec.amountReserved = 0;
+				allocRec.amountToBeAllocated = 0;
+				allocRec.amountAllocated = 0;
+				allocRec.proposals = new Array();
+				
+			} else {
+				allocRec = sumTopBudgetType[budgetType.get('topParentName')];
+			}
+			
+			
 			
 			var allProposals = this.currentObjective.get('proposals').where({budgetType:budgetType});
 			var sumAllocated = 0;
@@ -105,6 +125,10 @@ var DetailModalView = Backbone.View.extend({
 			var r2 = this.currentObjective.get('allocationRecordsR2').findWhere({budgetType:budgetType});
 			var r3 = this.currentObjective.get('allocationRecordsR3').findWhere({budgetType:budgetType});
 			var reserved = this.currentObjective.get('reservedBudgets').findWhere({budgetType:budgetType});
+			
+			
+
+			
 			proposal.amountAllocatedR1 = r1.get('amountAllocated');
 			proposal.amountAllocatedR2 = r2.get('amountAllocated');
 			proposal.amountAllocatedR3 = r3.get('amountAllocated');
@@ -114,11 +138,18 @@ var DetailModalView = Backbone.View.extend({
 			
 			proposal.amountAllocated = sumAllocated;
 			
-
+			allocRec.amountAllocatedR1 += proposal.amountAllocatedR1;
+			allocRec.amountAllocatedR2 += proposal.amountAllocatedR2;
+			allocRec.amountAllocatedR3 += proposal.amountAllocatedR3;
+			allocRec.amountReserved += proposal.amountReserved;
+			allocRec.amountToBeAllocated += proposal.amountToBeAllocated;
+			allocRec.amountAllocated += proposal.amountAllocated;
+			
+			allocRec.proposals.push(proposal);
 			
 		},this));
 		
-		html = this.detailViewTableTemplate(json);
+		html = this.detailViewTableTemplate(sumTopBudgetType);
 		this.$el.find('#detailModalDiv').html(html);
 		
 		return this;
@@ -773,8 +804,6 @@ var MainCtrView = Backbone.View.extend({
 	
 	el: "#mainCtr",
 	mainCtrTemplate : Handlebars.compile($("#mainCtrTemplate").html()),
-	mainTblTpl : Handlebars.compile($("#mainTblTemplate").html()),
-	easyuiTreegridTemplate : Handlebars.compile($("#easyuiTreegridTemplate").html()),
 	loadingTemplate : Handlebars.compile($("#loadingTemplate").html()),
 	
 	detailModalView: new DetailModalView(),
@@ -836,104 +865,113 @@ var MainCtrView = Backbone.View.extend({
 	},
 	renderMainTbl: function() {
 		
-		//this.collection = new ObjectiveCollection();
+		this.collection = new ObjectiveCollection();
 		//this.rootCollection = new ObjectiveCollection();
 		
-		//this.collection.url = appUrl("/ObjectiveWithBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants");
+		this.collection.url = appUrl("/ObjectiveWithBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants");
 		
-		//this.$el.find('#mainTbl').html(this.loadingTemplate());
-		this.$el.find('#mainTbl').empty();
+		this.$el.find('#mainTbl').html(this.loadingTemplate());
 		
-		
-		this.treeStore = Ext.create('Ext.data.TreeStore', {
-	        model: 'data.Model.Objective',
-	        proxy: {
-	            type: 'ajax',
-	            //the store will get the content from the .json file
-	            url: appUrl("/ObjectiveWithBudgetProposalAndAllocation/"+ fiscalYear + "/" + this.currentParentObjective.get('id') +"/flatDescendants")
-	        },
-	        folderSort: false
-	    });
-		
-		if(this.tree !=null) {
-			this.tree.destroy();
-		}
-		
-		this.tree = Ext.create('Ext.tree.Panel', {
-			id: 'treeGrid',
-	        title: 'การของบประมาณ',
-	        width: 920,
-	        height: 300,
-	        renderTo: Ext.getElementById('mainTbl'),
-	        collapsible: false,
-	        rootVisible: false,
-	        store: this.treeStore,
-	        columnLines: true, 
-	        rowLines: true,
-	        multiSelect: true,
-	        frame: true,
-	        columns: [{
-	             //this is so we know which column will show the tree
-	        	xtype: 'treecolumn',
-	            text: 'กิจกรรมรอง',
-	            sortable: true,
-	            dataIndex: 'codeAndName',
-	        	width: 300,
-	            locked: true,
-	            renderer: function(value, metaData, record, rowIdx, colIdx, store) {
-	                metaData.tdAttr = 'data-qtip="' + value + '"';
-	                if(record.data.children == null || record.data.children.length == 0) {
-	                	return "<a href='#' data-objectiveId=" + record.data.id +  " class='detail'>"+ value + "</a>";	
-	                }
-	                return value;
-	            }
-	        }, {
-	        	text: 'เป้าหมาย',
-	        	width: 80,
-	        	sortable: false,
-	        	align: 'center'
-	        },  {
-	        	text: 'พรบ.งบฯ',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumAllocationR3',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'จัดสรรไว้ส่วนกลาง',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumBudgetReserved',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'จัดสรรให้เจ้าของงาน',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'sumProposalsAllocated',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }, {
-	        	text: 'เหลือจัดสรร',
-	        	width: 120,
-	        	sortable : false,
-	        	dataIndex: 'amountAllocationLeft',
-	        	align: 'right',
-	        	renderer: function(value) {
-	        		return addCommas(value);
-	        	}
-	        		
-	        }]
-		});	
+		this.collection.fetch({
+			success: _.bind(function() {
+				var json = {};
+				json.objectives = this.collection.toJSON();
+				
+				this.$el.find('#mainTbl').empty();
+				this.treeStore = Ext.create('Ext.data.TreeStore', {
+			        model: 'data.Model.Objective',
+			        proxy: {
+			            type: 'memory',
+			            data: json.objectives,
+			            render: {
+			            	type: 'json'
+			            }
+			        },
+			        folderSort: false
+			    });
+				
+				if(this.tree !=null) {
+					this.tree.destroy();
+				}
+				
+				this.tree = Ext.create('Ext.tree.Panel', {
+					id: 'treeGrid',
+			        title: 'การของบประมาณ',
+			        width: 920,
+			        height: 300,
+			        renderTo: Ext.getElementById('mainTbl'),
+			        collapsible: false,
+			        rootVisible: false,
+			        store: this.treeStore,
+			        columnLines: true, 
+			        rowLines: true,
+			        multiSelect: true,
+			        frame: true,
+			        columns: [{
+			             //this is so we know which column will show the tree
+			        	xtype: 'treecolumn',
+			            text: 'กิจกรรมรอง',
+			            sortable: true,
+			            dataIndex: 'codeAndName',
+			        	width: 300,
+			            locked: true,
+			            renderer: function(value, metaData, record, rowIdx, colIdx, store) {
+			                metaData.tdAttr = 'data-qtip="' + value + '"';
+			                if(record.data.children == null || record.data.children.length == 0) {
+			                	return "<a href='#' data-objectiveId=" + record.data.id +  " class='detail'>"+ value + "</a>";	
+			                }
+			                return value;
+			            }
+			        }, {
+			        	text: 'เป้าหมาย',
+			        	width: 80,
+			        	sortable: false,
+			        	align: 'center'
+			        },  {
+			        	text: 'พรบ.งบฯ',
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumAllocationR3',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        		
+			        }, {
+			        	text: 'จัดสรรไว้ส่วนกลาง',
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumBudgetReserved',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        		
+			        }, {
+			        	text: 'จัดสรรให้เจ้าของงาน',
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumProposalsAllocated',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        		
+			        }, {
+			        	text: 'เหลือจัดสรร',
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'amountAllocationLeft',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        		
+			        }]
+				});
+				
+			}, this)	
+		});
 	}
 });
 	
