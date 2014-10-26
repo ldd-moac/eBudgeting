@@ -216,7 +216,9 @@ var menuJson = [{
 		name: "การจัดสรรงบประมาณ (m71)",code: "m71",  menus: [{
 			name: "m71f04: การประมวลผลก่อนการจัดสรรงบประมาณ", code: "m3f04", link: "page/m71f04/", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m71f02: การจัดสรรงบประมาณ", code: "m71f02", link: "page/m71f02/", group: "BGT_BGT_ADMIN"
+			name: "m71f02: การจัดสรรงบประมาณส่วนกลาง", code: "m71f02", link: "page/m71f02/", group: "BGT_BGT_ADMIN"
+		},{
+			name: "m71f03: การจัดสรรงบประมาณให้หน่วยงาน", code: "m71f03", link: "page/m71f03/", group: "BGT_BGT_ADMIN"
 		}]
 	}, {
 		name: "การจัดสรรเพิ่มเติม (m72)",code: "m72",  menus:[{

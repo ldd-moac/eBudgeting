@@ -3779,15 +3779,47 @@ public class EntityServiceJPA implements EntityService {
 		return tvar;
 	}
 
+	
+	
+	@Override
+	public void saveLotsBudgetProposal(JsonNode node) {
+		for(JsonNode n: node) {
+			Long id = n.get("id").asLong();
+			logger.debug("++++++++++++++++++++++++++++++++++++++++++++++++++ {} ", id);
+			BudgetProposal p = budgetProposalRepository.findOne(id);
+			Long oldAmount = p.getAmountAllocated();
+			if(oldAmount == null) {
+				oldAmount = 0L;
+			} 
+			
+			p.setAmountAllocated(n.get("amountAllocated").asLong());
+			logger.debug("saving new amountAllocated = " + p.getAmountAllocated());
+			
+			Long newAmout = p.getAmountAllocated();
+			Long adjustedRequestedValue = oldAmount-newAmout;
+			
+			budgetProposalRepository.save(p);
+			
+			List<BudgetProposal> ps = budgetProposalRepository
+					.findAllByOnwerIdAndObjectiveIdIn(
+							p.getOwner().getId(), p.getBudgetType().getId(),  p.getForObjective().getParentIds());
+
+				
+				for(BudgetProposal pp: ps) {
+					pp.adjustAmountRequest(adjustedRequestedValue);
+					
+					budgetProposalRepository.save(pp);
+				}
+			
+		}
+	}
+
 	@Override
 	public void saveLotsTargetValue(JsonNode node) {
 		for(JsonNode n: node) {
 			
-			
 			Long id = n.get("id").asLong();
 			logger.debug("++++++++++++++++++++++++++++++++++++++++++++++++++ {} ", id);
-			
-			
 			
 			TargetValue tv = targetValueRepository.findOne(id);
 			
@@ -3797,6 +3829,8 @@ public class EntityServiceJPA implements EntityService {
 			}
 			
 			tv.setAllocatedValue(n.get("allocatedValue").asLong());
+			
+			logger.debug("saving new AlllocatedValue = " + tv.getAllocatedValue());
 			
 			Long newAmout = tv.getAllocatedValue();
 			Long adjustedRequestedValue = oldAmount-newAmout;

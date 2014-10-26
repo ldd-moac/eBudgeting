@@ -1123,6 +1123,15 @@ public class GenericViewController {
 		return "m71f02";
 	}
 	
+	// --------------------------------------------------------------m71f03:
+	// การจัดสรรงบประมาณ (m71)
+	@RequestMapping("/page/m71f03/")
+	public String render_m71f03(Model model, HttpServletRequest request, HttpSession session) {
+		model.addAttribute("rootPage", true);
+		setFiscalYearFromSession(model, session);
+		return "m71f03";
+	}
+	
 	// --------------------------------------------------------------m72f01:
 			// การจัดสรรงบประมาณเพิ่มเติม (m72)
 		@RequestMapping("/page/m72f01/")

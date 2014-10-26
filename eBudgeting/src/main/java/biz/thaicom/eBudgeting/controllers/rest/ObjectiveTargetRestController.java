@@ -144,10 +144,11 @@ private static final Logger logger = LoggerFactory.getLogger(ObjectiveTargetRest
 	}
 	
 	@RequestMapping(value="/TargetValue/LotsUpdate", method=RequestMethod.PUT)
-	public @ResponseBody void updateLotsTargetValue(
+	public @ResponseBody String updateLotsTargetValue(
 			@RequestBody JsonNode node,
 			@Activeuser ThaicomUserDetail currentUser) throws Exception {
 		entityService.saveLotsTargetValue(node);
+		return "OK";
 	}
 	
 	
@@ -169,6 +170,8 @@ private static final Logger logger = LoggerFactory.getLogger(ObjectiveTargetRest
 	@ExceptionHandler(value=Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public @ResponseBody RESTError handleException(final Exception e, final HttpServletRequest request) {
+		e.printStackTrace();
+		
     	RESTError error = new RESTError();
     	error.setMessage(e.getMessage());
     	

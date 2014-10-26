@@ -360,6 +360,7 @@ public interface EntityService {
 	
 	public TargetValueAllocationRecord findTargetValueAllocationRecordById(
 			Long id);
+	public void saveLotsBudgetProposal(JsonNode node);
 
 
 	

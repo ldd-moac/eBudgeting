@@ -118,5 +118,17 @@ public interface BudgetProposalRepository extends
 			+ "WHERE proposal.forObjective.fiscalYear = ?1 "
 			+ "ORDER BY owner.id ")
 	public List<Organization> findAllOrganizationWhoProposed(Integer fiscalYear);
+
+
+
+	@Query("" +
+			"SELECT proposal " +
+			"FROM BudgetProposal proposal " +
+			"	INNER JOIN FETCH proposal.owner owner " +
+			"	INNER JOIN FETCH proposal.forObjective objective " +
+			"	INNER JOIN FETCH proposal.budgetType type " +
+			"WHERE owner.id = ?1 and type.id = ?2 and objective.id in (?3)")
+	public List<BudgetProposal> findAllByOnwerIdAndObjectiveIdIn(Long ownerId,
+			Long budgetTypeId, List<Long> parentObjectiveIds);
 	
 }

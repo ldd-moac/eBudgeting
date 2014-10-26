@@ -119,10 +119,14 @@ $(document).ready(function() {
    // register Global error handling here .. if there isn't one
    
 	$(document).ajaxError( function(event, jqXHR, ajaxSettings, thrownError){
-		if(jqXHR.status == 403) {
+		if(jqXHR.status == 200) {
+			return;
+		} else if(jqXHR.status == 403) {
 			alert('Session Timeout,  Please Log in again');
 			window.location.reload();
 		} else {
+			$('.modal').modal('hide');
+			
 			$('#errorModal').find('.modal-header span').html("<h3>Error Status Code: " + jqXHR.status + " " + jqXHR.statusText +"</h3>");
 			
 			var json =jqXHR.responseJSON;

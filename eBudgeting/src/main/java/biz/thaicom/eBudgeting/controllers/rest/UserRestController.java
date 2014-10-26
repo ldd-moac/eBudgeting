@@ -84,6 +84,7 @@ public class UserRestController {
 	@ExceptionHandler(value=Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public @ResponseBody RESTError handleException(final Exception e, final HttpServletRequest request) {
+		e.printStackTrace();
     	RESTError error = new RESTError();
     	error.setMessage(e.getMessage());
     	

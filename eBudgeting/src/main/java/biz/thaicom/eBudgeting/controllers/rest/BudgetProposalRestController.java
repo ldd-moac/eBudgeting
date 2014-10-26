@@ -191,6 +191,15 @@ public class BudgetProposalRestController {
 	}
 
 
+	
+	@RequestMapping(value="/BudgetProposal/LotsUpdate", method=RequestMethod.PUT)
+	public @ResponseBody String updateLotsBudgetProposal(
+			@RequestBody JsonNode node,
+			@Activeuser ThaicomUserDetail currentUser) throws Exception {
+		entityService.saveLotsBudgetProposal(node);
+		return "OK";
+	}
+	
 	@RequestMapping(value="/BudgetProposal", method=RequestMethod.POST)
 	public @ResponseBody BudgetProposal saveBudgetProposal (
 			@RequestBody JsonNode proposal,
@@ -418,6 +427,7 @@ public class BudgetProposalRestController {
 	@ExceptionHandler(value=Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public @ResponseBody RESTError handleException(final Exception e, final HttpServletRequest request) {
+		e.printStackTrace();
     	RESTError error = new RESTError();
     	error.setMessage(e.getMessage());
     	
