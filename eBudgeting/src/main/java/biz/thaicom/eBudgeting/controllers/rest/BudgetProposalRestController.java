@@ -2,6 +2,7 @@ package biz.thaicom.eBudgeting.controllers.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import biz.thaicom.eBudgeting.controllers.error.RESTError;
 import biz.thaicom.eBudgeting.models.bgt.AdditionalBudgetAllocation;
 import biz.thaicom.eBudgeting.models.bgt.AllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.BudgetProposal;
@@ -40,6 +42,7 @@ import biz.thaicom.security.models.ThaicomUserDetail;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Throwables;
 
 @Controller
 public class BudgetProposalRestController {
@@ -400,13 +403,19 @@ public class BudgetProposalRestController {
 		return success;
 	}
 	
+	
 	@ExceptionHandler(value=Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public @ResponseBody String handleException(final Exception e, final HttpServletRequest request) {
-		logger.error(e.toString());
-		e.printStackTrace();
-		return "failed: " + e.toString();
-		
+	public @ResponseBody RESTError handleException(final Exception e, final HttpServletRequest request) {
+    	RESTError error = new RESTError();
+    	error.setMessage(e.getMessage());
+    	
+    	String trace = Throwables.getStackTraceAsString(e);
+        error.setStackTrace(trace);
+        
+        error.setDate(new Date());
+        
+        return error;
 	}
 
 }

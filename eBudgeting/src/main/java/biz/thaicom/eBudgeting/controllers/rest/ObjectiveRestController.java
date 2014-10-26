@@ -3,6 +3,7 @@ package biz.thaicom.eBudgeting.controllers.rest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 
 
+import com.google.common.base.Throwables;
+
+import biz.thaicom.eBudgeting.controllers.error.RESTError;
 import biz.thaicom.eBudgeting.exception.ObjectiveHasBudgetProposalException;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
 import biz.thaicom.eBudgeting.models.pln.Objective;
@@ -578,14 +582,18 @@ public class ObjectiveRestController {
 
 	
 	
-	
 	@ExceptionHandler(value=Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public @ResponseBody String handleException(final Exception e, final HttpServletRequest request) {
-		logger.error(e.toString());
-		e.printStackTrace();
-		return "failed: " + e.toString();
-		
+	public @ResponseBody RESTError handleException(final Exception e, final HttpServletRequest request) {
+    	RESTError error = new RESTError();
+    	error.setMessage(e.getMessage());
+    	
+    	String trace = Throwables.getStackTraceAsString(e);
+        error.setStackTrace(trace);
+        
+        error.setDate(new Date());
+        
+        return error;
 	}
 
 	

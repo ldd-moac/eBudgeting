@@ -1,5 +1,6 @@
 package biz.thaicom.eBudgeting.controllers.rest;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +20,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Throwables;
 
+import biz.thaicom.eBudgeting.controllers.error.RESTError;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveTarget;
 import biz.thaicom.eBudgeting.models.pln.TargetUnit;
 import biz.thaicom.eBudgeting.models.pln.TargetValue;
@@ -162,11 +167,17 @@ private static final Logger logger = LoggerFactory.getLogger(ObjectiveTargetRest
 	}
 	
 	@ExceptionHandler(value=Exception.class)
-	public @ResponseBody String handleException(final Exception e, final HttpServletRequest request) {
-		logger.error(e.toString());
-		e.printStackTrace();
-		return "failed";
-		
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public @ResponseBody RESTError handleException(final Exception e, final HttpServletRequest request) {
+    	RESTError error = new RESTError();
+    	error.setMessage(e.getMessage());
+    	
+    	String trace = Throwables.getStackTraceAsString(e);
+        error.setStackTrace(trace);
+        
+        error.setDate(new Date());
+        
+        return error;
 	}
 	
 }
