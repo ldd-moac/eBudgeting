@@ -372,9 +372,11 @@
 		</thead>
 		<tbody>
 			{{#each values}}
+			<tr>
 			<td>{{owner.name}}</td>
 			<td>{{requestedValue}}</td>
 			<td><input type="text" class="txtForm" data-id="{{id}}" value="{{allocatedValue}}"/></td>
+			</tr>
 			{{/each}}
 		</tobdy
 	</table>
