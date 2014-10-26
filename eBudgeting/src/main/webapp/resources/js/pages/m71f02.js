@@ -34,38 +34,64 @@ var DetailModalView = Backbone.View.extend({
 	events: {
 		"click .detailAllocation" : "detailAllocation",
 		"click #cancelBtn" : "cancelBtn",
-		"click .backToProposal" : "backToProposal",
+		"click #backBtn" : "backBtn",
+		"click #saveBtn" : "saveBtn",
+		"change .txtForm" : "changeTxtForm"
+	},
+	changeTxtForm: function(e) {
+		var topBudgetTypeId = this.$el.find('form').attr('data-id');
+		var currAlloc = this.topAllocation['id'+topBudgetTypeId];
 		
-		"click .detailBasicAllocation" : "detailBasicAllocation",
-		"click .detailAllocationStrategy" : "detailAllocationStrategy",
+		var amountallocated = this.$el.find('#amountAllocated').val();
+		var amountReserved = this.$el.find('#amountReserved').val();
 		
-		"click .updateAllocRec" : "updateAllocRec",
-		"click .updateAllocRecStrgy" : "updateAllocRecStrgy",
+		var amountToBeAllocated =  currAlloc.amountAllocatedR3 - amountallocated - amountReserved;
+		console.log(amountToBeAllocated);
+		this.$el.find('#amountToBeAllocated').attr('value', amountToBeAllocated);
 		
-		"change .formulaColumnInput" : "formulaInputChange",
+	},
+	saveBtn: function(e) {
+		var topBudgetTypeId = this.$el.find('form').attr('data-id');
+		var currAlloc = this.topAllocation['id'+topBudgetTypeId];
+		
+		var amountallocated = this.$el.find('#amountAllocated').val();
+		var allocR9 = AllocationRecord.find({id: currAlloc.allocR9.id});
+		var updateAlloc = amountallocated - allocR9.get('amountAllocated') 
+		allocR9.set('amountAllocated', amountallocated);
+		
+		var amountReserved = this.$el.find('#amountReserved').val();
+		var reservedBudget = ReservedBudget.find({id: currAlloc.reservedBudget.id});
+		var updateReserved = amountReserved - reservedBudget.get('amountReserved');
+		reservedBudget.set('amountReserved', amountReserved);
+		
+		$.when(allocR9.save(), reservedBudget.save()).done(_.bind(function(x) {
+			var store=Ext.getStore('treeObjectiveStore');
+			var node = store.getNodeById(this.currentObjective.get('id'));
 			
-		"click #reservedBudgetLnk" : "toggleReservedBudgetCellInput",
-		"click .cancelUpdateReservedBudget" : "cancelUpdateReservedBudget",
-		"click .updateReservedBudget" : "updateReservedBudget",
+			node.data.sumAllocationR9 += updateAlloc; 
+			node.data.sumBudgetReserved += updateReserved;
+			node.data.amountAllocationLeft = node.data.sumAllocationR3 - (node.data.sumBudgetReserved + node.data.sumAllocationR9);
+			node.commit();
+			
+			alert('บันทึกข้อมูลเรียบร้อย');
+		},this));
 		
-		"click .proposalLnk" : "toggleStrategy",
-		"click .editProposal" : "editProposal",
-			
-		"click .updateProposalNoStretegy" : "updateProposalNoStretegy",
-		"click .cancelUpdateProposalNoStretegy" : "cancelUpdateProposalNoStretegy"
-			
 	},
 	setParentView: function(view) {
 		this.parentView = view;
 	},
 	cancelBtn : function(e) {
 		this.$el.modal('hide');
-		this.parentView.reloadTable();
+		// this.parentView.reloadTable();
 		
 	},
-	backToProposal : function(e) {
+
+	backBtn : function(e) {
 		this.render();
+		// this.parentView.reloadTable();
+		
 	},
+
 	renderWithObjective : function(objective) {
 		this.currentObjective = objective;
 		this.render();
@@ -93,418 +119,82 @@ var DetailModalView = Backbone.View.extend({
 			var budgetType = BudgetType.findOrCreate({id:proposal.budgetType.id});
 			// search the allocationR1
 						
-			if(sumTopBudgetType[budgetType.get('topParentName')] == null) {
-				sumTopBudgetType[budgetType.get('topParentName')] = {};
-				allocRec = sumTopBudgetType[budgetType.get('topParentName')];
+			if(sumTopBudgetType['id'+budgetType.get('parentIds')[1]] == null) {
+				sumTopBudgetType['id'+budgetType.get('parentIds')[1]] = {};
+				allocRec = sumTopBudgetType['id'+budgetType.get('parentIds')[1]];
 				allocRec.amountAllocatedR1 = 0;
 				allocRec.amountAllocatedR2 = 0;
 				allocRec.amountAllocatedR3 = 0;
 				allocRec.amountReserved = 0;
 				allocRec.amountToBeAllocated = 0;
 				allocRec.amountAllocated = 0;
+				allocRec.topParentName = budgetType.get('topParentName');
+				allocRec.topBudgetTypeId = proposal.budgetType.parentIds[1];
+				
+				var topBudgetType=BudgetType.findOrCreate({id:allocRec.topBudgetTypeId});
+				
 				allocRec.proposals = new Array();
 				
+				// then set allocR9 and amountReserved
+				
+				var allocR9 = this.currentObjective.get('allocationRecordsR9').findWhere({budgetType: topBudgetType});
+				if(allocR9!=null) {
+					allocRec.allocR9 = allocR9.toJSON();
+				}
+				
+				var reservedBudget = this.currentObjective.get('reservedBudgets').findWhere({budgetType: topBudgetType});
+				if(reservedBudget!=null) {
+					allocRec.reservedBudget = reservedBudget.toJSON();
+				}
+								
 			} else {
-				allocRec = sumTopBudgetType[budgetType.get('topParentName')];
+				allocRec = sumTopBudgetType['id'+budgetType.get('parentIds')[1]];
 			}
 			
-			
-			
-			var allProposals = this.currentObjective.get('proposals').where({budgetType:budgetType});
-			var sumAllocated = 0;
-			
-			_.forEach(allProposals, function(proposal) {
-				if(proposal.get("amountAllocated") != null) {
-					sumAllocated += proposal.get("amountAllocated");
-				}
-			});
-			
-			
-
-			var r1 = this.currentObjective.get('allocationRecordsR1').findWhere({budgetType:budgetType});
-			var r2 = this.currentObjective.get('allocationRecordsR2').findWhere({budgetType:budgetType});
 			var r3 = this.currentObjective.get('allocationRecordsR3').findWhere({budgetType:budgetType});
-			var reserved = this.currentObjective.get('reservedBudgets').findWhere({budgetType:budgetType});
-			
-			
 
-			
-			proposal.amountAllocatedR1 = r1.get('amountAllocated');
-			proposal.amountAllocatedR2 = r2.get('amountAllocated');
-			proposal.amountAllocatedR3 = r3.get('amountAllocated');
-			proposal.amountReserved = reserved.get('amountReserved');
-			
-			proposal.amountToBeAllocated = proposal.amountAllocatedR3 - proposal.amountAllocated - reserved.get('amountReserved');
-			
-			proposal.amountAllocated = sumAllocated;
-			
-			allocRec.amountAllocatedR1 += proposal.amountAllocatedR1;
-			allocRec.amountAllocatedR2 += proposal.amountAllocatedR2;
-			allocRec.amountAllocatedR3 += proposal.amountAllocatedR3;
-			allocRec.amountReserved += proposal.amountReserved;
-			allocRec.amountToBeAllocated += proposal.amountToBeAllocated;
-			allocRec.amountAllocated += proposal.amountAllocated;
-			
+			allocRec.amountAllocatedR3 +=  r3.get('amountAllocated');
+						
 			allocRec.proposals.push(proposal);
 			
 		},this));
 		
+		this.topAllocation = sumTopBudgetType;
+		
+		_.each(this.topAllocation, function(alloc) {
+			alloc.amountToBeAllocated = alloc.amountAllocatedR3 - alloc.allocR9.amountAllocated - alloc.reservedBudget.amountReserved;
+		});
+		
 		html = this.detailViewTableTemplate(sumTopBudgetType);
 		this.$el.find('#detailModalDiv').html(html);
+		
+		this.$el.find('.modal-footer').html('<a href="#" class="btn" id="cancelBtn">กลับหน้าหลัก</a>');
+		
 		
 		return this;
 	},
 	detailAllocation: function(e) {
-		this.currentBudgetType = BudgetType.findOrCreate($(e.target).attr('data-budgetTypeId'));
+		this.currentTopBudgetTypeId = $(e.target).attr('data-budgetTypeId');
 		this.renderBudgetTypeDetail();
 		
 	},
 	
 	renderBudgetTypeDetail: function() {
-		var currentBudgetType = this.currentBudgetType;
-		//get budgetproposal that has this budgetType
-		var proposals = this.currentObjective.get('proposals').where({budgetType: currentBudgetType});
+		var topBudget = this.topAllocation['id'+this.currentTopBudgetTypeId];
 		
-		var reservedBudget = this.currentObjective.get('reservedBudgets').findWhere({budgetType: currentBudgetType});
+		console.log(topBudget);
 		
-		var json = {};
-		json.allocationRecordR3 = this.currentObjective.get('allocationRecordsR3').findWhere({budgetType: currentBudgetType}).toJSON();
-		
-		json.proposals = [];
-		for(var i=0; i<proposals.length; i++) {
-			json.proposals.push(proposals[i].toJSON());
-		}
-		
-		json.reservedBudget = reservedBudget.toJSON();
-		
-		html = this.detailModalBudgetHeaderTemplate(json);
-		
+		html = this.detailModalBudgetHeaderTemplate(topBudget);
 		this.$el.find('.modal-body').html(html);
 		
-		html = this.detailModalBudgetTemplate(json.proposals);
+		html = this.detailModalBudgetTemplate(topBudget);
 		this.$el.find('.modal-body').append(html);
 		
-		// register current reservedBudget
-		this.currentReservedBudget = reservedBudget;
+		this.$el.find('.modal-footer').html('<a href="#" class="btn" id="saveBtn">บันทึก</a><a href="#" class="btn" id="backBtn">กลับหน้าเดิม</a>');
+		
+	}
+	
 
-	},
-	
-	toggleReservedBudgetCellInput: function(e) {
-		var json = this.currentReservedBudget.toJSON();
-		var html = this.reservedBudgetInputTemplate(json);
-		$('#reservedBudgetCell').html(html);
-	},
-	
-	cancelUpdateReservedBudget: function(e) {
-		this.renderBudgetTypeDetail();
-	},
-	
-	updateReservedBudget : function(e) {
-		var reservedAmount = $('#reservedBudgetInput').val();
-		
-		this.currentReservedBudget.set('amountReserved', parseInt(reservedAmount));
-		
-		// now put this change 
-		$.ajax({
-		    url: appUrl('/ReservedBudget/' + this.currentReservedBudget.get('id') + 
-		    		'/amountReserved/'+reservedAmount), 
-		    type: 'PUT',
-		    success: _.bind(function(result) {
-		    	this.renderBudgetTypeDetail();
-		    }, this)
-		});
-		
-		
-		
-	},
-	
-	toggleStrategy : function(e) {
-		var proposalId = $(e.target).attr('data-id');
-		var currentProposal = BudgetProposal.findOrCreate(proposalId);
-		
-		// now make a div after this
-		var nextDiv = $(e.target).parent().next();
-		
-		//prepare for data
-		var json = currentProposal.get('proposalStrategies').toJSON();
-		
-		var html = this.strategiesTemplate(json);
-		
-		nextDiv.html(html);
-		nextDiv.toggle();
-		
-	},
-	editProposal : function(e) {
-		
-		var psId = $(e.target).parent().attr('data-id');
-		// we have to turn this to input 
-		var ps = ProposalStrategy.findOrCreate(psId);
-		
-		var json = ps.toJSON();
-		var html;
-		
-		if(json.formulaStrategy != null) {
-		
-		var l = json.formulaStrategy.formulaColumns.length;
-		
-			json.formulaStrategy.formulaColumns[l-1].$last = true;
-			// now go through and put the requestColumn back on
-			for(var i=0; i<json.formulaStrategy.formulaColumns.length; i++) {
-				if(json.formulaStrategy.formulaColumns[i].isFixed) {
-					var columnId = json.formulaStrategy.formulaColumns[i].id;
-					
-					var fc = FormulaColumn.findOrCreate(columnId);
-					
-					var rc = ps.get('requestColumns').where({column: fc})[0];
-					
-					json.formulaStrategy.formulaColumns[i].requestColumnId = rc.get('id');
-					json.formulaStrategy.formulaColumns[i].requestColumnAllocatedValue = rc.get('allocatedValue');
-					
-				}
-			}
-			
-			html = this.editProposalFormTemplate(json);
-			
-		} else {
-		
-			html = this.editProposalNoStretegyFormTemplate(json);
-			
-		}
-		
-		
-		$(e.target).parent().html(html);
-		
-	},
-	
-	cancelUpdateProposalNoStretegy : function (e) {
-		this.renderBudgetTypeDetail();
-	},
-	
-	
-	updateProposalNoStretegy : function(e) {
-		var psId = $(e.target).parent().attr('data-id');
-		// we have to turn this to input 
-		var ps = ProposalStrategy.findOrCreate(psId);
-		
-		var inputText = $(e.target).prev().val().replace(/,/g ,"");
-		
-		if($.isNumeric(inputText)) {
-			ps.set('totalCalculatedAllocatedAmount', parseInt(inputText));
-			ps.get('proposal').set('amountAllocated', parseInt(inputText));
-			
-			// we have to put back this allocation to database
-			$.ajax({
-				url: appUrl('/ProposalStrategy/'+ps.get('id')+'/updateTotalCalculatedAllocatedAmount'),
-				type: 'POST',
-				data : {
-					totalCalculatedAllocatedAmount: ps.get('totalCalculatedAllocatedAmount')
-				},
-				success: _.bind(function() {
-					this.renderBudgetTypeDetail();
-				}, this)
-			});
-			
-			
-			
-		} else {
-			alert('กรุณาระบุการจัดสรรเป็นตัวเลข');
-		}
-		
-		
-	},
-	
- 	
-	detailBasicAllocation : function(e) {
-		var allocRec = AllocationRecord.findOrCreate($(e.target).attr('data-allocationId'));
-		this.$el.find('.modal-footer').html(this.detailAllocationBasicFooterTemplate());
-		
-		var json = allocRec.toJSON();
-		
-		var html = this.detailAllocationBasicTemplate(json);
-		
-		this.$el.find('.modal-body').html(html);
-	},
-	
-	updateAllocRec: function(e) {
-		
-		var validated = true;
-		this.$el.find('input:enabled').each(function(e) {
-			
-			if( isNaN( +$(this).val() ) ) {
-				$(this).parent('div').addClass('control-group error');
-				validated = false;
-				
-			} else {
-				$(this).parent('div').removeClass('control-group error');
-			}
-		});
-		
-		if(validated == false) {
-			alert('กรุณาใส่ข้อมูลที่เป็นตัวเลขเท่านั้น');
-			return false;
-		}
-		
-		var allocRec = AllocationRecord.findOrCreate(this.$el.find('#allocRecId').attr('data-id'));
-		var totalInputTxt = this.$el.find('#totalInputTxt').val();
-		
-		// now see to its change!
-		allocRec.set('amountAllocated', parseInt(totalInputTxt));
-		
-		// and we can save
-		allocRec.save(null, {
-			success:function(model, response, options) {
-				alert('บันทึกเรียบร้อยแล้ว');
-			}
-		});
-		
-		
-	},
-	
-	updateAllocRecStrgy: function(e) {
-		var validated = true;
-		this.$el.find('input:enabled').each(function(e) {
-			
-			if( isNaN( +$(this).val() ) ) {
-				$(this).parent('div').addClass('control-group error');
-				validated = false;
-				
-			} else {
-				$(this).parent('div').removeClass('control-group error');
-			}
-		});
-		
-		if(validated == false) {
-			alert('กรุณาใส่ข้อมูลที่เป็นตัวเลขเท่านั้น');
-			return false;
-		}
-		
-		var allocRecStrgy = AllocationRecordStrategy.findOrCreate(this.$el.find('#allocRecStrgy').attr('data-id'));
-		var i, calculatedAmount, adjustedAmount;
-		var strgy = allocRecStrgy.get('strategy');
-		
-		if(strgy == null) {
-			calculatedAmount = parseInt(this.$el.find('#totalInputTxt').val());
-			adjustedAmount = allocRecStrgy.get('totalCalculatedAmount') - calculatedAmount;
-			
-			allocRecStrgy.set('totalCalculatedAmount', calculatedAmount);
-			
-		} else {
-		
-			calculatedAmount = strgy.get('allocationStandardPriceMap').at(2).get('standardPrice');
-			var formulaColumns = strgy.get('formulaColumns');
-			for (i = 0; i < formulaColumns.length; i++) {
-	
-				var fc = formulaColumns.at(i);
-				if (fc.get('isFixed')) {
-					var colId = fc.get('id');
-					// now find this colId in requestColumns
-					var rc = allocRecStrgy.get('requestColumns');
-					var foundRC = rc.where({
-						column : FormulaColumn.findOrCreate(colId)
-					})[0];
-	
-					foundRC.set('amount', this.$el.find('#formulaColumnId-' + fc.get('id')).val());
-	
-					if (calculatedAmount == 0) {
-						calculatedAmount = foundRC.get('amount');
-					} else {
-						calculatedAmount = calculatedAmount * foundRC.get('amount');
-					}
-	
-				} else {
-					if (calculatedAmount == 0) {
-						calculatedAmount = fc.get('allocatedFormulaColumnValueMap').at(2).get('allocatedValue');
-					} else {
-						calculatedAmount = calculatedAmount	* fc.get('allocatedFormulaColumnValueMap')[0].get('allocatedValue');
-					}
-				}
-			}
-			adjustedAmount = allocRecStrgy.get('totalCalculatedAmount') - calculatedAmount;
-			allocRecStrgy.set('totalCalculatedAmount', calculatedAmount);
-		
-		}
-		// now we update allocRec
-		var record = allocRecStrgy.get('allocationRecord');
-		record.set('amountAllocated', record.get('amountAllocated') - adjustedAmount);
-		
-		// then save!
-		allocRecStrgy.save(null, {
-			success:function(model, response, options) {
-				alert('บันทึกเรียบร้อยแล้ว');
-			}
-		});
-		
-		
-	},
-	
-	detailAllocationStrategy: function(e) {
-		var allocRecStrgy = AllocationRecordStrategy.findOrCreate($(e.target).attr('data-allocationStrategyId'));
-		this.$el.find('.modal-footer').html(this.detailAllocationRecordStrategyFooterTemplate());
-		var json, html;
-		
-		if(allocRecStrgy.get('strategy') != null) {
-			json = allocRecStrgy.get('strategy').toJSON();
-			json.total = allocRecStrgy.get('totalCalculatedAmount');
-			
-			json.allocStrategyId = allocRecStrgy.get('id');
-			
-			// now fill in value from request columns
-			for(var i=0; i< json.formulaColumns.length; i++) {
-				var fcId = json.formulaColumns[i].id;
-				for(var j=0; j<allocRecStrgy.get('requestColumns').length; j++) {
-					if(allocRecStrgy.get('requestColumns').at(j).get('column').get('id') == fcId) {
-						json.formulaColumns[i].allocatedFormulaColumnValueMap[0].allocatedValue = allocRecStrgy.get('requestColumns').at(j).get('amount');
-					}
-				}
-				if(i==json.formulaColumns.length-1) {
-					json.formulaColumns[i].$last = true;
-				}
-				
-			}
-			
-			html = this.detailAllocationRecordStrategyTemplate(json);
-		} else {
-			json = allocRecStrgy.toJSON();
-			json.budgetType = {};
-			json.budgetType.name = allocRecStrgy.get('allocationRecord').get('budgetType').get('name');
-			json.amountAllocated = allocRecStrgy.get('totalCalculatedAmount');
-			html = this.detailAllocationBasicTemplate(json);
-		}
-		
-		
-		this.$el.find('.modal-body').html(html);
-		
-	},
-	formulaInputChange : function(e) {
-		// validate the box
-		if( isNaN( +$(e.target).val() ) ) {
-			$(e.target).parent('div').addClass('control-group error');
-			alert('กรุณาใส่ข้อมูลเป็นตัวเลขเท่านั้น');
-			return false;
-		} else {
-			$(e.target).parent('div').removeClass('control-group');
-			$(e.target).parent('div').removeClass('error');
-			
-		}
-		
-		// OK we'll go through all td value
-		var allocRecStrgy = AllocationRecordStrategy.findOrCreate(this.$el.find('#allocRecStrgy').attr('data-id'));
-		var strgy = allocRecStrgy.get('strategy');
-		var standardPrice = strgy.get('allocationStandardPriceMap').at(2).get('standardPrice');
-		
-		 if(isNaN(standardPrice) || standardPrice == null) {
-			standardPrice = 1;
-		}
-		var amount = standardPrice;
-		
-		var allInput = this.$el.find('.formulaColumnInput');
-		for(var i=0; i<allInput.length; i++ ) {
-			amount = amount * allInput[i].value;
-		}
-		
-		// now put amount back amount
-		this.$el.find('#totalInputTxt').val(addCommas(amount));
-	},
 	
 });
 
@@ -831,8 +521,7 @@ var MainCtrView = Backbone.View.extend({
 		
 		var currentObjectiveId = $(e.target).attr('data-objectiveId');
 		
-		//var budgetProposalCollection = new BudgetProposalCollection();
-		this.currentObjective = Objective.findOrCreate( this.treeStore.getById(currentObjectiveId).raw);
+		this.currentObjective = Objective.find({id:currentObjectiveId});
 		this.detailModalView.setParentView(this);
 		this.detailModalView.renderWithObjective(this.currentObjective);
 		
@@ -861,7 +550,7 @@ var MainCtrView = Backbone.View.extend({
 		this.renderMainTbl();
 	},
 	reloadTable: function() {
-		this.treeStore.reload();
+		//this.treeStore.reload();
 	},
 	renderMainTbl: function() {
 		
@@ -880,6 +569,7 @@ var MainCtrView = Backbone.View.extend({
 				this.$el.find('#mainTbl').empty();
 				this.treeStore = Ext.create('Ext.data.TreeStore', {
 			        model: 'data.Model.Objective',
+			        storeId: 'treeObjectiveStore',
 			        proxy: {
 			            type: 'memory',
 			            data: json.objectives,
@@ -926,7 +616,19 @@ var MainCtrView = Backbone.View.extend({
 			        	text: 'เป้าหมาย',
 			        	width: 80,
 			        	sortable: false,
-			        	align: 'center'
+			        	dataIndex: 'targetValueAllocationRecordsRound',
+			        	align: 'center',
+			        	renderer: function(value, metaData, record, rowIdx, colIdx, store) {
+			        		var html="";
+			        		for(var i=0; i<value.length; i++ ) {
+			        			if(i>0) {
+			        				html += "<br/>";
+			        			}
+			        			var unit = TargetUnit.findOrCreate(value[i].target.unit);
+			        			html += addCommas(value[i].amountAllocated)+" " + unit.get('name'); 
+			        		}
+			        		return html;
+			        	}
 			        },  {
 			        	text: 'พรบ.งบฯ',
 			        	width: 120,
@@ -938,20 +640,20 @@ var MainCtrView = Backbone.View.extend({
 			        	}
 			        		
 			        }, {
-			        	text: 'จัดสรรไว้ส่วนกลาง',
+			        	text: 'จัดสรรให้เจ้าของงาน',
 			        	width: 120,
 			        	sortable : false,
-			        	dataIndex: 'sumBudgetReserved',
+			        	dataIndex: 'sumAllocationR9',
 			        	align: 'right',
 			        	renderer: function(value) {
 			        		return addCommas(value);
 			        	}
 			        		
 			        }, {
-			        	text: 'จัดสรรให้เจ้าของงาน',
+			        	text: 'จัดสรรไว้ส่วนกลาง',
 			        	width: 120,
 			        	sortable : false,
-			        	dataIndex: 'sumProposalsAllocated',
+			        	dataIndex: 'sumBudgetReserved',
 			        	align: 'right',
 			        	renderer: function(value) {
 			        		return addCommas(value);

@@ -98,6 +98,11 @@ Objective = Backbone.RelationalModel.extend({
 	    	collectionType: 'AllocationRecordCollection'
 	    }, {
 	    	type: Backbone.HasMany,
+	    	key: 'allocationRecordsR9',
+	    	relatedModel: 'AllocationRecord',
+	    	collectionType: 'AllocationRecordCollection'
+	    }, {
+	    	type: Backbone.HasMany,
 	    	key: 'reservedBudgets',
 	    	relatedModel: 'ReservedBudget',
 	    	collectionType: 'ReservedBudgetCollection'

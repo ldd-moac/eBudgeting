@@ -182,73 +182,52 @@
 <div class="clearfix"></div>
 </script>
 <script id="detailViewTableTemplate" type="text/x-handler-template">
-<div style="overflow-x:scroll; overflow-y:visible;width:210px;margin-left:595px;">
 <table class="table table-bordered yscroll" id="detailViewTbl">
 	<thead>
 		<tr>
-			<td fixed="true" style="position:absolute; left:10px;width:250px;">รายการงบประมาณ<br/>&nbsp;</td>
-			<td fixed="true" style="position:absolute; left:277px;width:100px;">จัดสรรให้เจ้าของงาน</td>
-			<td fixed="true" style="position:absolute; left:394px;width:100px;">จัดสรรไว้ส่วนกลาง</td>
-			<td fixed="true" style="position:absolute; left:511px;width:82px;">คงเหลือจัดสรร</td>
-			<td  style="width:400px;">พรบ.งบฯ</td>
-			<td  style="width:400px;">ปรับลดครั้งที่2</td>
-			<td  style="width:400px;">ปรับลดครั้งที่1</td>
-			<td  style="width:400px;">ขอตั้ง</td>
+			<td fixed="true" style="width:250px;">รายการงบประมาณ<br/>&nbsp;</td>
+			<td fixed="true" style="width:100px;">พรบ.งบฯ</td>
+			<td fixed="true" style="width:100px;">จัดสรรให้เจ้าของงาน</td>
+			<td fixed="true" style="width:100px;">จัดสรรไว้ส่วนกลาง</td>
+			<td fixed="true" style="width:100px;">คงเหลือจัดสรร</td>
 		</tr>
 	</thead>
 	<tbody>
 		{{#each this}}
 		<tr>
-			<td fixed="true" style="position:absolute; left:10px;width:250px;"><a href="#" data-budgetTypeId={{budgetType.id}} class="detailAllocation">{{@key}}</a></td>
-			<td fixed="true" style="position:absolute; left:277px;width:100px;">{{formatNumber amountAllocated}}</td>
-			<td fixed="true" style="position:absolute; left:394px;width:100px;">{{formatNumber amountReserved}}</td>
-			<td fixed="true" style="position:absolute; left:511px;width:82px;">{{formatNumber amountToBeAllocated}}</td>
-			<td  style="width:400px;">{{formatNumber amountAllocatedR3}}</td>
-			<td  style="width:400px;">{{formatNumber amountAllocatedR2}}</td>
-			<td  style="width:400px;">{{formatNumber amountAllocatedR1}}</td>
-			<td  style="width:400px;">{{formatNumber amountRequest}}</td>
+			<td><a href="#" data-budgetTypeId="{{topBudgetTypeId}}" class="detailAllocation">{{topParentName}}</a></td>
+			<td>{{formatNumber amountAllocatedR3}}</td>
+			<td>{{formatNumber allocR9.amountAllocated}}</td>
+			<td>{{formatNumber reservedBudget.amountReserved}}</td>
+			<td>{{formatNumber amountToBeAllocated}}</td>
 		</tr>
-		{{#each proposals}}
-		<tr>
-			<td fixed="true" style="position:absolute; left:10px;width:250px;"> - {{budgetType.name}}</td>
-			<td fixed="true" style="position:absolute; left:277px;width:100px;">{{formatNumber amountAllocated}}</td>
-			<td fixed="true" style="position:absolute; left:394px;width:100px;">{{formatNumber amountReserved}}</td>
-			<td fixed="true" style="position:absolute; left:511px;width:82px;">{{formatNumber amountToBeAllocated}}</td>
-			<td  style="width:400px;">{{formatNumber amountAllocatedR3}}</td>
-			<td  style="width:400px;">{{formatNumber amountAllocatedR2}}</td>
-			<td  style="width:400px;">{{formatNumber amountAllocatedR1}}</td>
-			<td  style="width:400px;">{{formatNumber amountRequest}}</td>
-		</tr>
-		{{/each}}
 		{{/each}}
 	</tbody>
 </table>
-</div>
 </script>
 
 <script id="detailModalBudgetHeaderTemplate" type="text/x-handler-template">
 <div>
-	หมวดงบประมาณ {{allocationRecordR3.budgetType.name}}
-	<table>
-		<tr><td>พรบ.งบฯ</td><td style="text-align:right">{{formatNumber allocationRecordR3.amountAllocated}} </td><td>บาท</td></tr>
-		<tr><td>จัดสรรให้เจ้าของงาน</td><td style="text-align:right">{{sumAllocatedRecord proposals}}</td><td> บาท</td></tr>
-		<tr><td><a href="#" id="reservedBudgetLnk">จัดสรรไว้ส่วนกลาง</td><td style="text-align:right" id="reservedBudgetCell">{{formatNumber reservedBudget.amountReserved}} </td><td>บาท</td></tr>
-		<tr><td>เหลือจัดสรร</td><td style="text-align:right" id="amountLeftCell">{{amountLeft this}}</td><td>บาท</td></tr>
-	</table>
+	จัดสรรงบประมาณหมวด {{topParentName}}
 </div>
 	
 
 </script>
 
 <script id="detailModalBudgetTemplate" type="text/x-handler-template">
-<div><u>รายการขอตั้งประมาณ</u></div>
-	<ul id="budgetProposeLst">	
-	{{#each this}}
-		<li data-id="{{id}}"><a href="#" data-id="{{id}}" class="proposalLnk">{{owner.abbr}} ขอตั้ง = {{formatNumber amountRequest}}</a> บาท </a> / จัดสรร = {{#if amountAllocated}} {{formatNumber amountAllocated}} {{else}} 0 {{/if}} บาท</li> <div class="strategyDetail" style="display:none"/>
-	{{/each}}
-	</ul>
-</div>
-<div id="budgetTypeSelectionDiv"></div>
+<form data-id="{{topBudgetTypeId}}">
+	<label>พรบ.งบฯ</label>
+	<input type="text" disabled="disabled" value="{{amountAllocatedR3}}"/> บาท
+
+	<label>จัดสรรให้เจ้าของงาน</label>
+	<input data-id="{{allocR9.id}}" class="txtForm" id="amountAllocated" type="text" value="{{allocR9.amountAllocated}}"/> บาท
+
+	<label>จัดสรรไว้ส่วนกลาง</label>
+	<input data-id="{{reservedBudget.id}}" class="txtForm" id="amountReserved" type="text" value="{{reservedBudget.amountReserved}}"/> บาท
+
+	<label>คงเหลือจัดสรร</label>
+	<input type="text" disabled="disabled" id="amountToBeAllocated" value="{{amountToBeAllocated}}"/> บาท
+</form>
 </script>
 
 <script id="strategiesTemplate" type="text/x-handler-template">
@@ -786,6 +765,8 @@ $(document).ready(function() {
 		},{
 			name: 'proposals', mapping: 'proposals'
 		},{
+			name: 'targetValueAllocationRecords', mapping: 'targetValueAllocationRecords'
+		},{
 			name: 'reservedBudgets', mapping: 'reservedBudgets'
 		},{
 			name: 'allocationRecordsR1', mapping: 'allocationRecordsR1'
@@ -793,6 +774,8 @@ $(document).ready(function() {
 			name: 'allocationRecordsR2', mapping: 'allocationRecordsR2'
 		},{
 			name: 'allocationRecordsR3', mapping: 'allocationRecordsR3'
+		},{
+			name: 'allocationRecordsR9', mapping: 'allocationRecordsR9'
 		},{
 			name: 'sumBudgetReserved', 
             convert: function(v, rec) {
@@ -895,9 +878,34 @@ $(document).ready(function() {
         		return sum;
         	}
         },{
+        	name: 'sumAllocationR9',
+        	convert: function(v, rec) {
+        		var sum=0;
+        		_.forEach(rec.data.allocationRecordsR9, function(record) {
+        			if(record.index == 8) {        				
+        				sum += record.amountAllocated;
+        			}	
+        		});
+        		return sum;
+        	}
+        },{
         	name: 'amountAllocationLeft',
         	convert: function(v, rec) {
-        		return rec.data.sumAllocationR3 - (rec.data.sumBudgetReserved + rec.data.sumProposalsAllocated);
+        		return rec.data.sumAllocationR3 - (rec.data.sumBudgetReserved + rec.data.sumAllocationR9);
+        	}
+        
+        }, {
+        	name: 'targetValueAllocationRecordsRound',
+        	convert: function(v, rec) {
+        		var targetValues = new Array();
+        		
+        		_.forEach(rec.data.targetValueAllocationRecords, function(record) {
+        			
+        			if(record.index == (3-1)) {        				
+        				targetValues.push(record)
+        			}	
+        		});
+        		return targetValues;
         	}
         
         }]

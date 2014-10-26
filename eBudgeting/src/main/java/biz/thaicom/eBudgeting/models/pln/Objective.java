@@ -155,6 +155,9 @@ public class Objective implements Serializable {
 	private List<AllocationRecord> allocationRecordsR3;
 	
 	@Transient
+	private List<AllocationRecord> allocationRecordsR9;
+	
+	@Transient
 	private List<ObjectiveAllocationRecord> objectiveAllocationRecordsR1;
 
 	@Transient
@@ -338,6 +341,16 @@ public class Objective implements Serializable {
 	}
 	public void setAllocationRecordsR3(List<AllocationRecord> allocationRecordsR3) {
 		this.allocationRecordsR3 = allocationRecordsR3;
+	}
+	
+	public List<AllocationRecord> getAllocationRecordsR9() {
+		if(allocationRecordsR9 == null) {
+			allocationRecordsR9 = new ArrayList<AllocationRecord>();
+		}
+		return allocationRecordsR9;
+	}
+	public void setAllocationRecordsR9(List<AllocationRecord> allocationRecordsR9) {
+		this.allocationRecordsR9 = allocationRecordsR9;
 	}
 	
 	// loading barebone information about the entity

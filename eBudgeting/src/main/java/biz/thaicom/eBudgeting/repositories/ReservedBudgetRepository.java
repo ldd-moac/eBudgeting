@@ -39,5 +39,11 @@ public interface ReservedBudgetRepository extends JpaSpecificationExecutor<Reser
 			"FROM ReservedBudget reservedBudget " +
 			"WHERE reservedBudget.forObjective.id in (?1) and reservedBudget.budgetType = ?2 ")
 	List<ReservedBudget> findAllByObjetiveIds(List<Long> objectiveIds, BudgetType budgetType);
+
+	@Query(""
+			+ "SELECT reservedBudget "
+			+ "FROM ReservedBudget reservedBudget "
+			+ "WHERE reservedBudget.forObjective.fiscalYear = ?1" )
+	List<ReservedBudget> findAllByFiscalYear(Integer fiscalYear);
 		
 }

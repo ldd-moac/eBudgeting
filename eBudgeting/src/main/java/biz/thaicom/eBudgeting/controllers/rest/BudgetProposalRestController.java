@@ -267,6 +267,17 @@ public class BudgetProposalRestController {
 		return "ok";
 	}
 	
+	@RequestMapping(value="/ReservedBudget/{id}", method=RequestMethod.PUT)
+	public @ResponseBody String updateReservedBudget(
+			@PathVariable Long id,
+			@RequestBody JsonNode data,
+			@Activeuser ThaicomUserDetail currentUser){
+		
+		entityService.updateReservedBudget(id, data.get("amountReserved").asLong());
+		return "ok";
+	}
+	
+	
 	@RequestMapping(value="/AllocationRecord/{id}", method=RequestMethod.PUT)
 	public @ResponseBody String updateAllocationRecord(
 			@PathVariable Long id,

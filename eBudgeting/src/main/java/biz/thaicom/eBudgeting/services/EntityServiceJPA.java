@@ -1254,38 +1254,47 @@ public class EntityServiceJPA implements EntityService {
 	public String initReservedBudget(Integer fiscalYear) {
 		Objective root = objectiveRepository.findRootOfFiscalYear(fiscalYear);
 		String parentPathLikeString = "%."+root.getId()+"%";		
-		List<Objective> list = objectiveRepository.findFlatByObjectiveBudgetProposal(fiscalYear,parentPathLikeString);
+
+		// first we'll get rid of all allocR9  (index=8) and reservedBudget
 		
-		// we will copy from the last round (index = 2)
-					List<AllocationRecord> allocationRecordList = allocationRecordRepository
-							.findAllByForObjective_fiscalYearAndIndex(fiscalYear, 2);
+		List<ReservedBudget> rBudgets = reservedBudgetRepository.findAllByFiscalYear(fiscalYear);
+		List<AllocationRecord> allocR9s = allocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, 8);
+		
+		reservedBudgetRepository.delete(rBudgets);
+		allocationRecordRepository.delete(allocR9s);
+		
+		List<AllocationRecord> allocationRecordList = allocationRecordRepository
+				.findAllByForObjective_fiscalYearAndIndex(fiscalYear, 2);
 					
 		// go through this one
 		for(AllocationRecord record: allocationRecordList) {
-			ReservedBudget reservedBudget = reservedBudgetRepository.findOneByBudgetTypeAndObjective(record.getBudgetType(), record.getForObjective());
+			Long topBudgetId = record.getBudgetType().getParentIds().get(1);
+			BudgetType topBudgetType = budgetTypeRepository.findOne(topBudgetId);
 			
+			ReservedBudget reservedBudget = reservedBudgetRepository.findOneByBudgetTypeAndObjective(topBudgetType, record.getForObjective());
 			if(reservedBudget == null) {
 				reservedBudget = new ReservedBudget();
+				reservedBudget.setAmountReserved(0L);
+				reservedBudget.setBudgetType(topBudgetType);
+				reservedBudget.setForObjective(record.getForObjective());
+				
+				reservedBudgetRepository.save(reservedBudget);
 			}
-			reservedBudget.setAmountReserved(0L);
-			reservedBudget.setBudgetType(record.getBudgetType());
-			reservedBudget.setForObjective(record.getForObjective());
-
 			
-			reservedBudgetRepository.save(reservedBudget);
+			AllocationRecord allocR9 = allocationRecordRepository.findOneByBudgetTypeAndObjectiveAndIndex(topBudgetType, record.getForObjective(), 8);
+			if(allocR9 == null) {
+				allocR9 = new AllocationRecord();
+				
+				allocR9.setIndex(8);
+				allocR9.setAmountAllocated(0L);
+				allocR9.setBudgetType(topBudgetType);
+				allocR9.setForObjective(record.getForObjective());
+		
+				allocationRecordRepository.save(allocR9);
+			}
+
 		}
 		
-//		List<RequestColumn> requestColumns = requestColumnRepositories.findAllByFiscalYear(fiscalYear);
-//		for(RequestColumn rc : requestColumns) {
-//			rc.setAllocatedAmount(rc.getAmount());
-//			requestColumnRepositories.save(rc);
-//		}
-//	
-//		List<FormulaColumn> formulaColumns = formulaColumnRepository.findAllByFiscalYear(fiscalYear);
-//		for(FormulaColumn fc : formulaColumns) {
-//			fc.setAllocatedValue(fc.getValue());
-//			formulaColumnRepository.save(fc);
-//		}
 		
 
 		return "success";
@@ -1878,6 +1887,8 @@ public class EntityServiceJPA implements EntityService {
 				o.getAllocationRecordsR2().add(record);
 			} else if(record.getIndex() == 2) {
 				o.getAllocationRecordsR3().add(record);
+			} else if(record.getIndex() == 8) {
+				o.getAllocationRecordsR9().add(record);
 			}
 			
 			//o.getProposals().add(record);
@@ -3102,6 +3113,8 @@ public class EntityServiceJPA implements EntityService {
 		
 		// now update the value
 		Long amountUpdate = data.get("amountAllocated").asLong();
+		logger.debug("amountAllocated: " + amountUpdate);
+		
 		Long oldAmount = record.getAmountAllocated();
 		Long adjustedAmount = oldAmount - amountUpdate;
 		
@@ -5338,15 +5351,19 @@ public class EntityServiceJPA implements EntityService {
 			adjAmount = amountReserved - r.getAmountReserved();
 		}
 		
+		r.setAmountReserved(amountReserved);
 		
+		reservedBudgetRepository.save(r);
+		
+		r = reservedBudgetRepository.findOneByBudgetTypeAndObjective(
+				r.getBudgetType(), 
+				r.getForObjective().getParent());
 		while (r != null) {
 			if(r.getAmountReserved() == null) {
 				r.setAmountReserved(adjAmount);
 			} else {
-				r.setAmountReserved(r.getAmountReserved() + amountReserved);	
+				r.setAmountReserved(r.getAmountReserved() + adjAmount);
 			}
-			
-			reservedBudgetRepository.save(r);
 			
 			if(r.getForObjective().getParent() == null) {
 				r = null;
