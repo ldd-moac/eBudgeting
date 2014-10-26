@@ -67,7 +67,7 @@
 	<div id="errorModal" class="modal wideModal fade" role="dialog">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
-			<div class="modal-header">
+			<div class="modal-header" style="color: #a94442;background-color: #f2dede;border-color: #ebccd1;">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 				<span style="font-weight: bold;"></span>
 			</div>
@@ -100,6 +100,19 @@
 	<div id="container-footer" class="container">
 		<tiles:insertAttribute name="footer" />
 	</div>
+	
+	<script id="errorModalBodyTemplate" type="text/x-handlebars-template">
+		<div>
+			<b>Error Timestamp : </b> {{timestamp}}
+		</div>
+		<div>
+			<b>Error Message : </b> {{message}}
+		</div>
+		<div>
+			<b>Stack Trace : </b>
+			<pre class="pre-scrollable" style="font-size:0.75em;">{{stackTrace}}</pre>
+		</div>
+	</script>
 	
 <script type="text/javascript">
 $(document).ready(function() {
