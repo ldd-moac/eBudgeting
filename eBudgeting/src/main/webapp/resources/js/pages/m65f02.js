@@ -799,7 +799,6 @@ var MainCtrView = Backbone.View.extend({
 	el: "#mainCtr",
 	mainCtrTemplate : Handlebars.compile($("#mainCtrTemplate").html()),
 	mainTblTpl : Handlebars.compile($("#mainTblTemplate").html()),
-	easyuiTreegridTemplate : Handlebars.compile($("#easyuiTreegridTemplate").html()),
 	loadingTemplate : Handlebars.compile($("#loadingTemplate").html()),
 	
 	detailModalView: new DetailModalView(),
