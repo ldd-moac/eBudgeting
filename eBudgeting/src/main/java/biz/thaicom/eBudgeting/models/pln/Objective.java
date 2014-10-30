@@ -35,6 +35,7 @@ import biz.thaicom.eBudgeting.models.bgt.BudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.BudgetType;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
+import biz.thaicom.eBudgeting.models.bgt.OrganizationAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
 import biz.thaicom.eBudgeting.models.bgt.RequestColumn;
 import biz.thaicom.eBudgeting.models.bgt.ReservedBudget;
@@ -141,6 +142,9 @@ public class Objective implements Serializable {
 	
 	@Transient
 	private List<BudgetProposal> filterProposals;	
+	
+	@Transient
+	private List<OrganizationAllocationRecord> filterOrgAllocRecords;	
 	
 	@Transient
 	private List<ObjectiveBudgetProposal> filterObjectiveBudgetProposals;
@@ -435,7 +439,15 @@ public class Objective implements Serializable {
 	public void setFilterProposals(List<BudgetProposal> proposals){
 		this.filterProposals = proposals;
 	}
-
+	
+	public List<OrganizationAllocationRecord> getFilterOrgAllocRecords() {
+		return filterOrgAllocRecords;
+	}
+		
+	public void setFilterOrgAllocRecords(
+			List<OrganizationAllocationRecord> filterOrgAllocRecords) {
+		this.filterOrgAllocRecords = filterOrgAllocRecords;
+	}
 	public void addfilterProposal(BudgetProposal proposal) {
 		if(this.filterProposals == null) {
 			this.filterProposals = new ArrayList<BudgetProposal>();

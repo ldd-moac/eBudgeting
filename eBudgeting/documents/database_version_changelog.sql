@@ -1243,3 +1243,32 @@ alter table BGT_OBJALLOCATIONRECORD
 add (amountAllocatedNext1Year number(19,0),
 	amountAllocatedNext2Year number(19,0),
 	amountAllocatedNext3Year number(19,0));
+	
+-- version 23
+-- Modified Date: October 31, 2014   
+update app_info set db_version = 23;
+create table BGT_ORGALLOCATIONROUND (
+        id number(19,0) not null,
+        round number(19,0),
+        createddate timestamp,
+        fiscalyear number(4),
+        primary key (id)
+);
+ 
+create table BGT_ORGALLOCATIONRECORD (
+        id number(19,0) not null,
+        OBJECTIVE_ID number(19,0),
+        ORGANIZATION_ID number(19,0),
+        BUDGETTYPE_BGT_ID number(19,0),
+        ROUND_ID number(19,0),
+        AMOUNTALLOCATED number(19,0),
+        
+        primary key (id),
+        CONSTRAINT  FK238D932A98432923 FOREIGN KEY (round_id)  REFERENCES BGT_ORGALLOCATIONROUND(id),
+        CONSTRAINT  FK92EF93B3892C2394 FOREIGN KEY (OBJECTIVE_ID)  REFERENCES PLN_OBJECTIVE(id),
+        CONSTRAINT  FK028473F3829ED39A FOREIGN KEY (ORGANIZATION_ID)  REFERENCES HRX_ORGANIZATION(id),
+        CONSTRAINT  FK820478AEB380E328 FOREIGN KEY (BUDGETTYPE_BGT_ID)  REFERENCES BGT_BUDGETTYPE(id)
+);
+  
+create sequence BGT_ORGALLOCATIONRECORD_SEQ;
+create sequence BGT_ORGALLOCATIONROUND_SEQ;

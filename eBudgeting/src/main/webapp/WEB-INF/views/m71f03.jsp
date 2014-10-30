@@ -185,9 +185,8 @@
 	<thead>
 		<tr>
 			<td fixed="true" style="width:250px;">รายการงบประมาณ<br/>&nbsp;</td>
-			<td fixed="true" style="width:100px;">พรบ.งบฯ</td>
 			<td fixed="true" style="width:100px;">จัดสรรให้เจ้าของงาน</td>
-			<td fixed="true" style="width:100px;">จัดสรรไว้ส่วนกลาง</td>
+			<td fixed="true" style="width:100px;">จัดสรรให้ส่วนงานแล้ว</td>
 			<td fixed="true" style="width:100px;">คงเหลือจัดสรร</td>
 		</tr>
 	</thead>
@@ -195,7 +194,6 @@
 		{{#each this}}
 		<tr>
 			<td><a href="#" data-budgetTypeId="{{topBudgetTypeId}}" class="detailAllocation">{{topParentName}}</a></td>
-			<td>{{formatNumber amountAllocatedR3}}</td>
 			<td>{{formatNumber allocR9.amountAllocated}}</td>
 			<td>{{formatNumber reservedBudget.amountReserved}}</td>
 			<td>{{formatNumber amountToBeAllocated}}</td>
@@ -815,6 +813,8 @@ $(document).ready(function() {
 		},{
 			name: 'targetValueAllocationRecords', mapping: 'targetValueAllocationRecords'
 		},{
+			name: 'filterOrgAllocRecords', mapping: 'filterOrgAllocRecords'
+		},{
 			name: 'reservedBudgets', mapping: 'reservedBudgets'
 		},{
 			name: 'allocationRecordsR1', mapping: 'allocationRecordsR1'
@@ -824,6 +824,17 @@ $(document).ready(function() {
 			name: 'allocationRecordsR3', mapping: 'allocationRecordsR3'
 		},{
 			name: 'allocationRecordsR9', mapping: 'allocationRecordsR9'
+		},{
+			name: 'sumOrgAllocRecords', 
+            convert: function(v, rec) {
+            	var sum = 0;
+            	_.forEach(rec.data.filterOrgAllocRecords, function(record) {            	
+            		if(record.amountAllocated != null) {
+            			sum += record.amountAllocated;
+            		}
+            	});
+            	return sum;		
+            }
 		},{
 			name: 'sumBudgetReserved', 
             convert: function(v, rec) {
@@ -939,7 +950,7 @@ $(document).ready(function() {
         },{
         	name: 'amountAllocationLeft',
         	convert: function(v, rec) {
-        		return rec.data.sumAllocationR3 - (rec.data.sumBudgetReserved + rec.data.sumAllocationR9);
+        		return rec.data.sumAllocationR9 - rec.data.sumOrgAllocRecords;
         	}
         
         }, {

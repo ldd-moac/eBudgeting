@@ -43,6 +43,11 @@ Objective = Backbone.RelationalModel.extend({
 	    	collectionType: 'BudgetProposalCollection'
 	    },{
 	    	type: Backbone.HasMany,
+	    	key: 'filterOrgAllocRecords',
+	    	relatedModel: 'OrganizationAllocationRecord',
+	    	collectionType: 'OrganizationAllocationRecordCollection'
+	    },{
+	    	type: Backbone.HasMany,
 	    	key: 'filterObjectiveBudgetProposals',
 	    	relatedModel: 'ObjectiveBudgetProposal',
 	    	collectionType: 'ObjectiveBudgetProposalCollection'
@@ -410,6 +415,32 @@ AllocationRecord = Backbone.RelationalModel.extend({
 		relatedModel: 'AllocationRecordStrategy'
 	}],
 	urlRoot: appUrl('/AllocationRecord')
+});
+
+OrganizationAllocationRecord = Backbone.RelationalModel.extend({
+	idAttribute: 'id',
+	relations: [{
+		type: Backbone.HasOne,
+		key: 'forObjective',
+		relatedModel : 'Objective'
+	},{
+		type: Backbone.HasOne,
+		key: 'budgetType',
+		relatedModel : 'BudgetType'
+	},{
+		type:Backbone.HasOne,
+		key: 'owner',
+		relatedModel: 'Organization'
+	},{
+		type:Backbone.HasOne,
+		key: 'round',
+		relatedModel: 'OrganizationAllocationRound'
+	}],
+	urlRoot: appUrl('/OrganizationAllocationRecord')
+});
+
+OrganizationAllocationRound = Backbone.RelationalModel.extend({
+	idAttribute: 'id'
 });
 
 ObjectiveAllocationRecord = Backbone.RelationalModel.extend({
@@ -909,6 +940,10 @@ ProposalStrategyCollection = Backbone.Collection.extend({
 AllocationRecordCollection =Backbone.Collection.extend({
 	model: AllocationRecord
 });
+OrganizationAllocationRecordCollection =Backbone.Collection.extend({
+	model: OrganizationAllocationRecord
+});
+
 ObjectiveAllocationRecordCollection =Backbone.Collection.extend({
 	model: ObjectiveAllocationRecord
 }); 

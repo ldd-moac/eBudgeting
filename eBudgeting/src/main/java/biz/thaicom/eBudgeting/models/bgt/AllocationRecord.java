@@ -70,8 +70,6 @@ public class AllocationRecord implements Serializable{
 		this.id = id;
 	}
 
-
-
 	public Objective getForObjective() {
 		return forObjective;
 	}

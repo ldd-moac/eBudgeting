@@ -661,16 +661,6 @@ var MainCtrView = Backbone.View.extend({
 			        		}
 			        		return html;
 			        	}
-			        },  {
-			        	text: 'พรบ.งบฯ',
-			        	width: 120,
-			        	sortable : false,
-			        	dataIndex: 'sumAllocationR3',
-			        	align: 'right',
-			        	renderer: function(value) {
-			        		return addCommas(value);
-			        	}
-			        		
 			        }, {
 			        	text: 'จัดสรรให้เจ้าของงาน',
 			        	width: 120,
@@ -682,10 +672,30 @@ var MainCtrView = Backbone.View.extend({
 			        	}
 			        		
 			        }, {
-			        	text: 'จัดสรรไว้ส่วนกลาง',
+			        	text: 'จัดสรรเพิ่มเติม',
 			        	width: 120,
 			        	sortable : false,
-			        	dataIndex: 'sumBudgetReserved',
+			        	dataIndex: 'sumAllocationAfterR9',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        		
+			        }, {
+			        	text: 'รวมเงินที่ได้รับการจัดสรร',
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumAllocation',
+			        	align: 'right',
+			        	renderer: function(value) {
+			        		return addCommas(value);
+			        	}
+			        		
+			        }, {
+			        	text: 'จัดสรรให้หน่วยงาน',
+			        	width: 120,
+			        	sortable : false,
+			        	dataIndex: 'sumOrgAllocRecords',
 			        	align: 'right',
 			        	renderer: function(value) {
 			        		return addCommas(value);

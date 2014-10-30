@@ -54,6 +54,8 @@ import biz.thaicom.eBudgeting.models.bgt.FormulaStrategy;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposalTarget;
+import biz.thaicom.eBudgeting.models.bgt.OrganizationAllocationRecord;
+import biz.thaicom.eBudgeting.models.bgt.OrganizationAllocationRound;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
 import biz.thaicom.eBudgeting.models.bgt.RequestColumn;
 import biz.thaicom.eBudgeting.models.bgt.ReservedBudget;
@@ -89,6 +91,8 @@ import biz.thaicom.eBudgeting.repositories.ObjectiveRelationsRepository;
 import biz.thaicom.eBudgeting.repositories.ObjectiveRepository;
 import biz.thaicom.eBudgeting.repositories.ObjectiveTargetRepository;
 import biz.thaicom.eBudgeting.repositories.ObjectiveTypeRepository;
+import biz.thaicom.eBudgeting.repositories.OrganizationAllocationRecordRepository;
+import biz.thaicom.eBudgeting.repositories.OrganizationAllocationRoundRepository;
 import biz.thaicom.eBudgeting.repositories.OrganizationRepository;
 import biz.thaicom.eBudgeting.repositories.ProposalStrategyRepository;
 import biz.thaicom.eBudgeting.repositories.RequestColumnRepositories;
@@ -192,6 +196,12 @@ public class EntityServiceJPA implements EntityService {
 	
 	@Autowired
 	private ObjectiveAllocationRecordRepository objectiveAllocationRecordRepository;
+	
+	@Autowired
+	private OrganizationAllocationRecordRepository organizationAllocationRecordRepository;
+	
+	@Autowired
+	private OrganizationAllocationRoundRepository organizationAllocationRoundRepository;
 	
 	@Autowired
 	private ObjectMapper mapper;
@@ -1257,11 +1267,21 @@ public class EntityServiceJPA implements EntityService {
 
 		// first we'll get rid of all allocR9  (index=8) and reservedBudget
 		
+		
 		List<ReservedBudget> rBudgets = reservedBudgetRepository.findAllByFiscalYear(fiscalYear);
 		List<AllocationRecord> allocR9s = allocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, 8);
 		
 		reservedBudgetRepository.delete(rBudgets);
 		allocationRecordRepository.delete(allocR9s);
+		
+		
+		// all OrgAllocRound and OrgAllocRecord
+		List<OrganizationAllocationRecord> records = organizationAllocationRecordRepository.findAllByFiscalYear(fiscalYear);
+		List<OrganizationAllocationRound> rounds = organizationAllocationRoundRepository.findAllByFiscalYear(fiscalYear);
+		
+		organizationAllocationRecordRepository.delete(records);
+		organizationAllocationRoundRepository.delete(rounds);
+		
 		
 		List<AllocationRecord> allocationRecordList = allocationRecordRepository
 				.findAllByForObjective_fiscalYearAndIndex(fiscalYear, 2);
@@ -1295,8 +1315,41 @@ public class EntityServiceJPA implements EntityService {
 
 		}
 		
+		// now initialize OrganizationAllocationRecord/Round
+		OrganizationAllocationRound round = new OrganizationAllocationRound();
+		round.setCreatedDate(new Date());
+		round.setRound(0);
+		round.setFiscalYear(fiscalYear);
 		
-
+		organizationAllocationRoundRepository.save(round);
+		
+		HashMap<String, OrganizationAllocationRecord> orgAllocMap = new HashMap<String, OrganizationAllocationRecord>();
+		
+		List<Objective> objectives = objectiveRepository.findAllDescendantOf("%."+root.getId() +".");
+		for(Objective objective : objectives) {
+			List<BudgetProposal> proposals = objective.getProposals();
+			for(BudgetProposal p: proposals) {
+				
+				Long topBudgetProposalId = p.getBudgetType().getParentIds().get(1);
+				BudgetType topBudgetProposalType = budgetTypeRepository.findOne(topBudgetProposalId);
+				
+				String key = "o"+objective.getId() + "b"+ topBudgetProposalId + "owner"+p.getOwner().getId();
+				if(orgAllocMap.get(key) == null) {
+				
+					OrganizationAllocationRecord record = new OrganizationAllocationRecord();
+					record.setRound(round);
+					record.setAmountAllocated(0L);
+					record.setBudgetType(topBudgetProposalType);
+					record.setForObjective(objective);
+					record.setOwner(p.getOwner());
+					
+					orgAllocMap.put(key, record);
+				}
+			}
+		}
+		
+		organizationAllocationRecordRepository.save(orgAllocMap.values());
+		
 		return "success";
 	
 
@@ -1933,6 +1986,9 @@ public class EntityServiceJPA implements EntityService {
 				for(TargetValue tv : o.getTargetValues()) {
 					tv.getOwner().getId();
 				}
+				
+				o.setFilterOrgAllocRecords(organizationAllocationRecordRepository.findAllByObjective(o));
+				
 			} else {
 				
 			}
