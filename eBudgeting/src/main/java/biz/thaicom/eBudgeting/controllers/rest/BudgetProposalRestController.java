@@ -190,7 +190,15 @@ public class BudgetProposalRestController {
 		
 	}
 
-
+	
+	
+	@RequestMapping(value="/OrganizationAllocationRecord/LotsUpdate", method=RequestMethod.PUT)
+	public @ResponseBody String updateLotsOrganizationAllocationRecord(
+			@RequestBody JsonNode node,
+			@Activeuser ThaicomUserDetail currentUser) throws Exception {
+		entityService.saveLotsOrganizationAllocationRecord(node);
+		return "OK";
+	}
 	
 	@RequestMapping(value="/BudgetProposal/LotsUpdate", method=RequestMethod.PUT)
 	public @ResponseBody String updateLotsBudgetProposal(

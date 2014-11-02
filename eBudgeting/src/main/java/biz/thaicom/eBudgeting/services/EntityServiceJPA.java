@@ -3838,6 +3838,39 @@ public class EntityServiceJPA implements EntityService {
 	
 	
 	@Override
+	public void saveLotsOrganizationAllocationRecord(JsonNode node) {
+		for(JsonNode n: node) {
+			Long id = n.get("id").asLong();
+			logger.debug("++++++++++++++++++++++++++++++++++++++++++++++++++ {} ", id);
+			OrganizationAllocationRecord p = organizationAllocationRecordRepository.findOne(id);
+			Long oldAmount = p.getAmountAllocated();
+			if(oldAmount == null) {
+				oldAmount = 0L;
+			} 
+			
+			p.setAmountAllocated(n.get("amountAllocated").asLong());
+			logger.debug("saving new amountAllocated = " + p.getAmountAllocated());
+			
+			Long newAmout = p.getAmountAllocated();
+			Long adjustedRequestedValue = oldAmount-newAmout;
+			
+			organizationAllocationRecordRepository.save(p);
+			
+			List<OrganizationAllocationRecord> ps = organizationAllocationRecordRepository
+					.findAllByOnwerIdAndObjectiveIdIn(
+							p.getOwner().getId(), p.getBudgetType().getId(),  p.getForObjective().getParentIds());
+
+				
+				for(OrganizationAllocationRecord pp: ps) {
+					pp.adjustAmountAllocated(adjustedRequestedValue);
+					
+					organizationAllocationRecordRepository.save(pp);
+				}
+			
+		}
+	}
+
+	@Override
 	public void saveLotsBudgetProposal(JsonNode node) {
 		for(JsonNode n: node) {
 			Long id = n.get("id").asLong();

@@ -24,4 +24,14 @@ public interface OrganizationAllocationRecordRepository extends
 			+ "WHERE record.forObjective = ?1 ")
 	List<OrganizationAllocationRecord> findAllByObjective(Objective o);
 
+
+	@Query(""
+			+ "SELECT record "
+			+ "FROM OrganizationAllocationRecord record "
+			+ "WHERE record.forObjective.id in (?3) "
+			+ "		AND record.owner.id = ?1 "
+			+ "		AND record.budgetType.id = ?2 ")
+	List<OrganizationAllocationRecord> findAllByOnwerIdAndObjectiveIdIn(
+			Long ownerId, Long budgetTypeId, List<Long> objectiveIds);
+
 }

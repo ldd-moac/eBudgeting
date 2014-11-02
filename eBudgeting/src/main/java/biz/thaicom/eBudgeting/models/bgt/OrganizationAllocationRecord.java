@@ -102,6 +102,11 @@ public class OrganizationAllocationRecord implements Serializable{
 	public void setRound(OrganizationAllocationRound round) {
 		this.round = round;
 	}
+
+	public void adjustAmountAllocated(Long adjustedAmountAllocated) {
+		this.amountAllocated = this.amountAllocated - adjustedAmountAllocated;
+		
+	}
 	
 	
 }

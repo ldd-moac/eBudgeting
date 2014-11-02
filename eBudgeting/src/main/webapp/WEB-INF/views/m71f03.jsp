@@ -193,9 +193,9 @@
 	<tbody>
 		{{#each this}}
 		<tr>
-			<td><a href="#" data-budgetTypeId="{{topBudgetTypeId}}" class="detailAllocation">{{topParentName}}</a></td>
+			<td><a href="#" data-budgetTypeId="{{budgetType.id}}" class="detailAllocation">{{budgetType.name}}</a></td>
 			<td>{{formatNumber allocR9.amountAllocated}}</td>
-			<td>{{formatNumber reservedBudget.amountReserved}}</td>
+			<td>{{formatNumber amountAllocated}}</td>
 			<td>{{formatNumber amountToBeAllocated}}</td>
 		</tr>
 		{{/each}}
@@ -212,7 +212,7 @@
 </script>
 
 <script id="detailModalBudgetTemplate" type="text/x-handler-template">
-<form data-id="{{topBudgetTypeId}}">
+<form data-id="{{budgetType.id}}">
 	<div>
 	จัดสรรให้เจ้าของงาน : {{allocR9.amountAllocated}} บาท
 	</div>
@@ -220,29 +220,17 @@
 	<table class="table table-bordered" id="targetValueModalTbl">
 		<thead>
 			<tr>
-				<td>รายการ</td>
 				<td>หน่วยงาน</td>
-				<td>เป้าหมายที่ขอตั้ง</td>	
 				<td>เป้าหมายที่จัดสรร</td>
 			</tr>
 		</thead>
 		<tbody>
-			{{#each proposals}}
-			<tr>
-			<td>{{budgetType.name}}</td>
-			<td></td>
-			<td></td>
-			<td></td>
-			</tr>
-			{{#each ownerProposals}}
-			<tr>
-			<td></td>
+			{{#each orgAllocRecs}}
+			<tr data-id="{{id}}">
 			<td>{{owner.name}}</td>
-			<td>{{amountRequest}}</td>
 			<td><input type="text" class="txtForm" data-id="{{id}}" value="{{amountAllocated}}"/></td>
 			</tr>
 
-			{{/each}}
 			{{/each}}
 
 		</tobdy

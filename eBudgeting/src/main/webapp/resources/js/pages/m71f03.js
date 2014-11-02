@@ -43,9 +43,9 @@ var DetailModalView = Backbone.View.extend({
 		var currAlloc = this.topAllocation['id'+topBudgetTypeId];
 		
 		var amountallocated = this.$el.find('#amountAllocated').val();
-		var amountReserved = this.$el.find('#amountReserved').val();
 		
-		var amountToBeAllocated =  currAlloc.amountAllocatedR3 - amountallocated - amountReserved;
+		
+		var amountToBeAllocated =  currAlloc.allocR9.amountAllocated - currAlloc.amountAllocated;
 		console.log(amountToBeAllocated);
 		this.$el.find('#amountToBeAllocated').attr('value', amountToBeAllocated);
 		
@@ -56,12 +56,12 @@ var DetailModalView = Backbone.View.extend({
 		var input = this.$el.find('.txtForm');
 		_.each(input, function(el){
 			var id = $(el).attr('data-id');
-			var proposal = BudgetProposal.findOrCreate({id: id});
+			var orgAllocRecord = OrganizationAllocationRecord.findOrCreate({id: id});
 			var value = parseInt($(el).val());
 			
-			if(proposal!=null) {
-				proposal.set('amountAllocated', value);
-				values.push(proposal.toJSON());
+			if(orgAllocRecord!=null) {
+				orgAllocRecord.set('amountAllocated', value);
+				values.push(orgAllocRecord.toJSON());
 			}
 		});
 		
@@ -71,13 +71,33 @@ var DetailModalView = Backbone.View.extend({
 		// now save to the database?
 		
 		$.ajax({
-			url: appUrl('/BudgetProposal/LotsUpdate'),
+			url: appUrl('/OrganizationAllocationRecord/LotsUpdate'),
 			type: 'PUT',
     		data: JSON.stringify(values),
     		dataType: 'json',
     		contentType: 'application/json'})
     	.done(_.bind(function(msg) {
     			alert('บันทึกเรียบร้อย');
+    			var store=Ext.getStore('treeObjectiveStore');
+    			var node = store.getNodeById(this.currentObjective.get('id'));
+    			var changeAmount = 0;
+    			
+    			for(var i=0; i<values.length; i++) {
+    			
+    				var orgAllocRec = values[i]; 	
+    				
+    				var allocNode = _.findWhere(node.data.filterOrgAllocRecords, {id: parseInt(orgAllocRec.id)});
+    				changeAmount += orgAllocRec.amountAllocated - allocNode.amountAllocated;
+    				allocNode.amountAllocated = orgAllocRec.amountAllocated;
+    				
+    			}
+    			
+    			node.data.sumOrgAllocRecords  += changeAmount;
+    			node.data.amountAllocationLeft = node.data.sumAllocationR9 - node.data.sumOrgAllocRecords;
+    			
+    			node.commit();
+    			
+    			
     		},this));		
 	},
 	setParentView: function(view) {
@@ -118,61 +138,88 @@ var DetailModalView = Backbone.View.extend({
 		var allocRec = {};
 		var ownerProposals = this.currentObjective.get('proposals')
 		
-		//prepare the allocation
-		_.forEach(json.sumBudgetTypeProposals, _.bind(function(proposal) {
-			var budgetType = BudgetType.findOrCreate({id:proposal.budgetType.id});
-			// search the allocationR1
-						
-			if(sumTopBudgetType['id'+budgetType.get('parentIds')[1]] == null) {
-				sumTopBudgetType['id'+budgetType.get('parentIds')[1]] = {};
-				allocRec = sumTopBudgetType['id'+budgetType.get('parentIds')[1]];
-				allocRec.amountAllocatedR1 = 0;
-				allocRec.amountAllocatedR2 = 0;
-				allocRec.amountAllocatedR3 = 0;
-				allocRec.amountReserved = 0;
-				allocRec.amountToBeAllocated = 0;
-				allocRec.amountAllocated = 0;
-				allocRec.topParentName = budgetType.get('topParentName');
-				allocRec.topBudgetTypeId = proposal.budgetType.parentIds[1];
-				
-				var topBudgetType=BudgetType.findOrCreate({id:allocRec.topBudgetTypeId});
-				
-				allocRec.proposals = new Array();
-				
-				// then set allocR9 and amountReserved
-				
-				var allocR9 = this.currentObjective.get('allocationRecordsR9').findWhere({budgetType: topBudgetType});
+		_.forEach(json.filterOrgAllocRecords, _.bind(function(orgAllocRecord) {
+			var budgetType = BudgetType.findOrCreate({id: orgAllocRecord.budgetType.id});
+			
+			if(sumTopBudgetType['id'+budgetType.get('id')] == null) {
+				sumTopBudgetType['id'+budgetType.get('id')] = {};
+				allocRec = sumTopBudgetType['id'+budgetType.get('id')];
+				allocRec.amountAllocated=0;
+				allocRec.budgetType = budgetType.toJSON();
+
+				var allocR9 = this.currentObjective.get('allocationRecordsR9').findWhere({budgetType: budgetType});
 				if(allocR9!=null) {
 					allocRec.allocR9 = allocR9.toJSON();
 				}
 				
-				var reservedBudget = this.currentObjective.get('reservedBudgets').findWhere({budgetType: topBudgetType});
-				if(reservedBudget!=null) {
-					allocRec.reservedBudget = reservedBudget.toJSON();
-				}
-								
+				allocRec.orgAllocRecs = new Array();
+				
+				
 			} else {
-				allocRec = sumTopBudgetType['id'+budgetType.get('parentIds')[1]];
+				allocRec = sumTopBudgetType['id'+budgetType.get('id')];
 			}
 			
-			var r3 = this.currentObjective.get('allocationRecordsR3').findWhere({budgetType:budgetType});
-
-			allocRec.amountAllocatedR3 +=  r3.get('amountAllocated');
-		
-			var o =  ownerProposals.where({budgetType: budgetType});
-			proposal.ownerProposals = [];
-			for(var i=0; i< o.length; i++) {
-				proposal.ownerProposals.push(o[i].toJSON());
-			}
-		
-			allocRec.proposals.push(proposal);
+			allocRec.amountAllocated += orgAllocRecord.amountAllocated;
 			
-		},this));
+			allocRec.orgAllocRecs.push(orgAllocRecord);
+			
+		}, this) );
 		
+//		//prepare the allocation
+//		_.forEach(json.sumBudgetTypeProposals, _.bind(function(proposal) {
+//			var budgetType = BudgetType.findOrCreate({id:proposal.budgetType.id});
+//			// search the allocationR1
+//						
+//			if(sumTopBudgetType['id'+budgetType.get('parentIds')[1]] == null) {
+//				sumTopBudgetType['id'+budgetType.get('parentIds')[1]] = {};
+//				allocRec = sumTopBudgetType['id'+budgetType.get('parentIds')[1]];
+//				allocRec.amountAllocatedR1 = 0;
+//				allocRec.amountAllocatedR2 = 0;
+//				allocRec.amountAllocatedR3 = 0;
+//				allocRec.amountReserved = 0;
+//				allocRec.amountToBeAllocated = 0;
+//				allocRec.amountAllocated = 0;
+//				allocRec.topParentName = budgetType.get('topParentName');
+//				allocRec.topBudgetTypeId = proposal.budgetType.parentIds[1];
+//				
+//				var topBudgetType=BudgetType.findOrCreate({id:allocRec.topBudgetTypeId});
+//				
+//				allocRec.proposals = new Array();
+//				
+//				// then set allocR9 and amountReserved
+//				
+//				var allocR9 = this.currentObjective.get('allocationRecordsR9').findWhere({budgetType: topBudgetType});
+//				if(allocR9!=null) {
+//					allocRec.allocR9 = allocR9.toJSON();
+//				}
+//				
+//				var reservedBudget = this.currentObjective.get('reservedBudgets').findWhere({budgetType: topBudgetType});
+//				if(reservedBudget!=null) {
+//					allocRec.reservedBudget = reservedBudget.toJSON();
+//				}
+//								
+//			} else {
+//				allocRec = sumTopBudgetType['id'+budgetType.get('parentIds')[1]];
+//			}
+//			
+//			var r3 = this.currentObjective.get('allocationRecordsR3').findWhere({budgetType:budgetType});
+//
+//			allocRec.amountAllocatedR3 +=  r3.get('amountAllocated');
+//		
+//			var o =  ownerProposals.where({budgetType: budgetType});
+//			proposal.ownerProposals = [];
+//			for(var i=0; i< o.length; i++) {
+//				proposal.ownerProposals.push(o[i].toJSON());
+//			}
+//		
+//			allocRec.proposals.push(proposal);
+//			
+//		},this));
+//		
 		this.topAllocation = sumTopBudgetType;
 		
 		_.each(this.topAllocation, function(alloc) {
-			alloc.amountToBeAllocated = alloc.amountAllocatedR3 - alloc.allocR9.amountAllocated - alloc.reservedBudget.amountReserved;
+			alloc.amountToBeAllocated = alloc.allocR9.amountAllocated - alloc.amountAllocated;
 		});
 		
 		html = this.detailViewTableTemplate(sumTopBudgetType);
