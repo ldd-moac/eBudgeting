@@ -205,7 +205,7 @@
 
 <script id="detailModalBudgetHeaderTemplate" type="text/x-handler-template">
 <div>
-	จัดสรรงบประมาณหมวด {{topParentName}}
+	จัดสรรงบประมาณหมวด {{budgetType.name}}
 </div>
 	
 
@@ -213,21 +213,23 @@
 
 <script id="detailModalBudgetTemplate" type="text/x-handler-template">
 <form data-id="{{budgetType.id}}">
-	<div>
-	จัดสรรให้เจ้าของงาน : {{allocR9.amountAllocated}} บาท
+	<div id="summaryAllocation">
+		จัดสรรให้เจ้าของงาน : {{formatNumber allocR9.amountAllocated}} บาท  จัดสรรไปแล้ว {{formatNumber amountAllocated}} บาท คงเหลือการจัดสรร {{formatNumber amountToBeAllocated}} บาท
 	</div>
 	<div>
 	<table class="table table-bordered" id="targetValueModalTbl">
 		<thead>
 			<tr>
 				<td>หน่วยงาน</td>
-				<td>เป้าหมายที่จัดสรร</td>
+				<td>งบประมาณที่ขอตั้ง</td>
+				<td>งบประมาณที่จัดสรร</td>
 			</tr>
 		</thead>
 		<tbody>
 			{{#each orgAllocRecs}}
 			<tr data-id="{{id}}">
 			<td>{{owner.name}}</td>
+			<td>{{formatNumber sumBudgetProposal}}</td>
 			<td><input type="text" class="txtForm" data-id="{{id}}" value="{{amountAllocated}}"/></td>
 			</tr>
 
@@ -934,6 +936,11 @@ $(document).ready(function() {
         			}	
         		});
         		return sum;
+        	}
+        },{
+        	name: 'sumAllocation',
+        	convert: function(v, rec) {
+        		return rec.data.sumAllocationR9;
         	}
         },{
         	name: 'amountAllocationLeft',

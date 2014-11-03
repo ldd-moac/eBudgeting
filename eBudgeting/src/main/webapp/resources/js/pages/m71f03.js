@@ -42,12 +42,17 @@ var DetailModalView = Backbone.View.extend({
 		var topBudgetTypeId = this.$el.find('form').attr('data-id');
 		var currAlloc = this.topAllocation['id'+topBudgetTypeId];
 		
-		var amountallocated = this.$el.find('#amountAllocated').val();
+		var sum = 0;
+		this.$el.find('.txtForm').each(function(index, txt) {
+			
+			sum += parseInt($(txt).val());
+		});
 		
+		currAlloc.amountAllocated = sum;
 		
-		var amountToBeAllocated =  currAlloc.allocR9.amountAllocated - currAlloc.amountAllocated;
-		console.log(amountToBeAllocated);
-		this.$el.find('#amountToBeAllocated').attr('value', amountToBeAllocated);
+		currAlloc.amountToBeAllocated =  currAlloc.allocR9.amountAllocated - currAlloc.amountAllocated;
+		
+		this.$el.find('#summaryAllocation').html("จัดสรรให้เจ้าของงาน : "+ addCommas(currAlloc.allocR9.amountAllocated)+" บาท  จัดสรรไปแล้ว "+addCommas(currAlloc.amountAllocated)+" บาท คงเหลือการจัดสรร "+ addCommas(currAlloc.amountToBeAllocated)+" บาท")
 		
 	},
 	saveBtn: function(e) {
@@ -160,6 +165,24 @@ var DetailModalView = Backbone.View.extend({
 			}
 			
 			allocRec.amountAllocated += orgAllocRecord.amountAllocated;
+			
+			var p = ownerProposals.filter(function(pp) { 
+				if(pp.get('budgetType').get('topParentName') == budgetType.get('name') && 
+						pp.get('owner').get('id') == orgAllocRecord.owner.id) 
+					return true; 
+				else 
+					return false;
+				});
+			
+			var sumBudgetProposal = 0;
+			
+			_.forEach(p, _.bind(function(op) {
+				
+				sumBudgetProposal += op.get('amountRequest');
+				
+			},this));
+			
+			orgAllocRecord.sumBudgetProposal = sumBudgetProposal;
 			
 			allocRec.orgAllocRecs.push(orgAllocRecord);
 			
@@ -693,7 +716,7 @@ var MainCtrView = Backbone.View.extend({
 			            }
 			        }, {
 			        	text: 'เป้าหมาย',
-			        	width: 80,
+			        	width: 90,
 			        	sortable: false,
 			        	dataIndex: 'targetValueAllocationRecordsRound',
 			        	align: 'center',
@@ -710,7 +733,7 @@ var MainCtrView = Backbone.View.extend({
 			        	}
 			        }, {
 			        	text: 'จัดสรรให้เจ้าของงาน',
-			        	width: 120,
+			        	width: 100,
 			        	sortable : false,
 			        	dataIndex: 'sumAllocationR9',
 			        	align: 'right',
@@ -720,7 +743,7 @@ var MainCtrView = Backbone.View.extend({
 			        		
 			        }, {
 			        	text: 'จัดสรรเพิ่มเติม',
-			        	width: 120,
+			        	width: 100,
 			        	sortable : false,
 			        	dataIndex: 'sumAllocationAfterR9',
 			        	align: 'right',
@@ -730,7 +753,7 @@ var MainCtrView = Backbone.View.extend({
 			        		
 			        }, {
 			        	text: 'รวมเงินที่ได้รับการจัดสรร',
-			        	width: 120,
+			        	width: 100,
 			        	sortable : false,
 			        	dataIndex: 'sumAllocation',
 			        	align: 'right',
@@ -740,7 +763,7 @@ var MainCtrView = Backbone.View.extend({
 			        		
 			        }, {
 			        	text: 'จัดสรรให้หน่วยงาน',
-			        	width: 120,
+			        	width: 100,
 			        	sortable : false,
 			        	dataIndex: 'sumOrgAllocRecords',
 			        	align: 'right',
@@ -750,7 +773,7 @@ var MainCtrView = Backbone.View.extend({
 			        		
 			        }, {
 			        	text: 'เหลือจัดสรร',
-			        	width: 120,
+			        	width: 100,
 			        	sortable : false,
 			        	dataIndex: 'amountAllocationLeft',
 			        	align: 'right',
