@@ -37,7 +37,7 @@
 			</div>
 		</div>
 		
-		<div id="targetValueModal" class="modal hide fade">
+		<div id="targetValueModal" class="modal wideModal hide fade">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 				<span style="font-weight: bold;"></span>
@@ -356,14 +356,18 @@
 				<td>หน่วยงาน</td>
 				<td>เป้าหมายที่ขอตั้ง</td>	
 				<td>เป้าหมายที่จัดสรร</td>
+				<td>งบประมาณที่ขอตั้ง</td>
+				<td>งบประมาณที่จัดสรร</td>
 			</tr>
 		</thead>
 		<tbody>
 			{{#each values}}
 			<tr>
 			<td>{{owner.name}}</td>
-			<td>{{requestedValue}}</td>
+			<td>{{formatNumber requestedValue}}</td>
 			<td><input type="text" class="txtForm" data-id="{{id}}" value="{{allocatedValue}}"/></td>
+			<td>{{formatNumber sumProposal}}</td>
+			<td>{{formatNumber sumAllocation}}</td>
 			</tr>
 			{{/each}}
 		</tobdy

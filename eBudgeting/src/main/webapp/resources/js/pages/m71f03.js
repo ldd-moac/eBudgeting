@@ -387,12 +387,44 @@ var TargetValueModalView=Backbone.View.extend({
 		json.target = this.targetValue.toJSON();
 		json.values = [];
 		
-		this.objective.get('targetValues').each(function(target) {
-			if(target.get('target').get('unit').get('id') == json.target.target.unit.id) {
-				json.values.push(target.toJSON());
+		
+		
+		var sumProposal =  {};
+		var sumAllocation = {};
+		
+		this.objective.get('proposals').each(function(proposal) {
+			var ownerId=proposal.get('owner').get('id');
+			if(sumProposal[ownerId] == null) {
+				sumProposal[ownerId] = 0;
 			}
-			
+			sumProposal[ownerId] += proposal.get('amountRequest');
 		});
+		
+		this.objective.get('filterOrgAllocRecords').each(function(record) {
+			var ownerId=record.get('owner').get('id');
+			if(sumAllocation[ownerId] == null) {
+				sumAllocation[ownerId] = 0;
+			}
+			sumAllocation[ownerId] += record.get('amountAllocated');
+		});
+		
+		
+		console.log(sumProposal);
+		console.log(sumAllocation);
+		
+		this.objective.get('targetValues').each(function(target) {
+			var targetJson = {};
+			var ownerId=target.get('owner').get('id');
+			
+			if(target.get('target').get('unit').get('id') == json.target.target.unit.id) {
+				targetJson = target.toJSON(); 
+				targetJson.sumProposal = sumProposal[ownerId];
+				targetJson.sumAllocation = sumAllocation[ownerId];
+			
+				json.values.push(targetJson);
+			}
+		});
+		
 		
 		var html = this.targetValueModalTpl(json);
 		this.$el.find('.modal-body').html(html);
