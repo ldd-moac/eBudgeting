@@ -86,10 +86,7 @@ var MainTreeView = Backbone.View.extend({
 						parentTrEl.find('a.nextChildrenLnk').find('i').addClass('icon-circle');
 					}
 					
-				},this),
-				error: function(model, xhr, options) {
-					alert("ไม่สามารถลบรายการได้ \n Error: " + xhr.responseText);
-				}
+				},this)
 			});
 
 		}

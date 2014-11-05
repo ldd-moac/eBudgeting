@@ -2247,7 +2247,13 @@ public class EntityServiceJPA implements EntityService {
 			budgetProposalRepository.save(temp);
 		}
 		
+		
+		b.getProposalStrategies().remove(proposalStrategy);
 		proposalStrategyRepository.delete(proposalStrategy);
+		
+		if(b.getProposalStrategies() != null && b.getProposalStrategies().size() == 0) {
+			budgetProposalRepository.delete(proposalStrategy.getProposal());
+		}
 		
 		return proposalStrategy;
 	}
@@ -2892,7 +2898,7 @@ public class EntityServiceJPA implements EntityService {
 		List<BudgetProposal> list = budgetProposalRepository.findAllByForObjective(obj); 
 		
 		if(list.size() > 0) {
-			throw new ObjectiveHasBudgetProposalException(list);
+			throw new ObjectiveHasBudgetProposalException(obj, list);
 		}
 		
 		
