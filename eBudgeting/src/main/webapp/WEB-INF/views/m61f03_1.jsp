@@ -144,6 +144,15 @@
 	<div>Loading <img src="/eBudgeting/resources/graphics/spinner_bar.gif"/></div>
 </script>
 
+
+<script id="proposalListTemplate" type="text/x-handler-template">
+<ul>
+{{#each this}}
+	<li>{{name}}: {{formatNumber total}} บาท</li>
+{{/each}}
+</ul>
+</script>
+
 <script id="budgetInputSelectionTemplate" type="text/x-handler-template">
 <select id="budgetTypeSlt" {{#if editStrategy}} disabled {{/if}}>
 	<option value="0">กรุณาเลือกรายการ</option>
@@ -311,6 +320,64 @@
 </table>
 
 </script>
+<script id="childrenNodeTemplate" type="text/x-handler-template">
+	<tr data-level="{{this.level}}" data-id="{{this.id}}" class="type-{{type.id}}" showChildren="true" parentPath="{{this.parentPath}}">
+		<td style="width:20px;"></td>
+		<td style="width:246px;" class="{{#if this.children}}disable{{/if}}">
+			<div class="pull-left" style="margin-left:{{this.padding}}px; width:18px;">
+					{{#if this.children}}
+					<input class="checkbox_tree bullet" type="checkbox" id="bullet_{{this.id}}"/>
+					<label class="expand" for="bullet_{{this.id}}"><icon class="label-caret icon-caret-down"></icon></label>
+					{{else}}		
+						<label class="expand">			
+							<icon class="icon-file-alt"></icon>
+						<label>
+					{{/if}}					
+			</div>
+			<div class="pull-left" style="width:{{nameWidth}}px;">
+					<input class="checkbox_tree" type="checkbox" id="item_{{this.id}}"/>
+					<label class="main" for="item_{{this.id}}">
+						{{#unless this.children}}<a href="#" class="detail">{{/unless}}
+						<span class="label label-info mini">{{type.name}}</span> <br/>[{{this.code}}] {{this.name}}
+						{{#unless this.children}}</a>{{/unless}}
+					</label>
+			</div>
+{{#unless this.children}}
+			<div class="clearfix">	{{{listProposals this.filterProposals}}}</div>
+{{/unless}}
+			
+		</td>
+
+		<td  style="width:60px;" class="{{#if this.children}}disable{{/if}} centerAlign">
+			<span>
+				<ul  style="list-style:none; margin: 0px;">{{#each filterTargetValues}}<li style="list-style:none; padding: 0px;">{{target.unit.name}} ({{#if target.isSumable}}นับ{{else}}ไม่นับ{{/if}})</li>{{/each}}</ul>
+			</span>
+		</td>
+		<td  style="width:60px;" class="{{#if this.children}}disable{{/if}} centerAlign">
+			<span>
+				<ul  style="list-style:none; margin: 0px;">
+					{{#each filterTargetValues}}
+							<li style="list-style:none; padding: 0px;">{{sumTargetValue target.unit.id ../filterObjectiveBudgetProposals}}</li>
+					{{/each}}
+				</ul>
+			</span>
+		</td>
+		<td style="width:80px;" class="{{#if this.children}}disable{{/if}} rightAlign">
+				<span>{{#if this.filterObjectiveBudgetProposals}}{{{sumProposal this.filterObjectiveBudgetProposals}}}{{else}}-{{/if}}</span>
+		</td>
+
+		<td style="width:80px;" class="{{#if this.children}}disable{{/if}} rightAlign">
+				<span>{{#if this.filterObjectiveBudgetProposals}}{{{sumProposalNext1Year this.filterObjectiveBudgetProposals}}}{{else}}-{{/if}}</span>
+		</td>
+		<td style="width:80px;" class="{{#if this.children}}disable{{/if}} rightAlign">
+				<span>{{#if this.filterObjectiveBudgetProposals}}{{{sumProposalNext2Year this.filterObjectiveBudgetProposals}}}{{else}}-{{/if}}</span>				
+		</td>
+		<td style="width:80px;" class="{{#if this.children}}disable{{/if}} rightAlign">
+				<span>{{#if this.filterObjectiveBudgetProposals}}{{{sumProposalNext3Year this.filterObjectiveBudgetProposals}}}{{else}}-{{/if}}</span>
+		</td>
+	</tr>
+	{{{childrenNodeTpl this.children this.level}}}  
+</script>
 
 <script id="modalTemplate" type="text/x-handler-template">
 <div class="menu">{{#unless readOnly}}
@@ -449,6 +516,8 @@
 	
 	var readOnly = "${readOnly}";
 
+	var proposalListTemplate = Handlebars.compile($('#proposalListTemplate').html());
+	
 	Handlebars.registerHelper("smallText", function(str) {
 		if(str.length > 7) {
 			return "font-size:9px;";
@@ -475,6 +544,28 @@
 		}
 		
 		return addCommas(sum);
+	});
+	
+	Handlebars.registerHelper("listProposals", function(proposals) {
+		if(proposals == null || proposals.length == 0) return "";
+		
+		var budgetTypeList = [];
+		
+		for(var i=0; i< proposals.length; i++) {
+ 			if(budgetTypeList[proposals[i].budgetType.topParentName] == null) budgetTypeList[proposals[i].budgetType.topParentName] = 0;
+
+ 			budgetTypeList[proposals[i].budgetType.topParentName] += proposals[i].amountRequest;
+ 		}
+ 		
+ 		var json=[];
+ 		for(var i=0; i< topBudgetList.length; i++) {
+ 			if(budgetTypeList[topBudgetList[i]] != null && budgetTypeList[topBudgetList[i]] > 0) {
+ 				json.push({name: topBudgetList[i], total: budgetTypeList[topBudgetList[i]]});
+ 			}
+ 		}
+ 		 		
+ 		return proposalListTemplate(json);
+		
 	});
 	
 	Handlebars.registerHelper("sumProposal", function(proposals) {
@@ -548,8 +639,7 @@
 		var out = '';
 		var childNodeTpl = Handlebars
 				.compile($("#childrenNodeTemplate").html());
-		var childNormalNodeTpl = Handlebars.compile($(
-				"#childrenNormalNodeTemplate").html());
+		
 		if (level == undefined) {
 			level = 0;
 		}
@@ -566,10 +656,6 @@
 					out = out + childNodeTpl(child);
 				});
 
-			} else {
-				children.forEach(function(child) {
-					out = out + childNormalNodeTpl(child);
-				});
 			}
 		}
 
