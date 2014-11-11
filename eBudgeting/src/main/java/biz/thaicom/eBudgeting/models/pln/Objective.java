@@ -1,6 +1,5 @@
 package biz.thaicom.eBudgeting.models.pln;
 
-import java.io.Console;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,7 @@ import org.hibernate.annotations.FetchMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import biz.thaicom.eBudgeting.models.bgt.ActualBudget;
 import biz.thaicom.eBudgeting.models.bgt.AllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.BudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.BudgetType;
@@ -124,6 +124,9 @@ public class Objective implements Serializable {
 	
 	@OneToMany(mappedBy="forObjective", fetch=FetchType.LAZY)
 	private List<ReservedBudget> reservedBudgets;
+	
+	@OneToMany(mappedBy="forObjective", fetch=FetchType.LAZY)
+	private List<ActualBudget> actualBudgets;
 	
 	@ManyToMany(fetch=FetchType.LAZY)
 	@JoinTable(name="BGT_OBJECTIVE_BUDGETTYPE")
@@ -679,6 +682,13 @@ public class Objective implements Serializable {
 	}
 	public void setReservedBudgets(List<ReservedBudget> reservedBudgets) {
 		this.reservedBudgets = reservedBudgets;
+	}
+	
+	public List<ActualBudget> getActualBudgets() {
+		return actualBudgets;
+	}
+	public void setActualBudgets(List<ActualBudget> actualBudgets) {
+		this.actualBudgets = actualBudgets;
 	}
 	public List<ObjectiveTarget> getTargets() {
 		return targets;

@@ -14,32 +14,34 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import biz.thaicom.eBudgeting.models.hrx.Organization;
+import biz.thaicom.eBudgeting.models.pln.Objective;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import biz.thaicom.eBudgeting.models.pln.Objective;
-
 @Entity
-@Table(name="BGT_RESERVEDBUDGET")
-@SequenceGenerator(name="BGT_RESERVEDBUDGET_SEQ", sequenceName="BGT_RESERVEDBUDGET_SEQ", allocationSize=1)
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
-public class ReservedBudget implements Serializable{
+@Table(name="BGT_ACTUALBUDGET")
+@SequenceGenerator(name="BGT_ACTUALBUDGET_SEQ", sequenceName="BGT_ACTUALBUDGET_SEQ", allocationSize=1)
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope=ActualBudget.class)
+public class ActualBudget implements Serializable{
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 8389152899753513205L;
-	
+	private static final long serialVersionUID = -3582315154615939329L;
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="BGT_RESERVEDBUDGET_SEQ")
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="BGT_ACTUALBUDGET_SEQ")
 	private Long id;
 	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="OBJECTIVE_PLN_OBJECTIVE_ID")
-	private Objective forObjective;
-	
 	@Basic
-	private Long amountReserved;
+	@Column(name="AMOUNTALLOCATED")
+	private Long amountAllocated;
+	
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="OBJECTIVE_ID")
+	private Objective forObjective;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="BUDGETTYPE_BGT_ID")
@@ -57,20 +59,20 @@ public class ReservedBudget implements Serializable{
 		this.id = id;
 	}
 
+	public Long getAmountAllocated() {
+		return amountAllocated;
+	}
+
+	public void setAmountAllocated(Long amountAllocated) {
+		this.amountAllocated = amountAllocated;
+	}
+
 	public Objective getForObjective() {
 		return forObjective;
 	}
 
 	public void setForObjective(Objective forObjective) {
 		this.forObjective = forObjective;
-	}
-
-	public Long getAmountReserved() {
-		return amountReserved;
-	}
-
-	public void setAmountReserved(Long amountReserved) {
-		this.amountReserved = amountReserved;
 	}
 
 	public BudgetType getBudgetType() {
@@ -88,9 +90,11 @@ public class ReservedBudget implements Serializable{
 	public void setRound(OrganizationAllocationRound round) {
 		this.round = round;
 	}
-	
-	
-	
-	
 
+	public void adjustAmountAllocated(Long adjustedAmountAllocated) {
+		this.amountAllocated = this.amountAllocated - adjustedAmountAllocated;
+		
+	}
+	
+	
 }

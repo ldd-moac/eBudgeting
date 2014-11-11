@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import biz.thaicom.eBudgeting.exception.ObjectiveHasBudgetProposalException;
+import biz.thaicom.eBudgeting.models.bgt.ActualBudget;
 import biz.thaicom.eBudgeting.models.bgt.AdditionalBudgetAllocation;
 import biz.thaicom.eBudgeting.models.bgt.AllocatedFormulaColumnValue;
 import biz.thaicom.eBudgeting.models.bgt.AllocationRecord;
@@ -73,6 +74,7 @@ import biz.thaicom.eBudgeting.models.pln.TargetUnit;
 import biz.thaicom.eBudgeting.models.pln.TargetValue;
 import biz.thaicom.eBudgeting.models.pln.TargetValueAllocationRecord;
 import biz.thaicom.eBudgeting.models.webui.Breadcrumb;
+import biz.thaicom.eBudgeting.repositories.ActualBudgetRepository;
 import biz.thaicom.eBudgeting.repositories.AllocationRecordRepository;
 import biz.thaicom.eBudgeting.repositories.AllocationRecordStrategyRepository;
 import biz.thaicom.eBudgeting.repositories.BudgetCommonTypeRepository;
@@ -204,7 +206,12 @@ public class EntityServiceJPA implements EntityService {
 	private OrganizationAllocationRoundRepository organizationAllocationRoundRepository;
 	
 	@Autowired
+	private ActualBudgetRepository actualBudgetRepository;
+	
+	
+	@Autowired
 	private ObjectMapper mapper;
+
 	
 	@Override
 	public ObjectiveType findObjectiveTypeById(Long id) {
@@ -1265,15 +1272,15 @@ public class EntityServiceJPA implements EntityService {
 		Objective root = objectiveRepository.findRootOfFiscalYear(fiscalYear);
 		String parentPathLikeString = "%."+root.getId()+"%";		
 
-		// first we'll get rid of all allocR9  (index=8) and reservedBudget
-		
 		
 		List<ReservedBudget> rBudgets = reservedBudgetRepository.findAllByFiscalYear(fiscalYear);
-		List<AllocationRecord> allocR9s = allocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, 8);
+		List<ActualBudget> aBudgets = actualBudgetRepository.findAllByFiscalYear(fiscalYear);
+
+		// List<AllocationRecord> allocR9s = allocationRecordRepository.findAllByForObjective_fiscalYearAndIndex(fiscalYear, 8);
 		
 		reservedBudgetRepository.delete(rBudgets);
-		allocationRecordRepository.delete(allocR9s);
-		
+		actualBudgetRepository.delete(aBudgets);
+		//allocationRecordRepository.delete(allocR9s);
 		
 		// all OrgAllocRound and OrgAllocRecord
 		List<OrganizationAllocationRecord> records = organizationAllocationRecordRepository.findAllByFiscalYear(fiscalYear);
@@ -1282,6 +1289,15 @@ public class EntityServiceJPA implements EntityService {
 		organizationAllocationRecordRepository.delete(records);
 		organizationAllocationRoundRepository.delete(rounds);
 		
+		
+		// now initialize OrganizationAllocationRecord/Round
+		OrganizationAllocationRound round = new OrganizationAllocationRound();
+		round.setCreatedDate(new Date());
+		round.setRound(0);
+		round.setFiscalYear(fiscalYear);
+		
+		organizationAllocationRoundRepository.save(round);
+				
 		
 		List<AllocationRecord> allocationRecordList = allocationRecordRepository
 				.findAllByForObjective_fiscalYearAndIndex(fiscalYear, 2);
@@ -1297,31 +1313,38 @@ public class EntityServiceJPA implements EntityService {
 				reservedBudget.setAmountReserved(0L);
 				reservedBudget.setBudgetType(topBudgetType);
 				reservedBudget.setForObjective(record.getForObjective());
+				reservedBudget.setRound(round);
 				
 				reservedBudgetRepository.save(reservedBudget);
 			}
 			
-			AllocationRecord allocR9 = allocationRecordRepository.findOneByBudgetTypeAndObjectiveAndIndex(topBudgetType, record.getForObjective(), 8);
-			if(allocR9 == null) {
-				allocR9 = new AllocationRecord();
+			ActualBudget actualBudget = actualBudgetRepository.findOneByBudgetTypeAndObjective(topBudgetType, record.getForObjective());
+			if(actualBudget == null) {
+				actualBudget = new ActualBudget();
+				actualBudget.setAmountAllocated(0L);
+				actualBudget.setBudgetType(topBudgetType);
+				actualBudget.setForObjective(record.getForObjective());
+				actualBudget.setRound(round);
 				
-				allocR9.setIndex(8);
-				allocR9.setAmountAllocated(0L);
-				allocR9.setBudgetType(topBudgetType);
-				allocR9.setForObjective(record.getForObjective());
-		
-				allocationRecordRepository.save(allocR9);
+				actualBudgetRepository.save(actualBudget);
 			}
+			
+			
+			//AllocationRecord allocR9 = allocationRecordRepository.findOneByBudgetTypeAndObjectiveAndIndex(topBudgetType, record.getForObjective(), 8);
+//			if(allocR9 == null) {
+//				allocR9 = new AllocationRecord();
+//				
+//				allocR9.setIndex(8);
+//				allocR9.setAmountAllocated(0L);
+//				allocR9.setBudgetType(topBudgetType);
+//				allocR9.setForObjective(record.getForObjective());
+//		
+//				allocationRecordRepository.save(allocR9);
+//			}
 
 		}
 		
-		// now initialize OrganizationAllocationRecord/Round
-		OrganizationAllocationRound round = new OrganizationAllocationRound();
-		round.setCreatedDate(new Date());
-		round.setRound(0);
-		round.setFiscalYear(fiscalYear);
 		
-		organizationAllocationRoundRepository.save(round);
 		
 		HashMap<String, OrganizationAllocationRecord> orgAllocMap = new HashMap<String, OrganizationAllocationRecord>();
 		

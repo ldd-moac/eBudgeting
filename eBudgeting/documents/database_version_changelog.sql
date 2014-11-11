@@ -1272,3 +1272,26 @@ create table BGT_ORGALLOCATIONRECORD (
   
 create sequence BGT_ORGALLOCATIONRECORD_SEQ;
 create sequence BGT_ORGALLOCATIONROUND_SEQ;
+
+-- Modified Date: November 12, 2014
+update app_info set db_version=24;
+alter table BGT_RESERVEDBUDGET add (ROUND_ID number(19,0));
+alter table BGT_RESERVEDBUDGET
+		add constraint FK3884D8B9D4A43761 
+        foreign key (ROUND_ID) 
+        references BGT_ORGALLOCATIONROUND;
+
+create table BGT_ACTUALBUDGET (
+	id number(19,0) not null,
+	objective_id number(19,0),
+	BUDGETTYPE_BGT_ID number(19,0),
+	ROUND_ID number(19,0),
+    AMOUNTALLOCATED number(19,0),
+    
+    primary key (id),
+    CONSTRAINT  FK52E711112BD94FEA FOREIGN KEY (round_id)  REFERENCES BGT_ORGALLOCATIONROUND(id),
+    CONSTRAINT  FK62B1087D5ACB9F71 FOREIGN KEY (OBJECTIVE_ID)  REFERENCES PLN_OBJECTIVE(id),
+    CONSTRAINT  FK248903F4E979695A FOREIGN KEY (BUDGETTYPE_BGT_ID)  REFERENCES BGT_BUDGETTYPE(id)
+);
+
+create sequence BGT_ACTUALBUDGET_SEQ;
