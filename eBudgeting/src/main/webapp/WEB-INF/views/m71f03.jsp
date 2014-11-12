@@ -811,6 +811,8 @@ $(document).ready(function() {
 		},{
 			name: 'reservedBudgets', mapping: 'reservedBudgets'
 		},{
+			name: 'actualBudgets', mapping: 'actualBudgets'
+		},{
 			name: 'allocationRecordsR1', mapping: 'allocationRecordsR1'
 		},{
 			name: 'allocationRecordsR2', mapping: 'allocationRecordsR2'
@@ -836,6 +838,39 @@ $(document).ready(function() {
             	_.forEach(rec.data.reservedBudgets, function(reservedBudget) {            	
             		if(reservedBudget.amountReserved != null) {
             			sum += reservedBudget.amountReserved;
+            		}
+            	});
+            	return sum;		
+            }
+		},{
+			name: 'sumActualBudgetR0', 
+            convert: function(v, rec) {
+            	var sum = 0;
+            	_.forEach(rec.data.actualBudgets, function(actualBudget) {            	
+            		if(actualBudget.round.round == 0 && actualBudget.amountAllocated != null) {
+            			sum += actualBudget.amountAllocated;
+            		}
+            	});
+            	return sum;		
+            }
+		},{
+			name: 'sumActualBudgetAfterR0', 
+            convert: function(v, rec) {
+            	var sum = 0;
+            	_.forEach(rec.data.actualBudgets, function(actualBudget) {            	
+            		if(actualBudget.round.round > 0 && actualBudget.amountAllocated != null) {
+            			sum += actualBudget.amountAllocated;
+            		}
+            	});
+            	return sum;		
+            }
+		},{
+			name: 'sumTotalActualBudget', 
+            convert: function(v, rec) {
+            	var sum = 0;
+            	_.forEach(rec.data.actualBudgets, function(actualBudget) {            	
+            		if(actualBudget.amountAllocated != null) {
+            			sum += actualBudget.amountAllocated;
             		}
             	});
             	return sum;		
@@ -931,25 +966,9 @@ $(document).ready(function() {
         		return sum;
         	}
         },{
-        	name: 'sumAllocationR9',
-        	convert: function(v, rec) {
-        		var sum=0;
-        		_.forEach(rec.data.allocationRecordsR9, function(record) {
-        			if(record.index == 8) {        				
-        				sum += record.amountAllocated;
-        			}	
-        		});
-        		return sum;
-        	}
-        },{
-        	name: 'sumAllocation',
-        	convert: function(v, rec) {
-        		return rec.data.sumAllocationR9;
-        	}
-        },{
         	name: 'amountAllocationLeft',
         	convert: function(v, rec) {
-        		return rec.data.sumAllocationR9 - rec.data.sumOrgAllocRecords;
+        		return rec.data.sumTotalActualBudget - rec.data.sumOrgAllocRecords;
         	}
         
         }, {

@@ -197,7 +197,7 @@
 		<tr>
 			<td><a href="#" data-budgetTypeId="{{topBudgetTypeId}}" class="detailAllocation">{{topParentName}}</a></td>
 			<td>{{formatNumber amountAllocatedR3}}</td>
-			<td>{{formatNumber allocR9.amountAllocated}}</td>
+			<td>{{formatNumber actualBudget.amountAllocated}}</td>
 			<td>{{formatNumber reservedBudget.amountReserved}}</td>
 			<td>{{formatNumber amountToBeAllocated}}</td>
 		</tr>
@@ -220,7 +220,7 @@
 	<input type="text" disabled="disabled" value="{{amountAllocatedR3}}"/> บาท
 
 	<label>จัดสรรให้เจ้าของงาน</label>
-	<input data-id="{{allocR9.id}}" class="txtForm" id="amountAllocated" type="text" value="{{allocR9.amountAllocated}}"/> บาท
+	<input data-id="{{actualBudget.id}}" class="txtForm" id="amountAllocated" type="text" value="{{actualBudget.amountAllocated}}"/> บาท
 
 	<label>จัดสรรไว้ส่วนกลาง</label>
 	<input data-id="{{reservedBudget.id}}" class="txtForm" id="amountReserved" type="text" value="{{reservedBudget.amountReserved}}"/> บาท
@@ -769,13 +769,24 @@ $(document).ready(function() {
 		},{
 			name: 'reservedBudgets', mapping: 'reservedBudgets'
 		},{
+			name: 'actualBudgets', mapping: 'actualBudgets'
+		},{
 			name: 'allocationRecordsR1', mapping: 'allocationRecordsR1'
 		},{
 			name: 'allocationRecordsR2', mapping: 'allocationRecordsR2'
 		},{
 			name: 'allocationRecordsR3', mapping: 'allocationRecordsR3'
 		},{
-			name: 'allocationRecordsR9', mapping: 'allocationRecordsR9'
+			name: 'sumActualBudget', 
+            convert: function(v, rec) {
+            	var sum = 0;
+            	_.forEach(rec.data.actualBudgets, function(actualBudget) {            	
+            		if(actualBudget.amountAllocated != null) {
+            			sum += actualBudget.amountAllocated;
+            		}
+            	});
+            	return sum;		
+            }
 		},{
 			name: 'sumBudgetReserved', 
             convert: function(v, rec) {
@@ -878,20 +889,9 @@ $(document).ready(function() {
         		return sum;
         	}
         },{
-        	name: 'sumAllocationR9',
-        	convert: function(v, rec) {
-        		var sum=0;
-        		_.forEach(rec.data.allocationRecordsR9, function(record) {
-        			if(record.index == 8) {        				
-        				sum += record.amountAllocated;
-        			}	
-        		});
-        		return sum;
-        	}
-        },{
         	name: 'amountAllocationLeft',
         	convert: function(v, rec) {
-        		return rec.data.sumAllocationR3 - (rec.data.sumBudgetReserved + rec.data.sumAllocationR9);
+        		return rec.data.sumAllocationR3 - (rec.data.sumBudgetReserved + rec.data.sumActualBudget);
         	}
         
         }, {

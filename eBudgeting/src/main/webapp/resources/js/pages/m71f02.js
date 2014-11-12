@@ -55,22 +55,22 @@ var DetailModalView = Backbone.View.extend({
 		var currAlloc = this.topAllocation['id'+topBudgetTypeId];
 		
 		var amountallocated = this.$el.find('#amountAllocated').val();
-		var allocR9 = AllocationRecord.find({id: currAlloc.allocR9.id});
-		var updateAlloc = amountallocated - allocR9.get('amountAllocated') 
-		allocR9.set('amountAllocated', amountallocated);
+		var actualBudget = ActualBudget.find({id: currAlloc.actualBudget.id});
+		var updateAlloc = amountallocated - actualBudget.get('amountAllocated') 
+		actualBudget.set('amountAllocated', amountallocated);
 		
 		var amountReserved = this.$el.find('#amountReserved').val();
 		var reservedBudget = ReservedBudget.find({id: currAlloc.reservedBudget.id});
 		var updateReserved = amountReserved - reservedBudget.get('amountReserved');
 		reservedBudget.set('amountReserved', amountReserved);
 		
-		$.when(allocR9.save(), reservedBudget.save()).done(_.bind(function(x) {
+		$.when(actualBudget.save(), reservedBudget.save()).done(_.bind(function(x) {
 			var store=Ext.getStore('treeObjectiveStore');
 			var node = store.getNodeById(this.currentObjective.get('id'));
 			
-			node.data.sumAllocationR9 += updateAlloc; 
+			node.data.sumActualBudget += updateAlloc; 
 			node.data.sumBudgetReserved += updateReserved;
-			node.data.amountAllocationLeft = node.data.sumAllocationR3 - (node.data.sumBudgetReserved + node.data.sumAllocationR9);
+			node.data.amountAllocationLeft = node.data.sumAllocationR3 - (node.data.sumBudgetReserved + node.data.sumActualBudget);
 			node.commit();
 			
 			alert('บันทึกข้อมูลเรียบร้อย');
@@ -137,14 +137,14 @@ var DetailModalView = Backbone.View.extend({
 				
 				// then set allocR9 and amountReserved
 				
-				var allocR9 = this.currentObjective.get('allocationRecordsR9').findWhere({budgetType: topBudgetType});
-				if(allocR9!=null) {
-					allocRec.allocR9 = allocR9.toJSON();
-				}
-				
 				var reservedBudget = this.currentObjective.get('reservedBudgets').findWhere({budgetType: topBudgetType});
 				if(reservedBudget!=null) {
 					allocRec.reservedBudget = reservedBudget.toJSON();
+				}
+				
+				var actualBudget = this.currentObjective.get('actualBudgets').findWhere({budgetType: topBudgetType});
+				if(actualBudget!=null) {
+					allocRec.actualBudget = actualBudget.toJSON();
 				}
 								
 			} else {
@@ -162,7 +162,7 @@ var DetailModalView = Backbone.View.extend({
 		this.topAllocation = sumTopBudgetType;
 		
 		_.each(this.topAllocation, function(alloc) {
-			alloc.amountToBeAllocated = alloc.amountAllocatedR3 - alloc.allocR9.amountAllocated - alloc.reservedBudget.amountReserved;
+			alloc.amountToBeAllocated = alloc.amountAllocatedR3 - alloc.actualBudget.amountAllocated - alloc.reservedBudget.amountReserved;
 		});
 		
 		html = this.detailViewTableTemplate(sumTopBudgetType);
@@ -643,7 +643,7 @@ var MainCtrView = Backbone.View.extend({
 			        	text: 'จัดสรรให้เจ้าของงาน',
 			        	width: 120,
 			        	sortable : false,
-			        	dataIndex: 'sumAllocationR9',
+			        	dataIndex: 'sumActualBudget',
 			        	align: 'right',
 			        	renderer: function(value) {
 			        		return addCommas(value);

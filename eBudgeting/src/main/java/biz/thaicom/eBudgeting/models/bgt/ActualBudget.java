@@ -47,7 +47,7 @@ public class ActualBudget implements Serializable{
 	@JoinColumn(name="BUDGETTYPE_BGT_ID")
 	private BudgetType budgetType;
 	
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="ROUND_ID")
 	private OrganizationAllocationRound round;
 

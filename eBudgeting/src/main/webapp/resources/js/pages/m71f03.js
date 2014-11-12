@@ -767,7 +767,7 @@ var MainCtrView = Backbone.View.extend({
 			        	text: 'จัดสรรให้เจ้าของงาน',
 			        	width: 100,
 			        	sortable : false,
-			        	dataIndex: 'sumAllocationR9',
+			        	dataIndex: 'sumActualBudgetR0',
 			        	align: 'right',
 			        	renderer: function(value) {
 			        		return addCommas(value);
@@ -777,7 +777,7 @@ var MainCtrView = Backbone.View.extend({
 			        	text: 'จัดสรรเพิ่มเติม',
 			        	width: 100,
 			        	sortable : false,
-			        	dataIndex: 'sumAllocationAfterR9',
+			        	dataIndex: 'sumActualBudgetAfterR0',
 			        	align: 'right',
 			        	renderer: function(value) {
 			        		return addCommas(value);
@@ -787,7 +787,7 @@ var MainCtrView = Backbone.View.extend({
 			        	text: 'รวมเงินที่ได้รับการจัดสรร',
 			        	width: 100,
 			        	sortable : false,
-			        	dataIndex: 'sumAllocation',
+			        	dataIndex: 'sumTotalActualBudget',
 			        	align: 'right',
 			        	renderer: function(value) {
 			        		return addCommas(value);

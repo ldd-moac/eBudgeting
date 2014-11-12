@@ -27,4 +27,11 @@ public interface ActualBudgetRepository extends JpaRepository<ActualBudget, Long
 			"WHERE actualBudget.budgetType = ?1 and actualBudget.forObjective = ?2 ")
 	ActualBudget findOneByBudgetTypeAndObjective(BudgetType budgetType,
 			Objective forObjective);
+
+	@Query("" +
+			"SELECT actualBudget " +
+			"FROM ActualBudget actualBudget " +
+			"WHERE actualBudget.forObjective.fiscalYear = ?1 AND actualBudget.forObjective.parentPath like ?2 ")
+	List<ActualBudget> findAllByFiscalYearAndParentPathLike(Integer fiscalYear,
+			String parentPathLikeString);
 }

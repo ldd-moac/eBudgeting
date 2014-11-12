@@ -113,6 +113,11 @@ Objective = Backbone.RelationalModel.extend({
 	    	collectionType: 'ReservedBudgetCollection'
 	    }, {
 	    	type: Backbone.HasMany,
+	    	key: 'actualBudgets',
+	    	relatedModel: 'ActualBudget',
+	    	collectionType: 'ActualBudgetCollection'
+	    }, {
+	    	type: Backbone.HasMany,
 	    	key: 'targets',
 	    	relatedModel: 'ObjectiveTarget',
 	    	collectionType: 'ObjectiveTargetCollection'
@@ -538,6 +543,24 @@ ObjectiveBudgetProposalTarget = Backbone.RelationalModel.extend({
 	}]
 });
 
+ActualBudget = Backbone.RelationalModel.extend({
+	idAttribute: 'id',
+	relations: [{
+		type:Backbone.HasOne,
+		key: 'forObjective',
+		relatedModel: 'Objective'
+	},{
+		type:Backbone.HasOne,
+		key: 'budgetType',
+		relatedModel: 'BudgetType'
+	},{
+		type:Backbone.HasOne,
+		key: 'round',
+		relatedModel: 'OrganizationAllocationRound'
+	}],
+	urlRoot: appUrl('/ActualBudget')
+});
+
 ReservedBudget = Backbone.RelationalModel.extend({
 	idAttribute: 'id',
 	relations: [{
@@ -548,6 +571,10 @@ ReservedBudget = Backbone.RelationalModel.extend({
 		type:Backbone.HasOne,
 		key: 'budgetType',
 		relatedModel: 'BudgetType'
+	},{
+		type:Backbone.HasOne,
+		key: 'round',
+		relatedModel: 'OrganizationAllocationRound'
 	}],
 	urlRoot: appUrl('/ReservedBudget')
 });
@@ -943,7 +970,9 @@ AllocationRecordCollection =Backbone.Collection.extend({
 OrganizationAllocationRecordCollection =Backbone.Collection.extend({
 	model: OrganizationAllocationRecord
 });
-
+OrganizationAllocationRoundCollection =Backbone.Collection.extend({
+	model: OrganizationAllocationRound
+});
 ObjectiveAllocationRecordCollection =Backbone.Collection.extend({
 	model: ObjectiveAllocationRecord
 }); 
@@ -952,6 +981,9 @@ TargetValueAllocationRecordCollection=Backbone.Collection.extend({
 });
 ReservedBudgetCollection =Backbone.Collection.extend({
 	model: ReservedBudget
+});
+ActualBudgetCollection =Backbone.Collection.extend({
+	model: ActualBudget
 });
 ObjectiveTargetCollection = Backbone.Collection.extend({
 	model: ObjectiveTarget

@@ -26,6 +26,7 @@ import biz.thaicom.eBudgeting.models.bgt.FormulaColumn;
 import biz.thaicom.eBudgeting.models.bgt.FormulaStrategy;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
+import biz.thaicom.eBudgeting.models.bgt.OrganizationAllocationRound;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
 import biz.thaicom.eBudgeting.models.bgt.RequestColumn;
 import biz.thaicom.eBudgeting.models.hrx.Organization;
@@ -354,6 +355,10 @@ public interface EntityService {
 	public AdditionalBudgetAllocation additionalAllocationToProposal(Long budgetProposalId,
 			Long amount);
 	
+	
+	public void updateActualBudget(Long id, Long amountAllocated);
+	
+	
 	// BudgetSignOffLog
 	public List<BudgetSignOffLog> findAllBudgetSignOffLog(Integer fiscalYear,
 			Integer round, ThaicomUserDetail currentUser);
@@ -362,6 +367,10 @@ public interface EntityService {
 			Long id);
 	public void saveLotsBudgetProposal(JsonNode node);
 	public void saveLotsOrganizationAllocationRecord(JsonNode node);
+	public List<OrganizationAllocationRound> findAllOrganizationAllocationRoundByFiscalYear(
+			Integer fiscalYear);
+	public String organizationAllocationRecordNewRound(Integer fiscalYear);
+
 
 
 	

@@ -34,6 +34,7 @@ import biz.thaicom.eBudgeting.models.bgt.BudgetSignOff;
 import biz.thaicom.eBudgeting.models.bgt.BudgetSignOffLog;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
+import biz.thaicom.eBudgeting.models.bgt.OrganizationAllocationRound;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
 import biz.thaicom.eBudgeting.services.EntityService;
 import biz.thaicom.security.models.Activeuser;
@@ -263,12 +264,21 @@ public class BudgetProposalRestController {
 		
 	}
 	
-	@RequestMapping(value="/ReservedBudget/{fiscalYear}/initialize", method=RequestMethod.GET)
-	public @ResponseBody String initBudgetReserved(
+	@RequestMapping(value="/OrganizationAllocationRecord/{fiscalYear}/newRound", method=RequestMethod.GET)
+	public @ResponseBody String organizationAllocationRecordNewRound(
 			@PathVariable Integer fiscalYear,
 			@Activeuser ThaicomUserDetail currentUser){
 		
 		
+		
+		return entityService.organizationAllocationRecordNewRound(fiscalYear);
+		
+	}
+	
+	@RequestMapping(value="/ReservedBudget/{fiscalYear}/initialize", method=RequestMethod.GET)
+	public @ResponseBody String initBudgetReserved(
+			@PathVariable Integer fiscalYear,
+			@Activeuser ThaicomUserDetail currentUser){
 		
 		return entityService.initReservedBudget(fiscalYear);
 		
@@ -291,6 +301,16 @@ public class BudgetProposalRestController {
 			@Activeuser ThaicomUserDetail currentUser){
 		
 		entityService.updateReservedBudget(id, data.get("amountReserved").asLong());
+		return "ok";
+	}
+	
+	@RequestMapping(value="/ActualBudget/{id}", method=RequestMethod.PUT)
+	public @ResponseBody String updateActualBudget(
+			@PathVariable Long id,
+			@RequestBody JsonNode data,
+			@Activeuser ThaicomUserDetail currentUser){
+		
+		entityService.updateActualBudget(id, data.get("amountAllocated").asLong());
 		return "ok";
 	}
 	
@@ -419,6 +439,14 @@ public class BudgetProposalRestController {
 			@Activeuser ThaicomUserDetail currentUser) {
 		List<BudgetSignOffLog> logs = entityService.findAllBudgetSignOffLog(fiscalYear, round, currentUser);
 		return logs;
+	}
+	
+	@RequestMapping(value="/OrganizationAllocationRound/{fiscalYear}")
+	public @ResponseBody List<OrganizationAllocationRound> findOrganizationAllocationRoundByFiscalYear(
+			@PathVariable Integer fiscalYear,
+			@Activeuser ThaicomUserDetail currentUser) {
+		List<OrganizationAllocationRound> rounds = entityService.findAllOrganizationAllocationRoundByFiscalYear(fiscalYear);
+		return rounds;
 	}
 	
 	

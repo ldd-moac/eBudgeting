@@ -13,7 +13,8 @@ public interface OrganizationAllocationRoundRepository extends
 	@Query(""
 			+ "SELECT round "
 			+ "FROM OrganizationAllocationRound round "
-			+ "WHERE round.fiscalYear = ?1 ")
+			+ "WHERE round.fiscalYear = ?1 "
+			+ "ORDER BY round.round ASC ")
 	List<OrganizationAllocationRound> findAllByFiscalYear(Integer fiscalYear);
 
 }

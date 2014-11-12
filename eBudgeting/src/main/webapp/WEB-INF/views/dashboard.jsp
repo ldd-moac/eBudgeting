@@ -222,7 +222,9 @@ var menuJson = [{
 		}]
 	}, {
 		name: "การจัดสรรเพิ่มเติม (m72)",code: "m72",  menus:[{
-			name: "m72f01: การจัดสรรงบประมาณเพิ่มเติม",code: "m72f01",  link: "page/m72f01/", group: "BGT_BGT_ADMIN"
+			name: "m72f01: รอบการจัดสรรงบประมาณเพิ่มเติม",code: "m72f01",  link: "page/m72f01/", group: "BGT_BGT_ADMIN"
+		},{
+			name: "m72f02: จัดสรรงบประมาณเพิ่มเติม",code: "m72f02",  link: "page/m72f02/", group: "BGT_BGT_ADMIN"
 		}]
 	}]
 },{

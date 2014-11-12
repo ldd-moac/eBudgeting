@@ -1266,6 +1266,63 @@ public class EntityServiceJPA implements EntityService {
 	public BudgetProposal findBudgetProposalById(Long budgetProposalId) {
 		return budgetProposalRepository.findOne(budgetProposalId);
 	}
+	
+	
+
+	@Override
+	public String organizationAllocationRecordNewRound(Integer fiscalYear) {
+		List<OrganizationAllocationRound> rounds = organizationAllocationRoundRepository.findAllByFiscalYear(fiscalYear);
+		
+		OrganizationAllocationRound r = rounds.get(0);
+		
+		for(OrganizationAllocationRound round : rounds) {
+			if(round.getRound() > r.getRound()){
+				r = round;
+			}
+		}
+		
+		// now initialize OrganizationAllocationRecord/Round
+		OrganizationAllocationRound newRound = new OrganizationAllocationRound();
+		newRound.setCreatedDate(new Date());
+		newRound.setRound(r.getRound()+1);
+		newRound.setFiscalYear(fiscalYear);
+		
+		organizationAllocationRoundRepository.save(newRound);
+		
+		List<AllocationRecord> allocationRecordList = allocationRecordRepository
+				.findAllByForObjective_fiscalYearAndIndex(fiscalYear, 2);
+					
+		// go through this one
+		for(AllocationRecord record: allocationRecordList) {
+			Long topBudgetId = record.getBudgetType().getParentIds().get(1);
+			BudgetType topBudgetType = budgetTypeRepository.findOne(topBudgetId);
+			
+			ReservedBudget reservedBudget = reservedBudgetRepository.findOneByBudgetTypeAndObjective(topBudgetType, record.getForObjective());
+			if(reservedBudget == null) {
+				reservedBudget = new ReservedBudget();
+				reservedBudget.setAmountReserved(0L);
+				reservedBudget.setBudgetType(topBudgetType);
+				reservedBudget.setForObjective(record.getForObjective());
+				reservedBudget.setRound(newRound);
+				
+				reservedBudgetRepository.save(reservedBudget);
+			}
+			
+			ActualBudget actualBudget = actualBudgetRepository.findOneByBudgetTypeAndObjective(topBudgetType, record.getForObjective());
+			if(actualBudget == null) {
+				actualBudget = new ActualBudget();
+				actualBudget.setAmountAllocated(0L);
+				actualBudget.setBudgetType(topBudgetType);
+				actualBudget.setForObjective(record.getForObjective());
+				actualBudget.setRound(newRound);
+				
+				actualBudgetRepository.save(actualBudget);
+			}
+		}
+		
+		
+		return "ok";
+	}
 
 	@Override
 	public String initReservedBudget(Integer fiscalYear) {
@@ -1963,15 +2020,13 @@ public class EntityServiceJPA implements EntityService {
 				o.getAllocationRecordsR2().add(record);
 			} else if(record.getIndex() == 2) {
 				o.getAllocationRecordsR3().add(record);
-			} else if(record.getIndex() == 8) {
-				o.getAllocationRecordsR9().add(record);
-			}
+			} 
 			
 			//o.getProposals().add(record);
 			//logger.debug("proposal size is " + o.getAllocationRecords().size());
 		}
 		
-		// And lastly loop through reservedBudget
+		// And lastly loop through reservedBudget and actualBudget
 		List<ReservedBudget> reservedBudgets = reservedBudgetRepository.findAllByFiscalYearAndParentPathLike(fiscalYear, parentPathLikeString);
 		for(ReservedBudget rb : reservedBudgets) {
 			//logger.debug("reservedBuget: {} ", rb.getForObjective().getId());
@@ -1982,6 +2037,15 @@ public class EntityServiceJPA implements EntityService {
 			
 			
 		}
+		
+		List<ActualBudget> actualBudgets = actualBudgetRepository.findAllByFiscalYearAndParentPathLike(fiscalYear, parentPathLikeString);
+		for(ActualBudget ab : actualBudgets) {
+			Integer index = list.indexOf(ab.getForObjective());
+			Objective o = list.get(index);
+			
+			o.getActualBudgets().size();
+		}
+		
 		
 		List<Objective> returnList = new ArrayList<Objective>();
 		
@@ -5492,6 +5556,45 @@ public class EntityServiceJPA implements EntityService {
 		
 	}
 
+	
+	
+	@Override
+	public void updateActualBudget(Long id, Long amountAllocated) {
+		ActualBudget r = actualBudgetRepository.findOne(id);
+		Long adjAmount = 0L;
+		
+		if(r.getAmountAllocated() == null) {
+			adjAmount = amountAllocated;
+		} else {
+			adjAmount = amountAllocated - r.getAmountAllocated();
+		}
+		
+		r.setAmountAllocated(amountAllocated);
+		
+		actualBudgetRepository.save(r);
+		
+		r = actualBudgetRepository.findOneByBudgetTypeAndObjective(
+				r.getBudgetType(), 
+				r.getForObjective().getParent());
+		while (r != null) {
+			if(r.getAmountAllocated() == null) {
+				r.setAmountAllocated(adjAmount);
+			} else {
+				r.setAmountAllocated(r.getAmountAllocated() + adjAmount);
+			}
+			
+			if(r.getForObjective().getParent() == null) {
+				r = null;
+			} else {
+				// now find its parent
+				r = actualBudgetRepository.findOneByBudgetTypeAndObjective(
+						r.getBudgetType(), 
+						r.getForObjective().getParent());
+			}
+		}
+		
+	}
+
 	@Override
 	public void updateReservedBudget(Long id, Long amountReserved) {
 		ReservedBudget r = reservedBudgetRepository.findOne(id);
@@ -5592,6 +5695,13 @@ public class EntityServiceJPA implements EntityService {
 			Long id) {
 		
 		return targetValueAllocationRecordRepository.findOne(id);
+	}
+
+	@Override
+	public List<OrganizationAllocationRound> findAllOrganizationAllocationRoundByFiscalYear(
+			Integer fiscalYear) {
+		
+		return organizationAllocationRoundRepository.findAllByFiscalYear(fiscalYear);
 	}
 	
 	
