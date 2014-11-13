@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import biz.thaicom.eBudgeting.models.bgt.BudgetType;
+import biz.thaicom.eBudgeting.models.bgt.OrganizationAllocationRound;
 import biz.thaicom.eBudgeting.models.bgt.ReservedBudget;
 import biz.thaicom.eBudgeting.models.pln.Objective;
 
@@ -45,5 +46,13 @@ public interface ReservedBudgetRepository extends JpaSpecificationExecutor<Reser
 			+ "FROM ReservedBudget reservedBudget "
 			+ "WHERE reservedBudget.forObjective.fiscalYear = ?1" )
 	List<ReservedBudget> findAllByFiscalYear(Integer fiscalYear);
+
+	
+	@Query("" +
+			"SELECT reservedBudget " +
+			"FROM ReservedBudget reservedBudget " +
+			"WHERE reservedBudget.budgetType = ?1 and reservedBudget.forObjective = ?2 and reservedBudget.round = ?3")
+	ReservedBudget findOneByBudgetTypeAndObjectiveAndRound(BudgetType type,
+			Objective obj, OrganizationAllocationRound round);
 		
 }

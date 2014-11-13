@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import biz.thaicom.eBudgeting.exception.ObjectiveHasBudgetProposalException;
+import biz.thaicom.eBudgeting.models.bgt.ActualBudget;
 import biz.thaicom.eBudgeting.models.bgt.AdditionalBudgetAllocation;
 import biz.thaicom.eBudgeting.models.bgt.AllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.BudgetCommonType;
@@ -29,6 +30,7 @@ import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.OrganizationAllocationRound;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
 import biz.thaicom.eBudgeting.models.bgt.RequestColumn;
+import biz.thaicom.eBudgeting.models.bgt.ReservedBudget;
 import biz.thaicom.eBudgeting.models.hrx.Organization;
 import biz.thaicom.eBudgeting.models.pln.Objective;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveDetail;
@@ -370,6 +372,10 @@ public interface EntityService {
 	public List<OrganizationAllocationRound> findAllOrganizationAllocationRoundByFiscalYear(
 			Integer fiscalYear);
 	public String organizationAllocationRecordNewRound(Integer fiscalYear);
+	public OrganizationAllocationRound findMaxOrgAllocRound(Integer fiscalYear);
+	
+	public ActualBudget saveActualBudget(JsonNode node);
+	public ReservedBudget saveReservedBudget(JsonNode node);
 
 
 

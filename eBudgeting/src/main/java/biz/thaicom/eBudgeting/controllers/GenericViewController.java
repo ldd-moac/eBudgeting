@@ -1,6 +1,7 @@
 package biz.thaicom.eBudgeting.controllers;
 
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import biz.thaicom.eBudgeting.models.bgt.BudgetSignOff;
+import biz.thaicom.eBudgeting.models.bgt.OrganizationAllocationRound;
 import biz.thaicom.eBudgeting.models.pln.Objective;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveTypeId;
 import biz.thaicom.eBudgeting.models.pln.TargetUnit;
@@ -1141,6 +1143,18 @@ public class GenericViewController {
 			return "m72f01";
 		}
 		
+		// --------------------------------------------------------------m72f02:
+		// การจัดสรรงบประมาณเพิ่มเติม (m72)
+	@RequestMapping("/page/m72f02/")
+	public String render_m72f02(Model model, HttpServletRequest request, HttpSession session) {
+		model.addAttribute("rootPage", true);
+		Integer fiscalYear = setFiscalYearFromSession(model, session);
+		
+		OrganizationAllocationRound round = entityService.findMaxOrgAllocRound(fiscalYear);
+		model.addAttribute("round", round);
+		
+		return "m72f02";
+	}
 	
 	
 

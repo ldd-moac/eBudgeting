@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import biz.thaicom.eBudgeting.controllers.error.RESTError;
+import biz.thaicom.eBudgeting.models.bgt.ActualBudget;
 import biz.thaicom.eBudgeting.models.bgt.AdditionalBudgetAllocation;
 import biz.thaicom.eBudgeting.models.bgt.AllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.BudgetProposal;
@@ -314,6 +315,16 @@ public class BudgetProposalRestController {
 		return "ok";
 	}
 	
+	@RequestMapping(value="/ActualBudget/", method=RequestMethod.POST)
+	public @ResponseBody String saveActualBudget(
+			@PathVariable Long id,
+			@RequestBody JsonNode data,
+			@Activeuser ThaicomUserDetail currentUser){
+		
+		ActualBudget ab = entityService.saveActualBudget(data);
+		return ab.getId().toString();
+	}
+	
 	
 	@RequestMapping(value="/AllocationRecord/{id}", method=RequestMethod.PUT)
 	public @ResponseBody String updateAllocationRecord(
@@ -441,6 +452,14 @@ public class BudgetProposalRestController {
 		return logs;
 	}
 	
+	@RequestMapping(value="/OrganizationAllocationRound/{fiscalYear}/maxRound")
+	public @ResponseBody OrganizationAllocationRound findOrganizationAllocationRoundByFiscalYearAndMaxRound(
+			@PathVariable Integer fiscalYear,
+			@Activeuser ThaicomUserDetail currentUser) {
+		OrganizationAllocationRound round = entityService.findMaxOrgAllocRound(fiscalYear);
+		return round;
+	}
+	
 	@RequestMapping(value="/OrganizationAllocationRound/{fiscalYear}")
 	public @ResponseBody List<OrganizationAllocationRound> findOrganizationAllocationRoundByFiscalYear(
 			@PathVariable Integer fiscalYear,
@@ -448,6 +467,8 @@ public class BudgetProposalRestController {
 		List<OrganizationAllocationRound> rounds = entityService.findAllOrganizationAllocationRoundByFiscalYear(fiscalYear);
 		return rounds;
 	}
+	
+
 	
 	
 	@ExceptionHandler(value=EntityNotFoundException.class)

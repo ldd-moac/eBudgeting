@@ -1292,35 +1292,6 @@ public class EntityServiceJPA implements EntityService {
 		List<AllocationRecord> allocationRecordList = allocationRecordRepository
 				.findAllByForObjective_fiscalYearAndIndex(fiscalYear, 2);
 					
-		// go through this one
-		for(AllocationRecord record: allocationRecordList) {
-			Long topBudgetId = record.getBudgetType().getParentIds().get(1);
-			BudgetType topBudgetType = budgetTypeRepository.findOne(topBudgetId);
-			
-			ReservedBudget reservedBudget = reservedBudgetRepository.findOneByBudgetTypeAndObjective(topBudgetType, record.getForObjective());
-			if(reservedBudget == null) {
-				reservedBudget = new ReservedBudget();
-				reservedBudget.setAmountReserved(0L);
-				reservedBudget.setBudgetType(topBudgetType);
-				reservedBudget.setForObjective(record.getForObjective());
-				reservedBudget.setRound(newRound);
-				
-				reservedBudgetRepository.save(reservedBudget);
-			}
-			
-			ActualBudget actualBudget = actualBudgetRepository.findOneByBudgetTypeAndObjective(topBudgetType, record.getForObjective());
-			if(actualBudget == null) {
-				actualBudget = new ActualBudget();
-				actualBudget.setAmountAllocated(0L);
-				actualBudget.setBudgetType(topBudgetType);
-				actualBudget.setForObjective(record.getForObjective());
-				actualBudget.setRound(newRound);
-				
-				actualBudgetRepository.save(actualBudget);
-			}
-		}
-		
-		
 		return "ok";
 	}
 
@@ -5557,7 +5528,118 @@ public class EntityServiceJPA implements EntityService {
 	}
 
 	
+	@Override
+	public ReservedBudget saveReservedBudget(JsonNode node) {
+		ReservedBudget b;
+		Long oldAmount = 0L;
+		Long adjAmount = 0L;
+		
+		if(node.get("id") != null) {
+			b = reservedBudgetRepository.findOne(node.get("id").asLong());
+			oldAmount = b.getAmountReserved();
+		} else {
+			b = new ReservedBudget();
+		}
+		
+		Long roundId = node.get("round").get("id").asLong();
+		OrganizationAllocationRound round = organizationAllocationRoundRepository.getOne(roundId);
+		
+		
+		Long budgetTypeId = node.get("budgetType").get("id").asLong();
+		BudgetType type = budgetTypeRepository.findOne(budgetTypeId);
+		
+		Long objId = node.get("forObjective").get("id").asLong();
+		Objective obj = objectiveRepository.findOne(objId);
+		
+		b.setRound(round);
+		b.setBudgetType(type);
+		b.setAmountReserved(node.get("amountReserved").asLong());
+		b.setForObjective(obj);
+		
+		reservedBudgetRepository.save(b);
+		
+		adjAmount = b.getAmountReserved() - oldAmount;
+		
+		
+		obj = obj.getParent();
+		while(obj != null) {
+			
+			ReservedBudget r = reservedBudgetRepository.findOneByBudgetTypeAndObjectiveAndRound(
+					type, obj, round);
+			if(r == null) {
+				r = new ReservedBudget();
+				r.setRound(round);
+				r.setBudgetType(type);
+				r.setAmountReserved(b.getAmountReserved());
+				r.setForObjective(obj);
+			} else {
+				r.setAmountReserved(r.getAmountReserved() + adjAmount);
+			}
+			reservedBudgetRepository.save(r);
+			
+			obj = obj.getParent();
+		}
+		
+		return b;
+	}
+
 	
+	@Override
+	public ActualBudget saveActualBudget(JsonNode node) {
+		ActualBudget b;
+		Long oldAmount = 0L;
+		Long adjAmount = 0L;
+		
+		if(node.get("id") != null) {
+			b = actualBudgetRepository.findOne(node.get("id").asLong());
+			oldAmount = b.getAmountAllocated();
+		} else {
+			b = new ActualBudget();
+		}
+		
+		Long roundId = node.get("round").get("id").asLong();
+		OrganizationAllocationRound round = organizationAllocationRoundRepository.getOne(roundId);
+		
+		
+		Long budgetTypeId = node.get("budgetType").get("id").asLong();
+		BudgetType type = budgetTypeRepository.findOne(budgetTypeId);
+		
+		Long objId = node.get("forObjective").get("id").asLong();
+		Objective obj = objectiveRepository.findOne(objId);
+		
+		b.setRound(round);
+		b.setBudgetType(type);
+		b.setAmountAllocated(node.get("amountAllocated").asLong());
+		b.setForObjective(obj);
+		
+		actualBudgetRepository.save(b);
+		
+		adjAmount = b.getAmountAllocated() - oldAmount;
+		
+		
+		obj = obj.getParent();
+		while(obj != null) {
+			
+			ActualBudget r = actualBudgetRepository.findOneByBudgetTypeAndObjectiveAndRound(
+					type, obj, round);
+			if(r == null) {
+				r = new ActualBudget();
+				r.setRound(round);
+				r.setBudgetType(type);
+				r.setAmountAllocated(b.getAmountAllocated());
+				r.setForObjective(obj);
+			} else {
+				r.setAmountAllocated(r.getAmountAllocated() + adjAmount);
+			}
+			
+			actualBudgetRepository.save(r);
+			
+			obj = obj.getParent();
+		}
+		
+		return b;
+	}
+
 	@Override
 	public void updateActualBudget(Long id, Long amountAllocated) {
 		ActualBudget r = actualBudgetRepository.findOne(id);
@@ -5703,6 +5785,14 @@ public class EntityServiceJPA implements EntityService {
 		
 		return organizationAllocationRoundRepository.findAllByFiscalYear(fiscalYear);
 	}
+
+	@Override
+	public OrganizationAllocationRound findMaxOrgAllocRound(Integer fiscalYear) {
+		
+		return organizationAllocationRoundRepository.findMaxOrgAllocRound(fiscalYear);
+	}
+
+	
 	
 	
 	
