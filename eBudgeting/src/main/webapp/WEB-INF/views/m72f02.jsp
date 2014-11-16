@@ -195,11 +195,11 @@
 	<tbody>
 		{{#each this}}
 		<tr>
-			<td><a href="#" data-budgetTypeId="{{topBudgetTypeId}}" class="detailAllocation">{{topParentName}}</a></td>
+			<td>{{topParentName}}</td>
 			<td>{{formatNumber amountAllocatedR3}}</td>
-			<td>{{formatNumber actualBudget.amountAllocated}}</td>
-			<td>{{formatNumber reservedBudget.amountReserved}}</td>
-			<td>{{formatNumber amountToBeAllocated}}</td>
+			<td>{{formatNumber sumActualBudget}}</td>
+			<td><a href="#" data-budgetTypeId="{{topBudgetTypeId}}"  class="detailAmountReserved">{{formatNumber sumReservedBudget}}</a></td>
+			<td><a href="#" data-budgetTypeId="{{topBudgetTypeId}}"  class="detailAmountToBeAllocated">{{formatNumber amountToBeAllocated}}</a></td>
 		</tr>
 		{{/each}}
 	</tbody>
@@ -214,19 +214,16 @@
 
 </script>
 
-<script id="detailModalBudgetTemplate" type="text/x-handler-template">
-<form data-id="{{topBudgetTypeId}}">
-	<label>พรบ.งบฯ</label>
-	<input type="text" disabled="disabled" value="{{amountAllocatedR3}}"/> บาท
+<script id="detailModalBudgetReservedTemplate" type="text/x-handler-template">
+<form data-id="{{currentTopBudgetId}}">
+	<label>งบประมาณจัดสรรไว้ส่วนกลาง</label>
+	<input type="text" disabled="disabled" value="{{prevRoundAmountReserved}}"/> บาท
 
-	<label>จัดสรรให้เจ้าของงาน</label>
-	<input data-id="{{actualBudget.id}}" class="txtForm" id="amountAllocated" type="text" value="{{actualBudget.amountAllocated}}"/> บาท
+	<label>จัดสรรให้เจ้าของงานเพิ่มเติมในรอบนี้</label>
+	<input data-id="{{currentReservedBudgetId}}" class="txtForm" id="amountReserved" type="text" value="{{currentAmount}}"/> บาท
 
-	<label>จัดสรรไว้ส่วนกลาง</label>
-	<input data-id="{{reservedBudget.id}}" class="txtForm" id="amountReserved" type="text" value="{{reservedBudget.amountReserved}}"/> บาท
-
-	<label>คงเหลือจัดสรร</label>
-	<input type="text" disabled="disabled" id="amountToBeAllocated" value="{{amountToBeAllocated}}"/> บาท
+	<label>คงเหลืองบกลาง</label>
+	<input type="text" disabled="disabled" id="amountToBeAllocated" value="{{amountLeftToBeAllocated}}"/> บาท
 </form>
 </script>
 
@@ -432,7 +429,7 @@
 <script src="<c:url value='/resources/js/pages/m72f02.js'/>"></script>
 
 <script type="text/javascript">
-var roundId = "${round.id}";
+var currentRound = OrganizationAllocationRound.findOrCreate({id:parseInt("${round.id}")});
 
 var fiscalYear = "${fiscalYear}";
 
@@ -786,6 +783,13 @@ $(document).ready(function() {
             			sum += actualBudget.amountAllocated;
             		}
             	});
+            	_.forEach(rec.data.reservedBudgets, function(reservedBudget) {            	
+            		if(reservedBudget.amountReserved != null 
+            				&& reservedBudget.amountReserved < 0) {
+            			sum += -reservedBudget.amountReserved;
+            		}
+            	});
+            	
             	return sum;		
             }
 		},{
@@ -912,7 +916,9 @@ $(document).ready(function() {
         }]
     });
 	
+	currentRound.fetch();
     
+	
 	mainCtrView = new MainCtrView();
 	mainCtrView.render();
 

@@ -24,7 +24,9 @@ var DetailModalView = Backbone.View.extend({
 	detailAllocationRecordBasicTemplate: Handlebars.compile($('#detailAllocationRecordBasicTemplate').html()),
 	
 	detailModalBudgetHeaderTemplate: Handlebars.compile($('#detailModalBudgetHeaderTemplate').html()),
-	detailModalBudgetTemplate: Handlebars.compile($('#detailModalBudgetTemplate').html()),
+	detailModalBudgetReservedTemplate: Handlebars.compile($('#detailModalBudgetReservedTemplate').html()),
+	
+	
 	reservedBudgetInputTemplate: Handlebars.compile($('#reservedBudgetInputTemplate').html()),
 	
 	strategiesTemplate: Handlebars.compile($('#strategiesTemplate').html()),
@@ -32,44 +34,123 @@ var DetailModalView = Backbone.View.extend({
 	editProposalNoStretegyFormTemplate : Handlebars.compile($('#editProposalNoStretegyFormTemplate').html()),
 	
 	events: {
-		"click .detailAllocation" : "detailAllocation",
+		"click .detailAmountReserved" : "detailAmountReserved",
+		"click .detailAmountToBeAllocated" : "detailAmountToBeAllocated",
 		"click #cancelBtn" : "cancelBtn",
 		"click #backBtn" : "backBtn",
-		"click #saveBtn" : "saveBtn",
+		"click #saveReservedBtn" : "saveReservedBtn",
+		"click #saveActualBudgetBtn" : "saveActualBudgetBtn",
 		"change .txtForm" : "changeTxtForm"
 	},
 	changeTxtForm: function(e) {
 		var topBudgetTypeId = this.$el.find('form').attr('data-id');
+		
+		console.log(topBudgetTypeId);
+		
 		var currAlloc = this.topAllocation['id'+topBudgetTypeId];
 		
-		var amountallocated = this.$el.find('#amountAllocated').val();
-		var amountReserved = this.$el.find('#amountReserved').val();
+		var currentVal = $(e.currentTarget).val();
 		
-		var amountToBeAllocated =  currAlloc.amountAllocatedR3 - amountallocated - amountReserved;
+		var amountToBeAllocated =  currAlloc.prevRoundAmountReserved - currentVal;
 		console.log(amountToBeAllocated);
 		this.$el.find('#amountToBeAllocated').attr('value', amountToBeAllocated);
 		
 	},
-	saveBtn: function(e) {
+	
+	saveActualBudgetBtn: function(e) {
 		var topBudgetTypeId = this.$el.find('form').attr('data-id');
+		var budgetType = BudgetType.find({id: topBudgetTypeId});
+		
 		var currAlloc = this.topAllocation['id'+topBudgetTypeId];
+		var actualBudgetId = this.$el.find('#amountReserved').attr('data-id');
+	
+		var amountReserved = parseInt(this.$el.find('#amountReserved').val());
 		
-		var amountallocated = this.$el.find('#amountAllocated').val();
-		var actualBudget = ActualBudget.find({id: currAlloc.actualBudget.id});
-		var updateAlloc = amountallocated - actualBudget.get('amountAllocated') 
-		actualBudget.set('amountAllocated', amountallocated);
+		var updateAmount = 0;
 		
-		var amountReserved = this.$el.find('#amountReserved').val();
-		var reservedBudget = ReservedBudget.find({id: currAlloc.reservedBudget.id});
-		var updateReserved = amountReserved - reservedBudget.get('amountReserved');
-		reservedBudget.set('amountReserved', amountReserved);
+		var actualBudget;
 		
-		$.when(actualBudget.save(), reservedBudget.save()).done(_.bind(function(x) {
+		if(actualBudgetId == 0) {
+			actualBudget = new ActualBudget();
+			actualBudget.set('round', currentRound);
+			actualBudget.set('forObjective',this.currentObjective);
+			actualBudget.set('budgetType', budgetType);
+			
+			
+		} else {
+			actualBudget = ActualBudget.find({id: actualBudgetId});
+			updateAmount = actualBudget.get('amountAllocated');
+		}
+		
+		actualBudget.set('amountAllocated', amountReserved);
+		updateAmount = amountReserved - updateAmount;
+		
+		
+		$.when(actualBudget.save()).done(_.bind(function(id) {
+			
+			if(actualBudgetId == 0) {
+				actualBudget.set('id', id);
+				
+				this.currentObjective.get('actualBudgets').add(actualBudget);
+				
+			}
+			
+			
 			var store=Ext.getStore('treeObjectiveStore');
 			var node = store.getNodeById(this.currentObjective.get('id'));
 			
-			node.data.sumActualBudget += updateAlloc; 
-			node.data.sumBudgetReserved += updateReserved;
+			node.data.sumActualBudget += updateAmount; 
+			node.data.amountAllocationLeft = node.data.sumAllocationR3 - (node.data.sumBudgetReserved + node.data.sumActualBudget);
+			node.commit();
+			
+			alert('บันทึกข้อมูลเรียบร้อย');
+		},this));
+	},
+	
+	saveReservedBtn: function(e) {
+		var topBudgetTypeId = this.$el.find('form').attr('data-id');
+		var budgetType = BudgetType.find({id: topBudgetTypeId});
+		
+		var currAlloc = this.topAllocation['id'+topBudgetTypeId];
+		var reservedId = this.$el.find('#amountReserved').attr('data-id');
+	
+		var amountReserved = parseInt(this.$el.find('#amountReserved').val());
+		
+		var updateAmount = 0;
+		
+		var reservedBudget;
+		
+		if(reservedId == 0) {
+			reservedBudget = new ReservedBudget();
+			reservedBudget.set('round', currentRound);
+			reservedBudget.set('forObjective',this.currentObjective);
+			reservedBudget.set('budgetType', budgetType);
+			
+			
+		} else {
+			reservedBudget = ReservedBudget.find({id: reservedId});
+			updateAmount = -reservedBudget.get('amountReserved');
+		}
+		
+		reservedBudget.set('amountReserved', -amountReserved);
+		updateAmount = amountReserved - updateAmount;
+		
+		
+		$.when(reservedBudget.save()).done(_.bind(function(id) {
+			
+			if(reservedId == 0) {
+				reservedBudget.set('id', id);
+				
+				this.currentObjective.get('reservedBudgets').add(reservedBudget);
+				
+			}
+			
+			
+			var store=Ext.getStore('treeObjectiveStore');
+			var node = store.getNodeById(this.currentObjective.get('id'));
+			
+			node.data.sumActualBudget += updateAmount; 
+			node.data.sumBudgetReserved -= updateAmount;
 			node.data.amountAllocationLeft = node.data.sumAllocationR3 - (node.data.sumBudgetReserved + node.data.sumActualBudget);
 			node.commit();
 			
@@ -136,15 +217,32 @@ var DetailModalView = Backbone.View.extend({
 				allocRec.proposals = new Array();
 				
 				// then set allocR9 and amountReserved
+				allocRec.sumActualBudget = 0;
 				
-				var reservedBudget = this.currentObjective.get('reservedBudgets').findWhere({budgetType: topBudgetType});
-				if(reservedBudget!=null) {
-					allocRec.reservedBudget = reservedBudget.toJSON();
+				var reservedBudget = this.currentObjective.get('reservedBudgets').where({budgetType: topBudgetType});
+				if(reservedBudget!=null && reservedBudget.length > 0) {
+					allocRec.reservedBudget = new Array();
+					allocRec.sumReservedBudget  = 0;
+					for(var i=0; i<reservedBudget.length; i++) {
+						allocRec.reservedBudget.push(reservedBudget[i].toJSON());
+						allocRec.sumReservedBudget += reservedBudget[i].get('amountReserved');
+						
+						if(reservedBudget[i].get('amountReserved') < 0) {
+							allocRec.sumActualBudget += -reservedBudget[i].get('amountReserved');
+						}
+						
+					}
+					
 				}
 				
-				var actualBudget = this.currentObjective.get('actualBudgets').findWhere({budgetType: topBudgetType});
-				if(actualBudget!=null) {
-					allocRec.actualBudget = actualBudget.toJSON();
+				var actualBudget = this.currentObjective.get('actualBudgets').where({budgetType: topBudgetType});
+				if(actualBudget!=null && actualBudget.length > 0) {
+					allocRec.actualBudget = new Array();
+					
+					for(var i=0; i<actualBudget.length; i++) {
+						allocRec.actualBudget.push(actualBudget[i].toJSON());
+						allocRec.sumActualBudget += actualBudget[i].get('amountAllocated');
+					}
 				}
 								
 			} else {
@@ -162,7 +260,7 @@ var DetailModalView = Backbone.View.extend({
 		this.topAllocation = sumTopBudgetType;
 		
 		_.each(this.topAllocation, function(alloc) {
-			alloc.amountToBeAllocated = alloc.amountAllocatedR3 - alloc.actualBudget.amountAllocated - alloc.reservedBudget.amountReserved;
+			alloc.amountToBeAllocated = alloc.amountAllocatedR3 - alloc.sumActualBudget - alloc.sumReservedBudget;
 		});
 		
 		html = this.detailViewTableTemplate(sumTopBudgetType);
@@ -173,24 +271,107 @@ var DetailModalView = Backbone.View.extend({
 		
 		return this;
 	},
-	detailAllocation: function(e) {
+	detailAmountToBeAllocated: function(e) {
 		this.currentTopBudgetTypeId = $(e.target).attr('data-budgetTypeId');
-		this.renderBudgetTypeDetail();
+		this.renderAmountToBeAllocated();
+	},
+	
+	renderAmountToBeAllocated: function() {
+		var topBudget = this.topAllocation['id'+this.currentTopBudgetTypeId];
+		
+		var json={};
+		
+		var currentActualBudget;
+		var sum = 0;
+		var initReserved = 0;
+		for(var i=0; i<topBudget.actualBudget.length; i++) {
+			var r = topBudget.actualBudget[i];
+			
+			if(r.round.id == currentRound.get('id')) {
+				currentActualBudget = r;
+				json.currentAmount = (r.amountAllocated);
+				json.currentActualBudgetId=r.id;
+			} else {
+				sum += r.amountAllocated;
+			}
+		}
+		
+		for(var i=0; i<topBudget.reservedBudget.length; i++) {
+			var r = topBudget.reservedBudget[i];
+			
+			if(r.amountReserved > 0) {
+				initReserved = r.amountReserved;
+				continue;
+			}
+		}
+		
+		if(json.currentAmount == null) {
+			json.currentAmount = 0;
+			json.currentActualBudgetId = 0;
+		}
+		
+		json.prevRoundAmountReserved = topBudget.amountAllocatedR3 - (sum + json.currentAmount) - initReserved;
+		topBudget.prevRoundAmountReserved =  topBudget.amountAllocatedR3 - (sum + json.currentAmount) - initReserved;
+		json.amountLeftToBeAllocated = topBudget.prevRoundAmountReserved -  json.currentAmount;
+		
+		json.currentTopBudgetId = topBudget.topBudgetTypeId;
+		
+		
+		
+		html = this.detailModalBudgetHeaderTemplate(topBudget + ": จัดสรรไว้ส่วนกลาง" );
+		this.$el.find('.modal-body').html(html);
+		
+		html = this.detailModalBudgetReservedTemplate(json);
+		this.$el.find('.modal-body').append(html);
+		
+		this.$el.find('.modal-footer').html('<a href="#" class="btn" id="saveActualBudgetBtn">บันทึก</a><a href="#" class="btn" id="backBtn">กลับหน้าเดิม</a>');
+	},
+	
+	detailAmountReserved: function(e) {
+		this.currentTopBudgetTypeId = $(e.target).attr('data-budgetTypeId');
+		this.renderBudgetReservedDetail();
 		
 	},
 	
-	renderBudgetTypeDetail: function() {
+	renderBudgetReservedDetail: function() {
 		var topBudget = this.topAllocation['id'+this.currentTopBudgetTypeId];
 		
-		console.log(topBudget);
 		
-		html = this.detailModalBudgetHeaderTemplate(topBudget);
+		var json={};
+		var currentReservedBudget;
+		var sum = 0;
+		for(var i=0; i<topBudget.reservedBudget.length; i++) {
+			var r = topBudget.reservedBudget[i];
+			
+			if(r.round.id == currentRound.get('id')) {
+				currentReservedBudget = r;
+				json.currentAmount = -(r.amountReserved);
+				json.currentReservedBudgetId=r.id;
+			} else {
+				sum += r.amountReserved;
+			}
+		}
+		
+		if(json.currentAmount == null) {
+			json.currentAmount = 0;
+			json.currentReservedBudgetId = 0;
+		}
+		
+		json.prevRoundAmountReserved = sum;
+		topBudget.prevRoundAmountReserved = sum;
+		json.amountLeftToBeAllocated = sum - json.currentAmount;
+		
+		json.currentTopBudgetId = topBudget.topBudgetTypeId;
+		
+		
+		
+		html = this.detailModalBudgetHeaderTemplate(topBudget + ": จัดสรรไว้ส่วนกลาง" );
 		this.$el.find('.modal-body').html(html);
 		
-		html = this.detailModalBudgetTemplate(topBudget);
+		html = this.detailModalBudgetReservedTemplate(json);
 		this.$el.find('.modal-body').append(html);
 		
-		this.$el.find('.modal-footer').html('<a href="#" class="btn" id="saveBtn">บันทึก</a><a href="#" class="btn" id="backBtn">กลับหน้าเดิม</a>');
+		this.$el.find('.modal-footer').html('<a href="#" class="btn" id="saveReservedBtn">บันทึก</a><a href="#" class="btn" id="backBtn">กลับหน้าเดิม</a>');
 		
 	}
 	

@@ -1,21 +1,16 @@
 package biz.thaicom.eBudgeting.services;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.Stack;
 import java.util.TreeMap;
-
-import javassist.expr.NewArray;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -107,7 +102,6 @@ import biz.thaicom.security.models.ThaicomUserDetail;
 import biz.thaicom.security.models.User;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -5679,22 +5673,32 @@ public class EntityServiceJPA implements EntityService {
 
 	@Override
 	public void updateReservedBudget(Long id, Long amountReserved) {
-		ReservedBudget r = reservedBudgetRepository.findOne(id);
+		ReservedBudget r1 = reservedBudgetRepository.findOne(id);
 		Long adjAmount = 0L;
 		
-		if(r.getAmountReserved() == null) {
+		if(r1.getAmountReserved() == null) {
 			adjAmount = amountReserved;
 		} else {
-			adjAmount = amountReserved - r.getAmountReserved();
+			adjAmount = amountReserved - r1.getAmountReserved();
 		}
 		
-		r.setAmountReserved(amountReserved);
+		r1.setAmountReserved(amountReserved);
 		
-		reservedBudgetRepository.save(r);
+		reservedBudgetRepository.save(r1);
+	
 		
-		r = reservedBudgetRepository.findOneByBudgetTypeAndObjective(
-				r.getBudgetType(), 
-				r.getForObjective().getParent());
+		
+		ReservedBudget r = reservedBudgetRepository.findOneByBudgetTypeAndObjectiveAndRound(
+				r1.getBudgetType(), 
+				r1.getForObjective().getParent(),
+				r1.getRound());
+		if(r==null) {
+			r = new ReservedBudget();
+			r.setBudgetType(r1.getBudgetType());
+			r.setForObjective(r1.getForObjective().getParent());
+			r.setRound(r1.getRound());
+		}
+		
 		while (r != null) {
 			if(r.getAmountReserved() == null) {
 				r.setAmountReserved(adjAmount);
@@ -5702,13 +5706,23 @@ public class EntityServiceJPA implements EntityService {
 				r.setAmountReserved(r.getAmountReserved() + adjAmount);
 			}
 			
+			reservedBudgetRepository.save(r);
+			
 			if(r.getForObjective().getParent() == null) {
-				r = null;
+				r=null;
 			} else {
 				// now find its parent
-				r = reservedBudgetRepository.findOneByBudgetTypeAndObjective(
+				r = reservedBudgetRepository.findOneByBudgetTypeAndObjectiveAndRound(
 						r.getBudgetType(), 
-						r.getForObjective().getParent());
+						r.getForObjective().getParent(),
+						r.getRound());
+				
+				if(r==null) {
+					r = new ReservedBudget();
+					r.setBudgetType(r1.getBudgetType());
+					r.setForObjective(r.getForObjective().getParent());
+					r.setRound(r1.getRound());
+				}
 			}
 		}
 		
@@ -5792,6 +5806,12 @@ public class EntityServiceJPA implements EntityService {
 		return organizationAllocationRoundRepository.findMaxOrgAllocRound(fiscalYear);
 	}
 
+	@Override
+	public OrganizationAllocationRound findOrgAllocRound(Long id) {
+		return organizationAllocationRoundRepository.findOne(id);
+	}
+
+	
 	
 	
 	

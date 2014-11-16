@@ -376,6 +376,7 @@ public interface EntityService {
 	
 	public ActualBudget saveActualBudget(JsonNode node);
 	public ReservedBudget saveReservedBudget(JsonNode node);
+	public OrganizationAllocationRound findOrgAllocRound(Long id);
 
 
 

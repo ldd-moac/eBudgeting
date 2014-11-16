@@ -445,7 +445,8 @@ OrganizationAllocationRecord = Backbone.RelationalModel.extend({
 });
 
 OrganizationAllocationRound = Backbone.RelationalModel.extend({
-	idAttribute: 'id'
+	idAttribute: 'id',
+	urlRoot: appUrl('/OrganizationAllocationRound')
 });
 
 ObjectiveAllocationRecord = Backbone.RelationalModel.extend({

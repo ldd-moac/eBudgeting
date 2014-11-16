@@ -37,6 +37,7 @@ import biz.thaicom.eBudgeting.models.bgt.ObjectiveAllocationRecord;
 import biz.thaicom.eBudgeting.models.bgt.ObjectiveBudgetProposal;
 import biz.thaicom.eBudgeting.models.bgt.OrganizationAllocationRound;
 import biz.thaicom.eBudgeting.models.bgt.ProposalStrategy;
+import biz.thaicom.eBudgeting.models.bgt.ReservedBudget;
 import biz.thaicom.eBudgeting.services.EntityService;
 import biz.thaicom.security.models.Activeuser;
 import biz.thaicom.security.models.ThaicomUserDetail;
@@ -265,7 +266,7 @@ public class BudgetProposalRestController {
 		
 	}
 	
-	@RequestMapping(value="/OrganizationAllocationRecord/{fiscalYear}/newRound", method=RequestMethod.GET)
+	@RequestMapping(value="/OrganizationAllocationRecord/FY/{fiscalYear}/newRound", method=RequestMethod.GET)
 	public @ResponseBody String organizationAllocationRecordNewRound(
 			@PathVariable Integer fiscalYear,
 			@Activeuser ThaicomUserDetail currentUser){
@@ -295,6 +296,15 @@ public class BudgetProposalRestController {
 		return "ok";
 	}
 	
+	@RequestMapping(value="/ReservedBudget", method=RequestMethod.POST)
+	public @ResponseBody Long saveReservedBudget(
+			@RequestBody JsonNode data,
+			@Activeuser ThaicomUserDetail currentUser){
+		
+		ReservedBudget b = entityService.saveReservedBudget(data);
+		return b.getId();
+	}
+	
 	@RequestMapping(value="/ReservedBudget/{id}", method=RequestMethod.PUT)
 	public @ResponseBody String updateReservedBudget(
 			@PathVariable Long id,
@@ -303,6 +313,16 @@ public class BudgetProposalRestController {
 		
 		entityService.updateReservedBudget(id, data.get("amountReserved").asLong());
 		return "ok";
+	}
+	
+	
+	@RequestMapping(value="/ActualBudget", method=RequestMethod.POST)
+	public @ResponseBody Long saveActualBudget(
+			@RequestBody JsonNode data,
+			@Activeuser ThaicomUserDetail currentUser){
+		
+		ActualBudget b = entityService.saveActualBudget(data);
+		return b.getId();
 	}
 	
 	@RequestMapping(value="/ActualBudget/{id}", method=RequestMethod.PUT)
@@ -452,7 +472,9 @@ public class BudgetProposalRestController {
 		return logs;
 	}
 	
-	@RequestMapping(value="/OrganizationAllocationRound/{fiscalYear}/maxRound")
+	
+	
+	@RequestMapping(value="/OrganizationAllocationRound/FY/{fiscalYear}/maxRound")
 	public @ResponseBody OrganizationAllocationRound findOrganizationAllocationRoundByFiscalYearAndMaxRound(
 			@PathVariable Integer fiscalYear,
 			@Activeuser ThaicomUserDetail currentUser) {
@@ -460,7 +482,7 @@ public class BudgetProposalRestController {
 		return round;
 	}
 	
-	@RequestMapping(value="/OrganizationAllocationRound/{fiscalYear}")
+	@RequestMapping(value="/OrganizationAllocationRound/FY/{fiscalYear}")
 	public @ResponseBody List<OrganizationAllocationRound> findOrganizationAllocationRoundByFiscalYear(
 			@PathVariable Integer fiscalYear,
 			@Activeuser ThaicomUserDetail currentUser) {
@@ -468,7 +490,13 @@ public class BudgetProposalRestController {
 		return rounds;
 	}
 	
-
+	@RequestMapping(value="/OrganizationAllocationRound/{id}")
+	public @ResponseBody OrganizationAllocationRound findOrganizationAllocationRoundById(
+			@PathVariable Long id,
+			@Activeuser ThaicomUserDetail currentUser) {
+		OrganizationAllocationRound round = entityService.findOrgAllocRound(id);
+		return round;
+	}
 	
 	
 	@ExceptionHandler(value=EntityNotFoundException.class)

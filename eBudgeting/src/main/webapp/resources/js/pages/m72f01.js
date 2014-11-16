@@ -19,7 +19,7 @@ var MainCtrView = Backbone.View.extend({
 		
 		$.ajax({
 			type: 'GET',
-			url: appUrl('/OrganizationAllocationRecord/'+ fiscalYear +'/newRound'),
+			url: appUrl('/OrganizationAllocationRecord/FY/'+ fiscalYear +'/newRound'),
 			success: _.bind(function() {
 				this.render();
 			},this)
@@ -32,7 +32,7 @@ var MainCtrView = Backbone.View.extend({
 	render : function() {
 		this.collection = new OrganizationAllocationRoundCollection();
 		this.collection.fetch({
-			url: appUrl('/OrganizationAllocationRound/'+ fiscalYear),
+			url: appUrl('/OrganizationAllocationRound/FY/'+ fiscalYear),
 			success: _.bind(function() {
 				var json = this.collection.toJSON();
 				this.$el.html(this.mainTblTemplate());
