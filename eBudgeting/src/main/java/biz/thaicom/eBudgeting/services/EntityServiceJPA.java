@@ -2005,6 +2005,7 @@ public class EntityServiceJPA implements EntityService {
 		
 		List<ActualBudget> actualBudgets = actualBudgetRepository.findAllByFiscalYearAndParentPathLike(fiscalYear, parentPathLikeString);
 		for(ActualBudget ab : actualBudgets) {
+			ab.getBudgetType().getId();
 			Integer index = list.indexOf(ab.getForObjective());
 			Objective o = list.get(index);
 			

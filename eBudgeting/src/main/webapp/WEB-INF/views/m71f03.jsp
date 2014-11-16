@@ -193,8 +193,8 @@
 	<tbody>
 		{{#each this}}
 		<tr>
-			<td><a href="#" data-budgetTypeId="{{budgetType.id}}" class="detailAllocation">{{budgetType.name}}</a></td>
-			<td>{{formatNumber allocR9.amountAllocated}}</td>
+			<td><a href="#" data-budgetTypeId="{{actualBudget.budgetType.id}}" class="detailAllocation">- {{actualBudget.budgetType.name}}</a></td>
+			<td>{{formatNumber actualBudget.amountAllocated}}</td>
 			<td>{{formatNumber amountAllocated}}</td>
 			<td>{{formatNumber amountToBeAllocated}}</td>
 		</tr>

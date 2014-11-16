@@ -50,9 +50,9 @@ var DetailModalView = Backbone.View.extend({
 		
 		currAlloc.amountAllocated = sum;
 		
-		currAlloc.amountToBeAllocated =  currAlloc.allocR9.amountAllocated - currAlloc.amountAllocated;
+		currAlloc.amountToBeAllocated =  currAlloc.actualBudget.amountAllocated - currAlloc.amountAllocated;
 		
-		this.$el.find('#summaryAllocation').html("จัดสรรให้เจ้าของงาน : "+ addCommas(currAlloc.allocR9.amountAllocated)+" บาท  จัดสรรไปแล้ว "+addCommas(currAlloc.amountAllocated)+" บาท คงเหลือการจัดสรร "+ addCommas(currAlloc.amountToBeAllocated)+" บาท")
+		this.$el.find('#summaryAllocation').html("จัดสรรให้เจ้าของงาน : "+ addCommas(currAlloc.actualBudget.amountAllocated)+" บาท  จัดสรรไปแล้ว "+addCommas(currAlloc.amountAllocated)+" บาท คงเหลือการจัดสรร "+ addCommas(currAlloc.amountToBeAllocated)+" บาท")
 		
 	},
 	saveBtn: function(e) {
@@ -151,10 +151,11 @@ var DetailModalView = Backbone.View.extend({
 				allocRec = sumTopBudgetType['id'+budgetType.get('id')];
 				allocRec.amountAllocated=0;
 				allocRec.budgetType = budgetType.toJSON();
+				allocRec.topParentName = budgetType.get('topParentName');
 
-				var allocR9 = this.currentObjective.get('allocationRecordsR9').findWhere({budgetType: budgetType});
-				if(allocR9!=null) {
-					allocRec.allocR9 = allocR9.toJSON();
+				var actualBudget = this.currentObjective.get('actualBudgets').findWhere({budgetType: budgetType});
+				if(actualBudget!=null) {
+					allocRec.actualBudget = actualBudget.toJSON();
 				}
 				
 				allocRec.orgAllocRecs = new Array();
@@ -242,7 +243,7 @@ var DetailModalView = Backbone.View.extend({
 		this.topAllocation = sumTopBudgetType;
 		
 		_.each(this.topAllocation, function(alloc) {
-			alloc.amountToBeAllocated = alloc.allocR9.amountAllocated - alloc.amountAllocated;
+			alloc.amountToBeAllocated = alloc.actualBudget.amountAllocated - alloc.amountAllocated;
 		});
 		
 		html = this.detailViewTableTemplate(sumTopBudgetType);
