@@ -5537,7 +5537,7 @@ public class EntityServiceJPA implements EntityService {
 		}
 		
 		Long roundId = node.get("round").get("id").asLong();
-		OrganizationAllocationRound round = organizationAllocationRoundRepository.getOne(roundId);
+		OrganizationAllocationRound round = organizationAllocationRoundRepository.findOne(roundId);
 		
 		
 		Long budgetTypeId = node.get("budgetType").get("id").asLong();
