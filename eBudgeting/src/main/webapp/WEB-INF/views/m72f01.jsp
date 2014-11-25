@@ -76,8 +76,12 @@
 <script id="mainTblTbodyTemplate" type="text/x-handler-template">
 {{#each this}}
 <tr data-id={{id}}>
-	<td style="text-align: center;">{{round}}</td>
-	<td style="text-align: left;">{{formatTimeDetail createdDate}}</td>
+	<td style="text-align: center;">{{math round "+" 1}}</td>
+	{{#if round}} 
+		<td style="text-align: left;">{{formatTimeDetail createdDate}}</td>
+	{{else}}
+		<td style="text-align: left;">จัดสรรปรกติ (ครั้งแรก)</td>
+	{{/if}}
 </tr>
 {{/each}}
 </script>

@@ -72,6 +72,19 @@ $.fn.slideRight = function(data, callBack) {
 	this.slideTo(data, callBack, true);
 };
 
+Handlebars.registerHelper("math", function(lvalue, operator, rvalue, options) {
+    lvalue = parseFloat(lvalue);
+    rvalue = parseFloat(rvalue);
+        
+    return {
+        "+": lvalue + rvalue,
+        "-": lvalue - rvalue,
+        "*": lvalue * rvalue,
+        "/": lvalue / rvalue,
+        "%": lvalue % rvalue
+    }[operator];
+});
+
 Handlebars.registerHelper('indexHuman', function(index) {
 	if(isNaN(index) || index == null) {
 		return ""; 
