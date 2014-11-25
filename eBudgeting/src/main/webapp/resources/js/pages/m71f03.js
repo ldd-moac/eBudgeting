@@ -98,7 +98,7 @@ var DetailModalView = Backbone.View.extend({
     			}
     			
     			node.data.sumOrgAllocRecords  += changeAmount;
-    			node.data.amountAllocationLeft = node.data.sumAllocationR9 - node.data.sumOrgAllocRecords;
+    			node.data.amountAllocationLeft = node.data.sumTotalActualBudget - node.data.sumOrgAllocRecords;
     			
     			node.commit();
     			
