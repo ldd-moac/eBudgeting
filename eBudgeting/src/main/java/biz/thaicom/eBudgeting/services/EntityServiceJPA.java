@@ -5537,7 +5537,7 @@ public class EntityServiceJPA implements EntityService {
 		}
 		
 		Long roundId = node.get("round").get("id").asLong();
-		OrganizationAllocationRound round = organizationAllocationRoundRepository.getOne(roundId);
+		OrganizationAllocationRound round = organizationAllocationRoundRepository.findOne(roundId);
 		
 		
 		Long budgetTypeId = node.get("budgetType").get("id").asLong();
@@ -5712,6 +5712,8 @@ public class EntityServiceJPA implements EntityService {
 			if(r.getForObjective().getParent() == null) {
 				r=null;
 			} else {
+				Objective o = r.getForObjective().getParent();
+				
 				// now find its parent
 				r = reservedBudgetRepository.findOneByBudgetTypeAndObjectiveAndRound(
 						r.getBudgetType(), 
@@ -5719,9 +5721,10 @@ public class EntityServiceJPA implements EntityService {
 						r.getRound());
 				
 				if(r==null) {
+					
 					r = new ReservedBudget();
 					r.setBudgetType(r1.getBudgetType());
-					r.setForObjective(r.getForObjective().getParent());
+					r.setForObjective(o);
 					r.setRound(r1.getRound());
 				}
 			}
