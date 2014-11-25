@@ -218,6 +218,7 @@ var DetailModalView = Backbone.View.extend({
 				
 				// then set allocR9 and amountReserved
 				allocRec.sumActualBudget = 0;
+				allocRec.sumOrgAllocBudget = 0;
 				
 				var reservedBudget = this.currentObjective.get('reservedBudgets').where({budgetType: topBudgetType});
 				if(reservedBudget!=null && reservedBudget.length > 0) {
@@ -244,6 +245,19 @@ var DetailModalView = Backbone.View.extend({
 						allocRec.sumActualBudget += actualBudget[i].get('amountAllocated');
 					}
 				}
+				
+				var orgAllocBudget = this.currentObjective.get('filterOrgAllocRecords').where({budgetType: topBudgetType});
+				if(orgAllocBudget != null && orgAllocBudget.length > 0) {
+					allocRec.orgAllocBudget = new Array();
+					
+					for(var i=0; i<orgAllocBudget.length; i++) {
+						
+						allocRec.orgAllocBudget.push(orgAllocBudget[i].toJSON());
+						allocRec.sumOrgAllocBudget += orgAllocBudget[i].get('amountAllocated');
+					}
+					
+				}
+				
 								
 			} else {
 				allocRec = sumTopBudgetType['id'+budgetType.get('parentIds')[1]];
@@ -260,7 +274,12 @@ var DetailModalView = Backbone.View.extend({
 		this.topAllocation = sumTopBudgetType;
 		
 		_.each(this.topAllocation, function(alloc) {
-			alloc.amountToBeAllocated = alloc.amountAllocatedR3 - alloc.sumActualBudget - alloc.sumReservedBudget;
+					
+			alloc.amountToBeAllocated = (alloc.amountAllocatedR3 - alloc.sumActualBudget - alloc.sumReservedBudget);
+		
+			// now add back the left amount
+			alloc.amountToBeAllocated = alloc.amountToBeAllocated+  ( alloc.sumActualBudget - alloc.sumOrgAllocBudget);
+			
 		});
 		
 		html = this.detailViewTableTemplate(sumTopBudgetType);
@@ -310,9 +329,11 @@ var DetailModalView = Backbone.View.extend({
 			json.currentActualBudgetId = 0;
 		}
 		
-		json.prevRoundAmountReserved = topBudget.amountAllocatedR3 - (sum + json.currentAmount) - initReserved;
-		topBudget.prevRoundAmountReserved =  topBudget.amountAllocatedR3 - (sum + json.currentAmount) - initReserved;
-		json.amountLeftToBeAllocated = topBudget.prevRoundAmountReserved -  json.currentAmount;
+		json.prevRoundAmountReserved = topBudget.amountToBeAllocated ;
+		
+		topBudget.prevRoundAmountReserved = topBudget.amountToBeAllocated ;
+		
+		json.amountLeftToBeAllocated = topBudget.amountToBeAllocated -  json.currentAmount;
 		
 		json.currentTopBudgetId = topBudget.topBudgetTypeId;
 		
