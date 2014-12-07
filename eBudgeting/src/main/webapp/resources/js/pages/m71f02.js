@@ -73,6 +73,18 @@ var DetailModalView = Backbone.View.extend({
 			node.data.amountAllocationLeft = node.data.sumAllocationR3 - (node.data.sumBudgetReserved + node.data.sumActualBudget);
 			node.commit();
 			
+			while(node.data.parentId != 'root') {
+				node = store.getNodeById(node.data.parentId);
+				node.data.sumActualBudget += updateAlloc; 
+				node.data.sumBudgetReserved += updateReserved;
+				node.data.amountAllocationLeft = node.data.sumAllocationR3 - (node.data.sumBudgetReserved + node.data.sumActualBudget);
+				node.commit();
+				
+				node.commit();
+			}
+			
+			
+			
 			alert('บันทึกข้อมูลเรียบร้อย');
 		},this));
 		
