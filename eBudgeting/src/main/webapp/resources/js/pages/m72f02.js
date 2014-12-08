@@ -232,7 +232,6 @@ var DetailModalView = Backbone.View.extend({
 						if(reservedBudget[i].get('amountReserved') < 0) {
 							allocRec.sumActualBudget += -reservedBudget[i].get('amountReserved');
 						}
-						console.log(reservedBudget[i]);
 						if(reservedBudget[i].get('round').get('id') == currentRound.get('id')) {
 							allocRec.currentAmountReservedBudget = reservedBudget[i].get('amountReserved');
 						}
