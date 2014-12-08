@@ -898,7 +898,7 @@ $(document).ready(function() {
         },{
         	name: 'amountAllocationLeft',
         	convert: function(v, rec) {
-        		return rec.data.sumAllocationR3 - (rec.data.sumBudgetReserved + rec.data.sumActualBudget);
+        		return rec.data.sumAllocationR3 - (rec.data.sumActualBudget);
         	}
         
         }, {
