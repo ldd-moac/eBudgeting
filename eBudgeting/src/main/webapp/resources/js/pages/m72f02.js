@@ -224,12 +224,17 @@ var DetailModalView = Backbone.View.extend({
 				if(reservedBudget!=null && reservedBudget.length > 0) {
 					allocRec.reservedBudget = new Array();
 					allocRec.sumReservedBudget  = 0;
+					allocRec.currentAmountReservedBudget = 0;
 					for(var i=0; i<reservedBudget.length; i++) {
 						allocRec.reservedBudget.push(reservedBudget[i].toJSON());
 						allocRec.sumReservedBudget += reservedBudget[i].get('amountReserved');
 						
 						if(reservedBudget[i].get('amountReserved') < 0) {
 							allocRec.sumActualBudget += -reservedBudget[i].get('amountReserved');
+						}
+						console.log(reservedBudget[i]);
+						if(reservedBudget[i].get('round').get('id') == currentRound.get('id')) {
+							allocRec.currentAmountReservedBudget = reservedBudget[i].get('amountReserved');
 						}
 						
 					}
@@ -280,7 +285,7 @@ var DetailModalView = Backbone.View.extend({
 			alloc.leftOrgAllocBudget = ( alloc.sumActualBudget - alloc.sumOrgAllocBudget);
 			
 			// now add back the left amount
-			alloc.amountToBeAllocated = alloc.amountToBeAllocated+ alloc.leftOrgAllocBudget ;
+			alloc.amountToBeAllocated = alloc.amountToBeAllocated+ alloc.leftOrgAllocBudget + alloc.currentAmountReservedBudget;
 			
 		});
 		
