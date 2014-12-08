@@ -188,7 +188,8 @@
 			<td fixed="true" style="width:250px;">รายการงบประมาณ<br/>&nbsp;</td>
 			<td fixed="true" style="width:100px;">พรบ.งบฯ</td>
 			<td fixed="true" style="width:100px;">จัดสรรให้เจ้าของงาน</td>
-			<td fixed="true" style="width:100px;">จัดสรรไว้ส่วนกลาง</td>
+			<td fixed="true" style="width:100px;">คงเหลือจัดสรรให้เจ้าของงาน</td>
+			<td fixed="true" style="width:100px;">คงเหลือจัดสรรไว้ส่วนกลาง</td>
 			<td fixed="true" style="width:100px;">คงเหลือจัดสรร</td>
 		</tr>
 	</thead>
@@ -198,6 +199,7 @@
 			<td>{{topParentName}}</td>
 			<td>{{formatNumber amountAllocatedR3}}</td>
 			<td>{{formatNumber sumActualBudget}}</td>
+			<td>{{formatNumber leftOrgAllocBudget}}</td>
 			<td><a href="#" data-budgetTypeId="{{topBudgetTypeId}}"  class="detailAmountReserved">{{formatNumber sumReservedBudget}}</a></td>
 			<td><a href="#" data-budgetTypeId="{{topBudgetTypeId}}"  class="detailAmountToBeAllocated">{{formatNumber amountToBeAllocated}}</a></td>
 		</tr>

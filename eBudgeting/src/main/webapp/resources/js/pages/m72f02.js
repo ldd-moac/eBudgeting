@@ -277,8 +277,10 @@ var DetailModalView = Backbone.View.extend({
 					
 			alloc.amountToBeAllocated = (alloc.amountAllocatedR3 - alloc.sumActualBudget - alloc.sumReservedBudget);
 		
+			alloc.leftOrgAllocBudget = ( alloc.sumActualBudget - alloc.sumOrgAllocBudget);
+			
 			// now add back the left amount
-			alloc.amountToBeAllocated = alloc.amountToBeAllocated+  ( alloc.sumActualBudget - alloc.sumOrgAllocBudget);
+			alloc.amountToBeAllocated = alloc.amountToBeAllocated+ alloc.leftOrgAllocBudget ;
 			
 		});
 		
