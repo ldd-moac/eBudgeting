@@ -179,6 +179,9 @@ var DetailModalView = Backbone.View.extend({
 			var sumBudgetProposal = 0;
 			
 			_.forEach(p, _.bind(function(op) {
+				
+				console.log(op.get('owner').get('name') + "::" + op.get('budgetType').get('name') + " : " + op.get('budgetType').get('parentPath') + " -> " + op.get('amountRequest'));
+				
 				sumBudgetProposal += op.get('amountRequest');
 				
 			},this));
