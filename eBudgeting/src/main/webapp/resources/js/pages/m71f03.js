@@ -168,7 +168,8 @@ var DetailModalView = Backbone.View.extend({
 			allocRec.amountAllocated += orgAllocRecord.amountAllocated;
 			
 			var p = ownerProposals.filter(function(pp) { 
-				if(pp.get('budgetType').get('topParentName') == budgetType.get('name') && 
+				
+				if(pp.get('budgetType').get('parentPath').indexOf(budgetType.get('id')) > -1 && 				
 						pp.get('owner').get('id') == orgAllocRecord.owner.id) 
 					return true; 
 				else 
@@ -178,7 +179,6 @@ var DetailModalView = Backbone.View.extend({
 			var sumBudgetProposal = 0;
 			
 			_.forEach(p, _.bind(function(op) {
-				
 				sumBudgetProposal += op.get('amountRequest');
 				
 			},this));
