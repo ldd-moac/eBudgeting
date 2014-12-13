@@ -770,7 +770,7 @@ public class Objective implements Serializable {
 		this.units.add(unit);
 		
 	}
-	public Integer calculateAndSetLineNumberForChildren() {
+	public Integer calculateAndSetLineNumberForChildren(List<Objective> lists) {
 		Integer nextLineNumber = this.lineNumber+1;
 		
 		if(this.getChildren() == null || this.getChildren().size() == 0) {
@@ -778,8 +778,10 @@ public class Objective implements Serializable {
 		}
 		
 		for(Objective child : this.children) {
+			lists.add(child);
+			child.setParentPath("." + this.id +  this.parentPath );
 			child.setLineNumber(nextLineNumber);
-			nextLineNumber = child.calculateAndSetLineNumberForChildren();
+			nextLineNumber = child.calculateAndSetLineNumberForChildren(lists);
 		}
 		
 		return nextLineNumber;

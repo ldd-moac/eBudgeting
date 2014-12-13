@@ -2773,20 +2773,73 @@ public class EntityServiceJPA implements EntityService {
 				objectiveRepository.insertFiscalyearLineNumberAt(objective.getFiscalYear(), maxLineNumber+allDescendant.size()+1, maxLineNumber+allDescendant.size()+1);
 				objective.setLineNumber(maxLineNumber+1);
 				
+				List<Objective> all = new ArrayList<Objective>();
+				
 				// now we should set the Line number of all descendant
-				objective.calculateAndSetLineNumberForChildren();
+				objective.calculateAndSetLineNumberForChildren(all);
 				
 				// now save all descendant 
-				for(Objective descendant : allDescendant) {
+				for(Objective descendant : all) {
 					objectiveRepository.save(descendant);
 				}
 				
 			}
-			
-			
+
 			objective.setParent(parent);
 			parent.setIsLeaf(false);
 			objectiveRepository.save(parent);
+			
+			
+			if(objective.getProposals() != null && objective.getProposals().size() > 0) {
+				// now remove oldparent
+				List<Long> oldParentId = oldParent.getParentIds();
+				oldParentId.add(oldParent.getId());
+				
+				List<Long> newParentId = parent.getParentIds();
+				newParentId.add(parent.getId());
+				
+				for(BudgetProposal proposal : objective.getProposals()) {
+					List<BudgetProposal> oldParentProposals = budgetProposalRepository
+							.findAllByOnwerIdAndObjectiveIdIn(proposal.getOwner().getId(),
+									proposal.getBudgetType().getId(), oldParentId);
+					
+					for(BudgetProposal opp : oldParentProposals){
+						opp.setAmountRequest(opp.getAmountRequest() - proposal.getAmountRequest());
+						opp.setAmountRequestNext1Year(opp.getAmountRequestNext1Year() - proposal.getAmountRequestNext1Year());
+						opp.setAmountRequestNext2Year(opp.getAmountRequestNext2Year() - proposal.getAmountRequestNext2Year());
+						opp.setAmountRequestNext3Year(opp.getAmountRequestNext3Year() - proposal.getAmountRequestNext3Year());
+					}
+					
+					budgetProposalRepository.save(oldParentProposals);
+					
+					Objective p = parent;
+					
+					while(p != null) {
+						BudgetProposal parentProposal = budgetProposalRepository
+								.findByForObjectiveAndOwnerAndBudgetType(p, proposal.getOwner(), proposal.getBudgetType());
+						if(parentProposal == null) {
+							parentProposal = new BudgetProposal();
+							parentProposal.setBudgetType(proposal.getBudgetType());
+							parentProposal.setOwner(proposal.getOwner());
+							parentProposal.setForObjective(p);
+							parentProposal.setAmountRequest(proposal.getAmountRequest());
+							parentProposal.setAmountRequestNext1Year(proposal.getAmountRequestNext1Year());
+							parentProposal.setAmountRequestNext2Year(proposal.getAmountRequestNext2Year());
+							parentProposal.setAmountRequestNext3Year(proposal.getAmountRequestNext3Year());
+						} else {
+							parentProposal.setAmountRequest(parentProposal.getAmountRequest() + proposal.getAmountRequest());
+							parentProposal.setAmountRequestNext1Year(parentProposal.getAmountRequestNext1Year() + proposal.getAmountRequestNext1Year());
+							parentProposal.setAmountRequestNext2Year(parentProposal.getAmountRequestNext2Year() + proposal.getAmountRequestNext2Year());
+							parentProposal.setAmountRequestNext3Year(parentProposal.getAmountRequestNext3Year() + proposal.getAmountRequestNext3Year());
+						}
+						
+						budgetProposalRepository.save(parentProposal);
+						p=p.getParent();
+					}
+				}
+				
+			}
+
 			
 		} else if(objective.getType().getId() == ObjectiveTypeId.แผนงาน.getValue()) {
 			// this parent  must be root!
@@ -2876,15 +2929,15 @@ public class EntityServiceJPA implements EntityService {
 					logger.debug("{} ", relation.get("parent"));
 					
 					if(relation.get("parent").get("id") != null) {
-						Long parentId = relation.get("parent").get("id").asLong();
-						Objective parent = objectiveRepository.findOne(parentId);
+						Long parentId1 = relation.get("parent").get("id").asLong();
+						Objective parent1 = objectiveRepository.findOne(parentId1);
 						
 						ObjectiveRelations relationJpa = new ObjectiveRelations();
 						relationJpa.setObjective(objective);
 						relationJpa.setChildType(objective.getType());
 						relationJpa.setFiscalYear(objective.getFiscalYear());
-						relationJpa.setParent(parent);
-						relationJpa.setParentType(parent.getType());
+						relationJpa.setParent(parent1);
+						relationJpa.setParentType(parent1.getType());
 						
 						objectiveRelationsRepository.save(relationJpa);
 					}
@@ -2893,10 +2946,10 @@ public class EntityServiceJPA implements EntityService {
 			} else {
 				ObjectiveRelations relationJpa = objectiveRelationsRepository.findOne(relation.get("id").asLong());
 				if(relation.get("parent").get("id") != null) {
-					Long parentId = relation.get("parent").get("id").asLong();
-					Objective parent = objectiveRepository.findOne(parentId);
+					Long parentId2 = relation.get("parent").get("id").asLong();
+					Objective parent2 = objectiveRepository.findOne(parentId2);
 					
-					relationJpa.setParent(parent);
+					relationJpa.setParent(parent2);
 				//now this will have to only change parent!
 				} else {
 					logger.debug("*************************************parent is null");
