@@ -54,5 +54,14 @@ public interface ObjectiveBudgetProposalRepository extends
 	public List<ObjectiveBudgetProposal> findObjBudgetProposalByFiscalYearAndParentPath(
 			Integer fiscalYear, String parentPathLikeString);
 
+	@Query(""
+			+ "SELECT obp "
+			+ "FROM ObjectiveBudgetProposal obp "
+			+ "WHERE obp.owner.id = ?1 "
+			+ "		AND obp.bugetType.id = ?2 "
+			+ "		AND obp.forObjective in (?3) ")
+	public List<ObjectiveBudgetProposal> findAllByOnwerIdAndObjectiveIdIn(
+			Long ownerId, Long budgetTypeId, List<Long> oldParentId);
+
 
 }

@@ -2838,6 +2838,46 @@ public class EntityServiceJPA implements EntityService {
 					}
 				}
 				
+				for(ObjectiveBudgetProposal proposal : objective.getObjectiveProposals()) {
+					List<ObjectiveBudgetProposal> oldParentProposals = objectiveBudgetProposalRepository
+							.findAllByOnwerIdAndObjectiveIdIn(proposal.getOwner().getId(),
+									proposal.getBudgetType().getId(), oldParentId);
+					
+					for(ObjectiveBudgetProposal opp : oldParentProposals){
+						opp.setAmountRequest(opp.getAmountRequest() - proposal.getAmountRequest());
+						opp.setAmountRequestNext1Year(opp.getAmountRequestNext1Year() - proposal.getAmountRequestNext1Year());
+						opp.setAmountRequestNext2Year(opp.getAmountRequestNext2Year() - proposal.getAmountRequestNext2Year());
+						opp.setAmountRequestNext3Year(opp.getAmountRequestNext3Year() - proposal.getAmountRequestNext3Year());
+					}
+					
+					objectiveBudgetProposalRepository.save(oldParentProposals);
+					
+					Objective p = parent;
+					
+					while(p != null) {
+						ObjectiveBudgetProposal parentProposal = objectiveBudgetProposalRepository
+								.findByForObjectiveAndOwnerAndBudgetType(p, proposal.getOwner(), proposal.getBudgetType());
+						if(parentProposal == null) {
+							parentProposal = new ObjectiveBudgetProposal();
+							parentProposal.setBudgetType(proposal.getBudgetType());
+							parentProposal.setOwner(proposal.getOwner());
+							parentProposal.setForObjective(p);
+							parentProposal.setAmountRequest(proposal.getAmountRequest());
+							parentProposal.setAmountRequestNext1Year(proposal.getAmountRequestNext1Year());
+							parentProposal.setAmountRequestNext2Year(proposal.getAmountRequestNext2Year());
+							parentProposal.setAmountRequestNext3Year(proposal.getAmountRequestNext3Year());
+						} else {
+							parentProposal.setAmountRequest(parentProposal.getAmountRequest() + proposal.getAmountRequest());
+							parentProposal.setAmountRequestNext1Year(parentProposal.getAmountRequestNext1Year() + proposal.getAmountRequestNext1Year());
+							parentProposal.setAmountRequestNext2Year(parentProposal.getAmountRequestNext2Year() + proposal.getAmountRequestNext2Year());
+							parentProposal.setAmountRequestNext3Year(parentProposal.getAmountRequestNext3Year() + proposal.getAmountRequestNext3Year());
+						}
+						
+						objectiveBudgetProposalRepository.save(parentProposal);
+						p=p.getParent();
+					}
+				}
+				
 			}
 
 			
