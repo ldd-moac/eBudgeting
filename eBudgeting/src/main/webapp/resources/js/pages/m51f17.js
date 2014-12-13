@@ -107,83 +107,113 @@ var MainTreeView = Backbone.View.extend({
 		var objectiveId = $(e.target).parents('tr').attr('data-id');
 		$(trEl).addClass('selected');
 		
-		// we'll also now change the chevron
-		$(trEl).find('i').removeClass('icon-chevron-right');
-		$(trEl).find('i').addClass('icon-chevron-down');
+		var icon = $(trEl).find('i');
+		if( icon.hasClass('icon-chevron-right')  || icon.hasClass('icon-circle')) {
+			
+			if(icon.hasClass('icon-chevron-right')) {
+			
+				icon.removeClass('icon-chevron-right');
+				icon.addClass('icon-chevron-down');
+			}
 		
-		
-		
-		// now we load children
-		var selectedObjective = Objective.findOrCreate(objectiveId);
-		
-		if(selectedObjective.get('children').length == 0) {
-		
-			// then we're appearing to be loading
-			$(trEl).find('td:first').append(this.loadingTRTemplate());
-			var children = new ObjectiveCollection();
-			children.fetch({
-				url: appUrl('/Objective/' + selectedObjective.get('id') + '/children'),
-				success: _.bind(function() {
-					selectedObjective.set('children', children);
-					children.each(function(child) {
-						child.set('parent', selectedObjective);
-					});
-					
-					
-					
-					this.$el.find('.loading').fadeOut(1000, _.bind(function() {
-						    // Animation complete.
-						   this.$el.find('.loading').remove();
-					  }, this));
-					
-					// console.log("children.length : " + children.length);
-					for(var i=children.length-1; i>=0; i--) {
-						// console.log(i);
-						var json = children.at(i).toJSON();
+			// now we load children
+			var selectedObjective = Objective.findOrCreate(objectiveId);
+			
+		//	if(selectedObjective.get('children').length == 0) {
+			
+				// then we're appearing to be loading
+				$(trEl).find('td:first').append(this.loadingTRTemplate());
+				var children = new ObjectiveCollection();
+				children.fetch({
+					url: appUrl('/Objective/' + selectedObjective.get('id') + '/children'),
+					success: _.bind(function() {
+						selectedObjective.set('children', children);
+						children.each(function(child) {
+							child.set('parent', selectedObjective);
+						});
 						
-						if(json.type.id > 103 && json.type.id < 109) {
-							json.type.unlinkable = true;
-						} else {
-							json.type.unlinkable = false;
+						
+						
+						this.$el.find('.loading').fadeOut(1000, _.bind(function() {
+							    // Animation complete.
+							   this.$el.find('.loading').remove();
+						  }, this));
+						
+						// console.log("children.length : " + children.length);
+						for(var i=children.length-1; i>=0; i--) {
+							// console.log(i);
+							var json = children.at(i).toJSON();
+							
+							if(json.type.id > 103 && json.type.id < 109) {
+								json.type.unlinkable = true;
+							} else {
+								json.type.unlinkable = false;
+							}
+							
+							
+							var html = this.treeTRTemplate(json);
+							$(trEl).after(html);
+							trEl = $(trEl).after();
 						}
 						
-						
-						var html = this.treeTRTemplate(json);
-						$(trEl).after(html);
-						trEl = $(trEl).after();
-					}
-					
-				}, this)
-			});
-		}
-		
-		// now get the hight of everyone
-		var height = 0;
-		$(trEl).prevAll().each(function(index, el) {
-			height += $(el).height();
-		});
-		
-		if( selectedObjective.get('type') != null && selectedObjective.get('type').get('id') >= 103  ) {
-		
-			$.ajax({
-				type: 'GET',
-				url: appUrl('/Objective/' + selectedObjective.get('id') + '/childrenTypeName'),
-				success: function(response) {
-					mainCtrView.childrenSltView.renderWith({
-						topPadding: height, 
-						objective: selectedObjective, 
-						typeName: response,
-						trEl : $(trEl)
-					});		
-				}
+					}, this)
+				});
+	//		}
+			
+			// now get the hight of everyone
+			var height = 0;
+			$(trEl).prevAll().each(function(index, el) {
+				height += $(el).height();
 			});
 			
-		} else {
+			if( selectedObjective.get('type') != null && selectedObjective.get('type').get('id') >= 103  ) {
+			
+				$.ajax({
+					type: 'GET',
+					url: appUrl('/Objective/' + selectedObjective.get('id') + '/childrenTypeName'),
+					success: function(response) {
+						mainCtrView.childrenSltView.renderWith({
+							topPadding: height, 
+							objective: selectedObjective, 
+							typeName: response,
+							trEl : $(trEl)
+						});		
+					}
+				});
+				
+			} else {
+				mainCtrView.childrenSltView.clear();
+			}
+			
+		} else if( icon.hasClass('icon-chevron-down') ) {
+			icon.removeClass('icon-chevron-down');
+			icon.addClass('icon-chevron-right');
+			
+			var ourDataLevel = parseInt($(trEl).attr('data-level'));
+			var tr = $(trEl);
+			var childrenTr = new Array();
+			while(tr.next().length > 0) {
+				tr = tr.next();
+				console.log(tr);
+				
+				var childDataLevel = parseInt(tr.attr('data-level'));
+				if(childDataLevel > ourDataLevel) {
+					
+					childrenTr.push(tr);
+				} else {
+					break;
+				}
+			}
+			console.log('removing');
+			$.each(childrenTr, function(index, tr) {
+				console.log(tr);
+				tr.remove();
+				
+			});
 			mainCtrView.childrenSltView.clear();
 		}
-		
-		
-		
+			
+			
 		return false;
 	
 	}
