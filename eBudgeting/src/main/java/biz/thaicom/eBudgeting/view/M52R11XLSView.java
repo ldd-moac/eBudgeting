@@ -53,9 +53,9 @@ public class M52R11XLSView extends AbstractExcelView {
 
 		Row Row21 = sheet.createRow(1);
 		Cell cell21 = Row21.createCell(0);
-		cell21.setCellValue("ผู้พิมพ์รายงาน " +" หน่วยงาน "+ currentUser.getPerson().getWorkAt()+
+		cell21.setCellValue("(ผู้พิมพ์รายงาน " + " หน่วยงาน " + currentUser.getPerson().getWorkAt().getName() +
 				currentUser.getPerson().getFirstName() + " " +	currentUser.getPerson().getLastName() + 
-				" เวลาที่จัดทำรายงาน " +  sdf.format(new Date()) + "น.");
+				" เวลาที่จัดทำรายงาน " +  sdf.format(new Date()) + "น.)");
 
 		Row Row31 = sheet.createRow(2);
 		Cell cell31 = Row31.createCell(0);
