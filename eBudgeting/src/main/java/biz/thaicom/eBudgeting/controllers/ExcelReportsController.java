@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 
+
 import biz.thaicom.eBudgeting.models.bgt.BudgetType;
 import biz.thaicom.eBudgeting.models.pln.Objective;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveName;
@@ -27,6 +28,7 @@ import biz.thaicom.eBudgeting.models.pln.ObjectiveType;
 import biz.thaicom.eBudgeting.models.pln.ObjectiveTypeId;
 import biz.thaicom.eBudgeting.models.pln.TargetUnit;
 import biz.thaicom.eBudgeting.services.EntityService;
+import biz.thaicom.eBudgeting.services.ExcelReportService;
 import biz.thaicom.security.models.Activeuser;
 import biz.thaicom.security.models.ThaicomUserDetail;
 
@@ -39,6 +41,8 @@ public class ExcelReportsController {
 	@Autowired
 	public EntityService entityService;
 	
+	@Autowired
+	public ExcelReportService excelReportService;
 	
 	@RequestMapping("/admin/excel/sample.xls")
 	public String excelSample(Model model) {
@@ -344,7 +348,9 @@ public class ExcelReportsController {
 			@Activeuser ThaicomUserDetail currentUser, HttpServletResponse response) {
 		
 		List<Objective> objectiveList = entityService.findAllObjectiveChildren(fiscalYear,(long) 101);
+		List<String[]> rows = excelReportService.getRowsForM51R16(fiscalYear);
 		
+		model.addAttribute("rows", rows);
 		model.addAttribute("objectiveList", objectiveList);
 		model.addAttribute("fiscalYear", fiscalYear);
 		model.addAttribute("currentUser", currentUser);

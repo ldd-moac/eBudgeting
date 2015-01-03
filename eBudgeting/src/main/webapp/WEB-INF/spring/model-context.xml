@@ -83,6 +83,7 @@
 	</bean>
 	
 	<bean id="entityService" class="biz.thaicom.eBudgeting.services.EntityServiceJPA"/>
+	<bean id="excelReportService" class="biz.thaicom.eBudgeting.services.ExcelReportServiceJPA"/>
 	<bean id="databaseSchemaExport" class="biz.thaicom.eBudgeting.repositories.DatabaseSchemaExport"/>
 	
 	

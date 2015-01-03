@@ -259,7 +259,7 @@ var menuJson = [{
 		},{
 			name: "m51r15: ทะเบียนประเภทรายการกลาง", code: 'm51r01', link: "m51r15.xls/"+fiscalYear+"/file/m51r15.xls",  type: "download", group: "BGT_BGT_ADMIN"
 		},{
-			name: "m51r16: ตรวจสอบสายการเชื่อมโยงข้อมูล", code: 'm51r01', link: "m51r16.xls/"+fiscalYear+"/file/m51r16.xls",  type: "download", disabled: "disabled", group: "BGT_BGT_ADMIN"
+			name: "m51r16: ตรวจสอบสายการเชื่อมโยงข้อมูล", code: 'm51r01', link: "m51r16.xls/"+fiscalYear+"/file/m51r16.xls",  type: "download", group: "BGT_BGT_ADMIN"
 		},{
 			name: "m51r17: ตรวจสอบสายการเชื่อมโยงข้อมูล (สายยุทธศาสตร์กระทรวงฯ-กลยุทธ์หน่วยงาน)", code: 'm51r01', link: "m51r17.xls/"+fiscalYear+"/file/m51r17.xls",  type: "download",disabled: "disabled", group: "BGT_BGT_ADMIN"
 		},{

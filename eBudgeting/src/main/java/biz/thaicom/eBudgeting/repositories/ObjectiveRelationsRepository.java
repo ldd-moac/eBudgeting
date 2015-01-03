@@ -15,6 +15,14 @@ public interface ObjectiveRelationsRepository extends JpaSpecificationExecutor<O
 		PagingAndSortingRepository<ObjectiveRelations, Long> {
 
 	
+	
+	@Query(""
+			+ "SELECT  relation.parent "
+			+ "FROM ObjectiveRelations relation "
+			+ "WHERE relation.objective = ?1 "
+			+ "		AND relation.parentType.id = ?2 ")
+	public Objective findParentByObjectiveAndParentType(Objective objective, Long parentTypeId);
+	
 	@Query("" +
 			"SELECT relation.objective " +
 			"FROM ObjectiveRelations relation " +
