@@ -24,6 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import biz.thaicom.eBudgeting.models.bgt.BudgetProposal;
 import biz.thaicom.eBudgeting.models.pln.Objective;
+import biz.thaicom.eBudgeting.models.pln.ObjectiveTypeId;
 import biz.thaicom.security.models.ThaicomUserDetail;
 
 public class M52R02_1XLSView extends AbstractPOIExcelView {
@@ -153,18 +154,18 @@ public class M52R02_1XLSView extends AbstractPOIExcelView {
 		}
 
 		sheet.setColumnWidth(0, 15000);
-		sheet.setColumnWidth(1, 3000);
-		sheet.setColumnWidth(2, 3000);
-		sheet.setColumnWidth(3, 3000);
-		sheet.setColumnWidth(4, 3000);
-		sheet.setColumnWidth(5, 3000);
-		sheet.setColumnWidth(6, 3000);
-		sheet.setColumnWidth(7, 3000);
-		sheet.setColumnWidth(8, 3000);
-		sheet.setColumnWidth(9, 3000);
+		sheet.setColumnWidth(1, 3500);
+		sheet.setColumnWidth(2, 3500);
+		sheet.setColumnWidth(3, 3500);
+		sheet.setColumnWidth(4, 3500);
+		sheet.setColumnWidth(5, 3500);
+		sheet.setColumnWidth(6, 3500);
+		sheet.setColumnWidth(7, 3500);
+		sheet.setColumnWidth(8, 3500);
+		sheet.setColumnWidth(9, 3500);
 		sheet.setColumnWidth(10, 3500);
-		sheet.setColumnWidth(11, 3000);
-		sheet.setColumnWidth(12, 3000);
+		sheet.setColumnWidth(11, 3500);
+		sheet.setColumnWidth(12, 3500);
 		sheet.setColumnWidth(13, 4000);
 	}
 	
@@ -223,61 +224,71 @@ public class M52R02_1XLSView extends AbstractPOIExcelView {
 			s+= "         ";
 		}
 		
+		CellStyle numberStyle = null;
+		CellStyle textStyle = null;
+		if(o.getType().getId().equals(ObjectiveTypeId.แผนงาน.getValue())) {
+			numberStyle = styles.get("groupnumber");
+			textStyle = styles.get("groupleft");
+		} else {
+			numberStyle = styles.get("cellnumber");
+			textStyle = styles.get("cellleft");
+		}
+		
 		c01.setCellValue(s+ "- <" + o.getCode() + ">" + o.getName());
-		c01.setCellStyle(styles.get("cellleft"));
+		c01.setCellStyle(textStyle);
 		
 		Cell c02 = rows.createCell(1);
 		c02.setCellValue(budgetSumMap.get(2));
-		c02.setCellStyle(styles.get("cellnumber"));
+		c02.setCellStyle(numberStyle);
 		
 		Cell c03 = rows.createCell(2);
 		c03.setCellValue(budgetSumMap.get(24));
-		c03.setCellStyle(styles.get("cellnumber"));
+		c03.setCellStyle(numberStyle);
 		
 		Cell c04 = rows.createCell(3);
 		c04.setCellValue(budgetSumMap.get(39));
-		c04.setCellStyle(styles.get("cellnumber"));
+		c04.setCellStyle(numberStyle);
 		
 		Cell c05 = rows.createCell(4);
 		c05.setCellValue(budgetSumMap.get(44));
-		c05.setCellStyle(styles.get("cellnumber"));
+		c05.setCellStyle(numberStyle);
 		
 		Cell c06 = rows.createCell(5);
 		c06.setCellValue(budgetSumMap.get(48));
-		c06.setCellStyle(styles.get("cellnumber"));
+		c06.setCellStyle(numberStyle);
 		
 		Cell c07 = rows.createCell(6);
 		c07.setCellValue(budgetSumMap.get(60));
-		c07.setCellStyle(styles.get("cellnumber"));
+		c07.setCellStyle(numberStyle);
 		
 		Cell c08 = rows.createCell(7);
 		c08.setCellValue(budgetSumMap.get(85));
-		c08.setCellStyle(styles.get("cellnumber"));
+		c08.setCellStyle(numberStyle);
 		
 		Cell c09 = rows.createCell(8);
 		c09.setCellValue(budgetSumMap.get(108));
-		c09.setCellStyle(styles.get("cellnumber"));
+		c09.setCellStyle(numberStyle);
 		
 		Cell c10 = rows.createCell(9);
 		c10.setCellValue(budgetSumMap.get(119));
-		c10.setCellStyle(styles.get("cellnumber"));
+		c10.setCellStyle(numberStyle);
 		
 		Cell c11 = rows.createCell(10);
 		c11.setCellValue(budgetSumMap.get(479));
-		c11.setCellStyle(styles.get("cellnumber"));
+		c11.setCellStyle(numberStyle);
 		
 		Cell c12 = rows.createCell(11);
 		c12.setCellValue(budgetSumMap.get(780));
-		c12.setCellStyle(styles.get("cellnumber"));
+		c12.setCellStyle(numberStyle);
 		
 		Cell c13 = rows.createCell(12);
 		c13.setCellValue(budgetSumMap.get(786));
-		c13.setCellStyle(styles.get("cellnumber"));
+		c13.setCellStyle(numberStyle);
 		
 		Cell c14 = rows.createCell(13);
 		c14.setCellType(HSSFCell.CELL_TYPE_FORMULA);
 		c14.setCellFormula("SUM(B"+(i+1)+":M"+(i+1)+")");
-		c14.setCellStyle(styles.get("cellnumber"));
+		c14.setCellStyle(numberStyle);
 		
 		
 		// now print each child
@@ -309,7 +320,7 @@ public class M52R02_1XLSView extends AbstractPOIExcelView {
 
         Font headFont = wb.createFont();
         headFont.setFontName("Tahoma");
-        headFont.setFontHeightInPoints((short)11);
+        headFont.setFontHeightInPoints((short)10);
         headFont.setColor(IndexedColors.WHITE.getIndex());
         headFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
         style = wb.createCellStyle();
@@ -331,7 +342,7 @@ public class M52R02_1XLSView extends AbstractPOIExcelView {
 
         Font groupFont = wb.createFont();
         groupFont.setFontName("Tahoma");
-        groupFont.setFontHeightInPoints((short)11);
+        groupFont.setFontHeightInPoints((short)10);
         groupFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
         style = wb.createCellStyle();
         style.setAlignment(CellStyle.ALIGN_LEFT);
@@ -385,6 +396,10 @@ public class M52R02_1XLSView extends AbstractPOIExcelView {
         style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
         styles.put("groupnumber", style);
 
+        
+        Font textFont = wb.createFont();
+        textFont.setFontName("Tahoma");
+        textFont.setFontHeightInPoints((short)10);
         style = wb.createCellStyle();
         style.setAlignment(CellStyle.ALIGN_LEFT);
         style.setVerticalAlignment(CellStyle.VERTICAL_TOP);
@@ -397,6 +412,7 @@ public class M52R02_1XLSView extends AbstractPOIExcelView {
         style.setTopBorderColor(IndexedColors.BLACK.getIndex());
         style.setBorderBottom(CellStyle.BORDER_THIN);
         style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setFont(textFont);
         styles.put("cellleft", style);
 
         style = wb.createCellStyle();
@@ -411,6 +427,7 @@ public class M52R02_1XLSView extends AbstractPOIExcelView {
         style.setTopBorderColor(IndexedColors.BLACK.getIndex());
         style.setBorderBottom(CellStyle.BORDER_THIN);
         style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setFont(textFont);
         styles.put("cellcenter", style);
 
         style = wb.createCellStyle();
@@ -425,6 +442,7 @@ public class M52R02_1XLSView extends AbstractPOIExcelView {
         style.setTopBorderColor(IndexedColors.BLACK.getIndex());
         style.setBorderBottom(CellStyle.BORDER_THIN);
         style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setFont(textFont);
         styles.put("cellright", style);
 
         style = wb.createCellStyle();
@@ -440,6 +458,7 @@ public class M52R02_1XLSView extends AbstractPOIExcelView {
         style.setTopBorderColor(IndexedColors.BLACK.getIndex());
         style.setBorderBottom(CellStyle.BORDER_THIN);
         style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setFont(textFont);
         styles.put("cellnumber", style);
 
         return styles;
