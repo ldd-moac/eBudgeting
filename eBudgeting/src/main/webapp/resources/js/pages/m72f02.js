@@ -142,6 +142,7 @@ var DetailModalView = Backbone.View.extend({
 				reservedBudget.set('id', id);
 				
 				this.currentObjective.get('reservedBudgets').add(reservedBudget);
+				this.$el.find('#amountReserved').attr('data-id', id);
 				
 			}
 			

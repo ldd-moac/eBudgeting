@@ -44,7 +44,7 @@
 	 
 	<script src="<c:url value='/resources/jslibs/ext-4.2.1.883/ext-all.js'/>"></script>
 	
-		<script src="<c:url value='/resources/jslibs/lodash-1.3.1.min.js'/>"></script>
+		<script src="<c:url value='/resources/jslibs/lodash-3.5.0.min.js'/>"></script>
 	<!-- 
 	<script src="<c:url value='/resources/jslibs/underscore-1.5.1.min.js'/>"></script>
 	 -->

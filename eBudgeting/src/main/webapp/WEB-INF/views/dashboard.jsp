@@ -317,9 +317,15 @@ var menuJson = [{
 	var mainview;
 	var e1;
 	
+	var mm = menuJson;
+
+	
 
 	//	find only the last menu of our right!
-	var l2Menu = _.flatten(_.flatten(menuJson, 'menus'), 'menus').filter(function(menu) {
+	//var l2Menu = _.flatten(_.flatten(menuJson, 'menus'), 'menus').filter(function(menu) {
+	var l2Menu = _.flatten(_.pluck(_.flatten(_.pluck(menuJson, 'menus')),'menus'));
+	
+	l2Menu = _.filter(l2Menu, function(menu) {
 		return  userGroups.indexOf(menu.group) >= 0;
 	});
 	
