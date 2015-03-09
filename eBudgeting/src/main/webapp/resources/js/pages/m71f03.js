@@ -265,7 +265,7 @@ var DetailModalView = Backbone.View.extend({
 	
 	renderBudgetTypeDetail: function() {
 		var topBudget = this.topAllocation['id'+this.currentTopBudgetTypeId];
-		
+		e1=topBudget;
 		html = this.detailModalBudgetHeaderTemplate(topBudget);
 		this.$el.find('.modal-body').html(html);
 		

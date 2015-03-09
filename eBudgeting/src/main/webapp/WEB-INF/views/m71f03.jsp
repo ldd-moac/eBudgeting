@@ -214,7 +214,7 @@
 <script id="detailModalBudgetTemplate" type="text/x-handler-template">
 <form data-id="{{budgetType.id}}">
 	<div id="summaryAllocation">
-		จัดสรรให้เจ้าของงาน : {{formatNumber allocR9.amountAllocated}} บาท  จัดสรรไปแล้ว {{formatNumber amountAllocated}} บาท คงเหลือการจัดสรร {{formatNumber amountToBeAllocated}} บาท
+		จัดสรรให้เจ้าของงาน : {{formatNumber actualBudget.amountAllocated}} บาท  จัดสรรไปแล้ว {{formatNumber amountAllocated}} บาท คงเหลือการจัดสรร {{formatNumber amountToBeAllocated}} บาท
 	</div>
 	<div>
 	<table class="table table-bordered" id="targetValueModalTbl">
